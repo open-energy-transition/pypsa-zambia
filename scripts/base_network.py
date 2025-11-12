@@ -566,6 +566,8 @@ def base_network(
     transformers = _load_transformers_from_osm(inputs.osm_transformers, buses)
     converters = _load_converters_from_osm(inputs.osm_converters, buses)
 
+    region_line_types = _load_regional_linetypes(inputs.line_types)
+
     lines_ac = lines[~lines.dc].copy()
     lines_dc = lines[lines.dc].copy()
     lines_ac = _set_electrical_parameters_lines(
