@@ -261,6 +261,12 @@ def _load_transformers_from_osm(fp_osm_transformers, buses):
 
     return transformers
 
+def _load_regional_linetypes(line_types_csv):
+    line_types = read_csv_nafix(
+            line_types_csv,
+            dtype=dict(country="str", v_nom="str", name="str", i_nom="str"),
+        )
+    return line_types
 
 def _load_regional_linetypes(line_types_csv):
     line_types = read_csv_nafix(
