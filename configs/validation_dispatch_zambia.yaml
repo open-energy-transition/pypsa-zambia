@@ -15,25 +15,15 @@ enable:
   build_cutout: false
 scenario:
   simpl: [""]
-  ll: ["copt"]
+  ll: ["v1.0"]
   clusters: [10]
   opts: [Co2L-3h]        
-  planning_horizons:
-  - 2025                   
-  sopts:
-  - "144h"
-  demand:
-  - "AB"
 
 snapshots:
   start: "2013-01-01"
   end: "2014-01-01"
   inclusive: "left" # end is not inclusive
 countries: ["ZM"]
-enable:
-  build_cutout: false     
-  retrieve_databundle: false
-  retrieve_cost_data: true
 
 atlite:
   nprocesses: 4
@@ -78,7 +68,7 @@ load_options:
   ssp: "ssp2-2.6"
   weather_year: 2013
   prediction_year: 2030   
-  scale: 1                
+  scale: 0.74  # scaled the model demand by a factor of 14.4/19.34 to match the national value           
 
 
 electricity:
