@@ -6,6 +6,17 @@
 Release Notes
 ##########################################
 
+
+PyPSA-Zambia release
+====================
+
+This part of documentation collects descriptive release notes to capture the main improvements introduced by developing the model before the next release.
+
+**New Features and Major Changes**
+
+* Adds a PyPSA-Zambia specific GitHub Actions workflow for the Zambia model `PR #60 <https://github.com/openenergytransition/pypsa-zambia/pull/60>`__
+
+
 Upcoming release
 ================
 
