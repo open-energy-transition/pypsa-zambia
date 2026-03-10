@@ -98,7 +98,7 @@ electricity:
   renewable_carriers: [solar, onwind, hydro]
 
   estimate_renewable_capacities:
-    stats: false
+    stats: false # wind and solar generation provided by the custom powerplants file
   operational_reserve:
     activate: false
 lines:
