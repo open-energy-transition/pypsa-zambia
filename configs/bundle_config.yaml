@@ -152,6 +152,17 @@ databundles:
     disable_by_opt:
       build_cutout: [all]
 
+  # Cutout of Zambia for CI test of pypsa-zambia (10 MB)
+  bundle_cutouts_test_ZM:
+    countries: [ZM]
+    category: cutouts
+    destination: "cutouts"
+    urls:
+      zenodo: https://sandbox.zenodo.org/records/469893/files/bundle_cutouts_tutorial_ZM.zip?download=1
+    output: [cutouts/cutout-2013-era5-tutorial.nc]
+    disable_by_opt:
+      build_cutout: [all]
+
   # tutorial bundle for all African countries
   bundle_tutorial_data_common:
     countries: [Africa]
