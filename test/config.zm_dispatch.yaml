@@ -67,6 +67,14 @@ cluster_options:
   simplify_network:
     exclude_carriers: []
 
+renewable:
+  onwind:
+    natura: true
+  solar:
+    natura: true
+  csp:
+    natura: true
+
 sector:
   enable:
     heat: false
