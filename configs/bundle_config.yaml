@@ -159,7 +159,7 @@ databundles:
     destination: "cutouts"
     urls:
       zenodo: https://sandbox.zenodo.org/records/469893/files/bundle_cutouts_tutorial_ZM.zip?download=1
-    output: [cutouts/cutout-2013-era5-tutorial.nc]
+    output: [cutouts/zm-2013-tutorial-era5.nc]
     disable_by_opt:
       build_cutout: [all]
 
