@@ -67,13 +67,33 @@ cluster_options:
   simplify_network:
     exclude_carriers: []
 
+# Exclude Copernicus and GEBCO rasters 
+# as there are no regional datasets for therm yet
 renewable:
   onwind:
     natura: true
+    copernicus: false
+    max_depth: false
+  offwind-ac:
+    natura: true
+    copernicus: false
+    max_depth: false
+  offwind-dc:
+    natura: true
+    copernicus: false
+    max_depth: false   
   solar:
     natura: true
+    copernicus: false
+    max_depth: false
   csp:
     natura: true
+    copernicus: false
+    max_depth: false
+
+
+
+
 
 sector:
   enable:
