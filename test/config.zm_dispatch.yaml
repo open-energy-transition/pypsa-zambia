@@ -102,10 +102,6 @@ renewable:
     min_shore_distance: false
     max_shore_distance: false
 
-
-
-
-
 sector:
   enable:
     heat: false
@@ -118,6 +114,7 @@ sector:
     agriculture: false
     residential: false
     services: false
+  chp: false     
 
 solving:
   solver:
