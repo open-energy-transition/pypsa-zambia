@@ -40,6 +40,9 @@ data:
   irena:
     source: primary
     version: latest
+  landcover:
+    source: primary
+    version: Mar2026
 
 
 custom_rules: [] # Default empty [] or link to custom rule file e.g. ["my_folder/my_rules.smk"] that add rules to Snakefile

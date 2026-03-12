@@ -364,14 +364,7 @@ databundles:
     disable_by_opt:
       build_cutout: [all]
 
-  # data bundle containing the protected data for the whole world
-  bundle_landcover_earth:
-    countries: [Earth]
-    category: landcover
-    destination: "data/landcover/world_protected_areas"
-    urls:
-      protectedplanet: https://d1gam3xoknrgr2.cloudfront.net/current/WDPA_{month:s}{year:d}_Public_shp.zip
-    output: [data/landcover/world_protected_areas/*]
+
 
     # # Backup tutorial bundles with no gadm-like data; for reference:
     # # https://github.com/pypsa-meets-earth/pypsa-earth/issues/1258

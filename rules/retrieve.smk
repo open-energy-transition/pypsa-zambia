@@ -148,3 +148,55 @@ if (IRENA_DATASET := dataset_version("irena"))["source"] in ["primary"]:
             irena_xlsx_local=f"data/IRENA_Statistics_Extract_2025H2.xlsx",
         run:
             copy2(str(input["irena_xlsx"]), output["irena_xlsx_local"])
+
+
+#   # data bundle containing the protected data for the whole world
+#   bundle_landcover_earth:
+#     countries: [Earth]
+#     category: landcover
+#     destination: "data/landcover/world_protected_areas"
+#     urls:
+#       protectedplanet: https://d1gam3xoknrgr2.cloudfront.net/current/WDPA_0126_Public_shp.zip
+#     output: [data/landcover/world_protected_areas/*]
+
+if (LANDCOVER_DATASET := dataset_version("landcover"))["source"] in ["primary"]:
+
+    folder = LANDCOVER_DATASET["folder"]
+    version = LANDCOVER_DATASET["version"]
+
+    rule retrieve_landcover:
+        message:
+            "Retrieving landcover dataset"
+        input:
+            landcover_zip=HTTP.remote(LANDCOVER_DATASET["url"], keep_local=True),
+        output:
+            unzip=directory(f"{folder}"),
+            zips=expand(
+                f"{folder}/WDPA_{version}" + "_Public_shp_{index}.zip", index=[0, 1, 2]
+            ),
+        run:
+            unpack_archive(str(input["landcover_zip"]), output["unzip"])
+
+    rule unpack_landcover_zips:
+        input:
+            zip=f"{folder}/WDPA_{version}" + "_Public_shp_{index}.zip",
+        output:
+            dir=directory(
+                f"data/landcover/world_protected_areas/WDPA_{version}"
+                + "_Public_shp_{index}"
+            ),
+            shp=f"data/landcover/world_protected_areas/WDPA_{version}"
+            + "_Public_shp_{index}/WDPA_"
+            + f"{version}_Public_shp-points.shp",
+        run:
+            unpack_archive(str(input["zip"]), output["dir"])
+
+    rule target_landcover:
+        input:
+            expand(
+                f"data/landcover/world_protected_areas/WDPA_{version}_"
+                + "Public_shp_{index}"
+                + f"/WDPA_{version}_Public_shp-points.shp",
+                index=[0, 1, 2],
+            ),
+            #    /home/will/repositories/pypsa-zambia/data/landcover/WDPA_Mar2026_Public_shp_1/WDPA_Mar2026_Public_shp-polygons.shp
