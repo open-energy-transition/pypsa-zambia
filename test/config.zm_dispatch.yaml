@@ -71,25 +71,35 @@ cluster_options:
 # as there are no regional datasets for therm yet
 renewable:
   onwind:
-    natura: true
+    natura: false
     copernicus: false
     max_depth: false
+    min_shore_distance: false
+    max_shore_distance: false
   offwind-ac:
-    natura: true
+    natura: false
     copernicus: false
     max_depth: false
+    min_shore_distance: false
+    max_shore_distance: false
   offwind-dc:
-    natura: true
+    natura: false
     copernicus: false
-    max_depth: false   
+    max_depth: false
+    min_shore_distance: false
+    max_shore_distance: false  
   solar:
-    natura: true
+    natura: false
     copernicus: false
     max_depth: false
+    min_shore_distance: false
+    max_shore_distance: false
   csp:
-    natura: true
+    natura: false
     copernicus: false
     max_depth: false
+    min_shore_distance: false
+    max_shore_distance: false
 
 
 
