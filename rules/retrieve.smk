@@ -10,18 +10,6 @@ from shutil import move, unpack_archive, rmtree, copy2
 from zipfile import ZipFile
 
 
-# Configure the default storage provider for accessing remote files using http
-# and the special storage plugin for accessing Zenodo files
-storage:
-    provider="http",
-    keep_local=True,
-    retries=3,
-
-
-storage cached_http:
-    provider="cached-http",
-
-
 # # load tutorial hydrobasins bundle for Africa only
 # bundle_tutorial_hydrobasins:
 #   countries: [Africa]
@@ -75,8 +63,9 @@ if (HYDROBASINS_DATASET := dataset_version("hydrobasins"))["source"] in ["build"
         message:
             "Retrieving hydrobasins dataset for {wildcards.suffix}"
         input:
-            hydro_zip=storage(
-                f"{HYDROBASINS_DATASET['url']}" + "/hybas_{suffix}_lev01-12_v1c.zip"
+            hydro_zip=HTTP.remote(
+                f"{HYDROBASINS_DATASET['url']}" + "/hybas_{suffix}_lev01-12_v1c.zip",
+                keep_local=True,
             ),
         output:
             unzip=directory(
@@ -96,7 +85,7 @@ if (HYDROBASINS_DATASET := dataset_version("hydrobasins"))["source"] in ["build"
                 ".shx",
             ),
         run:
-            unpack_archive(input["hydro_zip"], output["unzip"])
+            unpack_archive(str(input["hydro_zip"]), output["unzip"])
 
     rule create_hydrobasins_world:
         message:
@@ -154,8 +143,8 @@ if (IRENA_DATASET := dataset_version("irena"))["source"] in ["primary"]:
         message:
             "Retrieving IRENA energy statistics dataset"
         input:
-            irena_xlsx=storage(IRENA_DATASET["url"]),
+            irena_xlsx=HTTP.remote(IRENA_DATASET["url"], keep_local=True),
         output:
             irena_xlsx_local=f"data/IRENA_Statistics_Extract_2025H2.xlsx",
         run:
-            copy2(input["irena_xlsx"], output["irena_xlsx_local"])
+            copy2(str(input["irena_xlsx"]), output["irena_xlsx_local"])
