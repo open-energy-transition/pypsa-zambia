@@ -36,7 +36,7 @@ build_shape_options:
 atlite:
   nprocesses: 4
   cutouts:
-    zm-2024-era5:
+    cutout-2024-era5:
       module: era5
       dx: 0.3 # cutout resolution
       dy: 0.3 # cutout resolution
