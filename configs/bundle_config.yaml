@@ -439,8 +439,8 @@ databundles:
       gdrive: https://drive.google.com/file/d/1Fv-dNk4ZonEKEEMU94U-HHo-hiAp_ZLd/view?usp=drive_link
     output: [cutouts/cutout-2024-era5.nc]
     disable_by_opt:
-      build_cutout: [all]      
-  
+      build_cutout: [all]
+
   # data bundle containing the protected data for the whole world
   bundle_landcover_earth:
     countries: [Earth]
