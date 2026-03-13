@@ -83,6 +83,10 @@ wildcard_constraints:
     planning_horizons="20[2-9][0-9]|2100",
 
 
+include: "rules/common.smk"
+include: "rules/retrieve.smk"
+
+
 if config["custom_rules"] is not []:
     for rule in config["custom_rules"]:
 
@@ -149,7 +153,6 @@ if config["enable"].get("retrieve_databundle", True):
     rule retrieve_databundle_light:
         params:
             bundles_to_download=bundles_to_download,
-            hydrobasins_level=config["renewable"]["hydro"]["hydrobasins_level"],
         output:  #expand(directory('{file}') if isdir('{file}') else '{file}', file=datafiles)
             expand(
                 "{file}", file=datafiles_retrivedatabundle(config, bundles_to_download)
@@ -492,6 +495,7 @@ HYDRO_PROFILES = {
     "eia_hydro_generation": "data/eia_hydro_annual_generation.csv",
     "irena_stats": "data/IRENA_Statistics_Extract_2025H2.xlsx",
     "powerplants": "resources/" + RDIR + "powerplants.csv",
+    "hydrobasins": "data/hydrobasins/hybas_world.shp",
 }
 
 
