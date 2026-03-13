@@ -17,7 +17,7 @@ scenario:
   simpl: [""]
   ll: ["v1.0"]
   clusters: [10]
-  opts: [Co2L-3h]        
+  opts: [Co2L-3h]
 
 snapshots:
   start: "2013-01-01"
@@ -33,53 +33,53 @@ atlite:
       dx: 0.3
       dy: 0.3
       time: ["2013-01-01", "2014-01-01"]
-      x: [21.5, 33.7]     
-      y: [-18.8, -7.8]    
+      x: [21.5, 33.7]
+      y: [-18.8, -7.8]
 
 
 renewable:
   onwind:
     cutout: cutout-2013-era5
     correction_factor: 0.93
-    extendable: false    
+    extendable: false
   offwind-ac:
     cutout: cutout-2013-era5
-    extendable: false      
+    extendable: false
   offwind-dc:
     cutout: cutout-2013-era5
-    extendable: false      
+    extendable: false
   solar:
     cutout: cutout-2013-era5
     correction_factor: 0.854337
-    extendable: false     
+    extendable: false
   hydro:
     cutout: cutout-2013-era5
-    extendable: false       
+    extendable: false
     normalization:
       method: irena
-      year: 2013         
-    multiplier: 1.0         
+      year: 2013
+    multiplier: 1.0
   csp:
     cutout: cutout-2013-era5
-    extendable: false       
+    extendable: false
 
 
 load_options:
   ssp: "ssp2-2.6"
   weather_year: 2013
-  prediction_year: 2030   
-  scale: 0.74  # scaled the model demand by a factor of 14.4/19.34 to match the national value           
+  prediction_year: 2030
+  scale: 0.74  # scaled the model demand by a factor of 14.4/19.34 to match the national value
 
 
 electricity:
   extendable_carriers:
-    Generator: []         
-    StorageUnit: []        
-    Store: []           
-    Link: []           
+    Generator: []
+    StorageUnit: []
+    Store: []
+    Link: []
 
   automatic_emission: false
-  automatic_emission_base_year: 1990 # 1990 is taken as default. Any year from 1970 to 2018 can be selected.  
+  automatic_emission_base_year: 1990 # 1990 is taken as default. Any year from 1970 to 2018 can be selected.
 
   powerplants_filter: (DateOut >= 2023 or DateOut != DateOut) and (DateIn <= 2023 or DateIn != DateIn)
   custom_powerplants: replace # set to "merge" or "replace" if you have a custom_powerplants.csv for Zambia
@@ -92,13 +92,13 @@ electricity:
   operational_reserve:
     activate: false
 lines:
-  s_max_pu: 0.7    
+  s_max_pu: 0.7
   s_nom_extendable: false
   s_nom_max: .inf
   s_nom_max_min: -.inf
 
 costs:
-  year: 2025     
+  year: 2025
 
 cluster_options:
   simplify_network:
@@ -117,7 +117,7 @@ sector:
     agriculture: false
     residential: false
     services: false
-  chp: false 
+  chp: false
 solving:
   solver:
     name: highs
