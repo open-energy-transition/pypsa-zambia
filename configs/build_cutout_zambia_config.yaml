@@ -21,7 +21,7 @@ build_shape_options:
   # false (not "false") no pop addition to shape which is useful when generating only cutout
   gdp_method: false # "standard" pulls from web 1x1km raster, false (not "false") no gdp addition to shape which useful when generating only cutout
 
-# a dedicated run folder needed to store shapes without pop and GDP data 
+# a dedicated run folder needed to store shapes without pop and GDP data
 run:
   name: "ZM_cutout" # use this to keep track of runs with different settings
   sector_name: "ZM_cutout" # use this to keep track of sector scenario runs
@@ -31,7 +31,7 @@ run:
 
 snapshots:
   start: "2024-01-01"
-  end: "2025-01-01"  
+  end: "2025-01-01"
   inclusive: "left" # end is not inclusive
 
 atlite:
