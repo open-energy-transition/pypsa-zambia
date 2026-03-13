@@ -39,6 +39,7 @@ configfile: "configs/bundle_config.yaml"
 configfile: "configs/powerplantmatching_config.yaml"
 configfile: "configs/validation_dispatch_zambia.yaml"
 
+
 check_config_version(config=config)
 
 config.update({"git_commit": get_last_commit_message(".")})
