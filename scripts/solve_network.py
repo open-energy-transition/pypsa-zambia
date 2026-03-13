@@ -815,7 +815,6 @@ def add_chp_constraints(n):
         return
     electric_bool = (
         n.links.index.str.contains("urban central")
-
         & n.links.index.str.contains("CHP")
         & n.links.index.str.contains("electric")
     )
