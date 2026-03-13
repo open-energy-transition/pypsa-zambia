@@ -1,5 +1,17 @@
 countries: ["ZM"]
-# Can be replaced by country ["NG", "BJ"], continent ["Africa"] or user-specific region, see more at https://pypsa-earth.readthedocs.io/en/latest/configuration.html#top-level-configuration
+
+snapshots:
+  start: "2013-01-01"
+  end: "2013-01-08" 
+  inclusive: "left" # end is not inclusive
+
+# a dedicated run folder needed to store shapes without pop and GDP data 
+run:
+  name: "ZM_cutout" # use this to keep track of runs with different settings
+  sector_name: "ZM_cutout" # use this to keep track of sector scenario runs
+  shared_cutouts: true # set to true to share the default cutout(s) across runs
+  # Note: value false requires build_cutout to be enabled
+  allow_scenario_failure: false # If True, the workflow will continue even if a scenario in run_scnenario fails
 
 enable:
   retrieve_databundle: false #  Recommended 'true', for the first run. Otherwise data might be missing.
@@ -20,19 +32,6 @@ build_shape_options:
   worldpop_method: false # "standard" pulls from web 1kmx1km raster, "api" pulls from API 100mx100m raster,
   # false (not "false") no pop addition to shape which is useful when generating only cutout
   gdp_method: false # "standard" pulls from web 1x1km raster, false (not "false") no gdp addition to shape which useful when generating only cutout
-
-# a dedicated run folder needed to store shapes without pop and GDP data 
-run:
-  name: "ZM_cutout" # use this to keep track of runs with different settings
-  sector_name: "ZM_cutout" # use this to keep track of sector scenario runs
-  shared_cutouts: true # set to true to share the default cutout(s) across runs
-  # Note: value false requires build_cutout to be enabled
-  allow_scenario_failure: false # If True, the workflow will continue even if a scenario in run_scnenario fails
-
-snapshots:
-  start: "2013-01-01"
-  end: "2013-01-08" 
-  inclusive: "left" # end is not inclusive
 
 atlite:
   nprocesses: 4
