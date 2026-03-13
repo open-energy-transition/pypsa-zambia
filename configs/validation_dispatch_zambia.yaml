@@ -117,7 +117,7 @@ sector:
     agriculture: false
     residential: false
     services: false
-
+  chp: false 
 solving:
   solver:
     name: highs
