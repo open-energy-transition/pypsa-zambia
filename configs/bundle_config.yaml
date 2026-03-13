@@ -155,7 +155,7 @@ databundles:
   # Cutout of Zambia for CI test of pypsa-zambia (10 MB)
   bundle_cutouts_test_ZM:
     countries: [ZM]
-    tutorial: true    
+    tutorial: true
     category: cutouts
     destination: "cutouts"
     urls:

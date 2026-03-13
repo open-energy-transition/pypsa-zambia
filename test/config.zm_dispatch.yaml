@@ -6,7 +6,7 @@
 run:
   name: "zm_dispatch"
   shared_cutouts: true
-  base_config: config.tutorial.yaml  # base configuration file  
+  base_config: config.tutorial.yaml  # base configuration file
 # enable:
 #   retrieve_databundle: false #  Recommended 'true', for the first run. Otherwise data might be missing.
 #   retrieve_databundle_sector: false
@@ -18,7 +18,7 @@ scenario:
   simpl: [""]
   ll: ["v1.0"]
   clusters: [10]
-  opts: [Co2L-3h]        
+  opts: [Co2L-3h]
 
 snapshots:
   start: "2013-01-01"
@@ -31,18 +31,18 @@ download_osm_data_nprocesses: 4
 load_options:
   ssp: "ssp2-2.6"
   weather_year: 2013
-  prediction_year: 2030   
-  scale: 0.74  # scaled the model demand by a factor of 14.4/19.34 to match the national value           
+  prediction_year: 2030
+  scale: 0.74  # scaled the model demand by a factor of 14.4/19.34 to match the national value
 
 electricity:
   extendable_carriers:
-    Generator: []         
-    StorageUnit: []        
-    Store: []           
-    Link: []           
+    Generator: []
+    StorageUnit: []
+    Store: []
+    Link: []
 
   automatic_emission: false
-  automatic_emission_base_year: 1990 # 1990 is taken as default. Any year from 1970 to 2018 can be selected.  
+  automatic_emission_base_year: 1990 # 1990 is taken as default. Any year from 1970 to 2018 can be selected.
 
   powerplants_filter: (DateOut >= 2023 or DateOut != DateOut) and (DateIn <= 2023 or DateIn != DateIn)
   custom_powerplants: merge # set to "merge" or "replace" if you have a custom_powerplants.csv for Zambia
@@ -55,19 +55,19 @@ electricity:
   operational_reserve:
     activate: false
 lines:
-  s_max_pu: 0.7    
+  s_max_pu: 0.7
   s_nom_extendable: false
   s_nom_max: .inf
   s_nom_max_min: -.inf
 
 costs:
-  year: 2025     
+  year: 2025
 
 cluster_options:
   simplify_network:
     exclude_carriers: []
 
-# Exclude Copernicus and GEBCO rasters 
+# Exclude Copernicus and GEBCO rasters
 # as there are no regional datasets for therm yet
 renewable:
   onwind:
@@ -87,7 +87,7 @@ renewable:
     copernicus: false
     max_depth: false
     min_shore_distance: false
-    max_shore_distance: false  
+    max_shore_distance: false
   solar:
     natura: false
     copernicus: false
@@ -113,7 +113,7 @@ sector:
     agriculture: false
     residential: false
     services: false
-  chp: false     
+  chp: false
 
 solving:
   solver:
