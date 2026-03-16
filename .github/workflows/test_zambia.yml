@@ -77,7 +77,7 @@ jobs:
       run: conda list
 
     - name: Run Zambia Test Network
-      run: snakemake -j 1 solve_all_networks --configfile configs/validation_dispatch_zambia.yaml
+      run: snakemake -j 1 solve_all_networks --configfile config.tutorial.yaml test/config.zm_dispatch.yaml
 
     - name: Upload artifacts
       if: always()
