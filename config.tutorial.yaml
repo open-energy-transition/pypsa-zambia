@@ -43,23 +43,23 @@ atlite:
     # use 'base' to determine geographical bounds and time span from config
     # base:
     # module: era5
-    cutout-2013-era5-tutorial: {}
+    zm-2013-tutorial-era5: {}
 
 renewable:
   onwind:
-    cutout: cutout-2013-era5-tutorial
+    cutout: zm-2013-tutorial-era5
   offwind-ac:
-    cutout: cutout-2013-era5-tutorial
+    cutout: zm-2013-tutorial-era5
   offwind-dc:
-    cutout: cutout-2013-era5-tutorial
+    cutout: zm-2013-tutorial-era5
   solar:
-    cutout: cutout-2013-era5-tutorial
+    cutout: zm-2013-tutorial-era5
   hydro:
-    cutout: cutout-2013-era5-tutorial
+    cutout: zm-2013-tutorial-era5
     hydrobasins_level: 4
     hydro_max_hours: "energy_capacity_totals_by_country"
   csp:
-    cutout: cutout-2013-era5-tutorial
+    cutout: zm-2013-tutorial-era5
 
 
 solving:
