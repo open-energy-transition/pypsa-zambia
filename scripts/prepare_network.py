@@ -73,6 +73,7 @@ from _helpers import (
     sanitize_locations,
 )
 from add_electricity import load_costs, update_transmission_costs
+from utility_custom_features import add_interconnectors
 
 idx = pd.IndexSlice
 
@@ -452,6 +453,15 @@ if __name__ == "__main__":
 
     sanitize_carriers(n, snakemake.config)
     sanitize_locations(n)
+    if snakemake.config["validation"]["interconnectors"]["enable"]:
+        n = add_interconnectors(
+            n,
+            snakemake.input.power_pool_countries,
+            snakemake.input.power_pool_links,
+            snakemake.input.focus_country_substations,
+        )
+    else:
+        logger.info("Interconnectors are not added to the network as per config settings.")
 
     n.meta = dict(snakemake.config, **dict(wildcards=dict(snakemake.wildcards)))
     n.export_to_netcdf(snakemake.output[0])

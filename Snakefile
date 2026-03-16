@@ -811,6 +811,11 @@ rule prepare_network:
     input:
         "networks/" + RDIR + "elec_s{simpl}_{clusters}_ec.nc",
         tech_costs=COSTS,
+        power_pool_countries="data/sapp_countries.csv",
+        power_pool_links="data/sapp_links.csv",
+        focus_country_substations="data/zm_substations.csv", 
+       
+
     output:
         "networks/" + RDIR + "elec_s{simpl}_{clusters}_ec_l{ll}_{opts}.nc",
     log:
