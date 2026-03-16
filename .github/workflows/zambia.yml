@@ -48,10 +48,11 @@ jobs:
             - 'rules/**'
             - 'data/**'
             - 'Snakefile'
-            - 'config/**'
-            - 'pixi.toml'
-            - 'pixi.lock'
+            - 'configs/**'
+            - 'envs/**'
             - '.github/workflows/test.yaml'
+            - '.github/workflows/zambia.yaml'
+            - 'config.*yaml'
 
     - name: Use base env file if it was changed
       run: |
