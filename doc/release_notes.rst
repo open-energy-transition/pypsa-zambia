@@ -18,6 +18,7 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Adds a PyPSA-Zambia specific GitHub Actions workflow for the Zambia model `PR #60 <https://github.com/openenergytransition/pypsa-zambia/pull/60>`__
 
+* Only run Github Action test workflows when workflow-relevant files are changed `PR #94 <https://github.com/openenergytransition/pypsa-zambia/pull/94>`__
 
 Upcoming release
 ================
