@@ -39,6 +39,20 @@ jobs:
     steps:
     - uses: actions/checkout@v6
 
+    - uses: dorny/paths-filter@v4
+      id: filter
+      with:
+        filters: |
+          src:
+            - 'scripts/**'
+            - 'rules/**'
+            - 'data/**'
+            - 'Snakefile'
+            - 'config/**'
+            - 'pixi.toml'
+            - 'pixi.lock'
+            - '.github/workflows/test.yaml'
+
     - name: Use base env file if it was changed
       run: |
         git fetch origin main
