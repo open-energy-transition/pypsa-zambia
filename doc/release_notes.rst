@@ -20,6 +20,9 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Only run Github Action test workflows when workflow-relevant files are changed `PR #94 <https://github.com/openenergytransition/pypsa-zambia/pull/94>`__
 
+* Integrate a regional cutout into a testing workflow for the Zambia model `PR #75 <https://github.com/openenergytransition/pypsa-zambia/pull/75>`__
+
+
 Upcoming release
 ================
 
