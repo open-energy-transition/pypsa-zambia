@@ -37,8 +37,16 @@ copy_default_files()
 configfile: "config.default.yaml"
 configfile: "configs/bundle_config.yaml"
 configfile: "configs/powerplantmatching_config.yaml"
+
+
 # configfile: "configs/validation_dispatch_zambia.yaml"
-configfile: "configs/build_cutout_zambia_config.yaml"
+
+# uncomment to build a full-scale cutout
+# configfile: "configs/build_cutout_zambia_config.yaml"
+
+
+# uncomment to build a tutorial cutout
+configfile: "configs/build_cutout_tutorial_zambia_config.yaml"
 
 
 check_config_version(config=config)
