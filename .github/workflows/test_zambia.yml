@@ -50,8 +50,8 @@ jobs:
             - 'Snakefile'
             - 'configs/**'
             - 'envs/**'
-            - '.github/workflows/test.yaml'
-            - '.github/workflows/zambia.yaml'
+            - '.github/workflows/test.yml'
+            - '.github/workflows/zambia.yml'
             - 'config.*yaml'
             - 'test/**'
 
@@ -94,7 +94,7 @@ jobs:
       id: cache-env
 
     - name: Update environment
-      if: (steps.filter.outputs.src == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && steps.cache-env.outputs.cache-hit != 'true' 
+      if: (steps.filter.outputs.src == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && steps.cache-env.outputs.cache-hit != 'true'
       run: conda env update -n pypsa-earth -f ${{ matrix.env_file }}
 
     - name: Conda list
