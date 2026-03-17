@@ -6,6 +6,18 @@ SPDX-License-Identifier: CC-BY-4.0
 
 Release Notes
 
+# PyPSA-Zambia release
+
+This part of documentation collects descriptive release notes to capture the main improvements introduced by developing the model before the next release.
+
+**New Features and Major Changes**
+
+**Minor Changes and bug-fixing**
+
+* Adds a PyPSA-Zambia specific GitHub Actions workflow for the Zambia model `PR #60 <https://github.com/openenergytransition/pypsa-zambia/pull/60>`__
+
+* Integrate a regional cutout into a testing workflow for the Zambia model `PR #75 <https://github.com/openenergytransition/pypsa-zambia/pull/75>`__
+
 # Upcoming release
 
 This part of documentation collects descriptive release notes to capture the main improvements introduced by developing the model before the next release.
