@@ -22,6 +22,8 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Integrate a regional cutout into a testing workflow for the Zambia model `PR #75 <https://github.com/openenergytransition/pypsa-zambia/pull/75>`__
 
+* Prevent pre-commit from providing automatic corrections to pull requests `PR #89 <https://github.com/openenergytransition/pypsa-zambia/pull/89>`__
+
 
 Upcoming release
 ================
