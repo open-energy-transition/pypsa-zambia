@@ -16,7 +16,7 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Adds a PyPSA-Zambia specific GitHub Actions workflow for the Zambia model [PR #60](https://github.com/openenergytransition/pypsa-zambia/pull/60)
 
-* Integrate a regional cutout into a testing workflow for the Zambia model `PR #75 <https://github.com/openenergytransition/pypsa-zambia/pull/75>`__
+* Integrate a regional cutout into a testing workflow for the Zambia model [PR #75](https://github.com/openenergytransition/pypsa-zambia/pull/75)
 
 # Upcoming release
 
