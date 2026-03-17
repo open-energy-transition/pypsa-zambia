@@ -430,7 +430,7 @@ databundles:
       build_cutout: [all]
 
   # 0.5 GB
-  bundle_cutouts_africa_zm:
+  bundle_cutouts_africa_zm-2024:
     countries: [ZM-2024]
     category: cutouts
     destination: "cutouts"
