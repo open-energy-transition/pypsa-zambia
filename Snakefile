@@ -167,7 +167,8 @@ if config["validation"]["custom_powerplants"].get("download_data", False):
 
     rule download_custom_powerplants:
         params:
-            url="https://sandbox.zenodo.org/records/471583/files/custom_powerplants.csv?download=1",
+        input:
+            url=HTTP.remote("https://sandbox.zenodo.org/records/471583/files/custom_powerplants.csv?download=1")
         output:
             "data/custom_powerplants.csv",
         log:
