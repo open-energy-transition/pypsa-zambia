@@ -3,6 +3,22 @@ import pandas as pd
 
 
 def find_nearest_zm_bus(n, lat, lon):
+    """Find the nearest Zambian bus
+
+    Arguments
+    =========
+    n: pypsa.network
+        The PyPSA network to interrogate
+    lat: shapely.Point
+        Latitude
+    lon: shapely.Point
+        Longitude
+
+    Returns
+    =======
+    str
+        The name of the nearest bus
+    """
     smallest_distance = 999999999
     nearest_bus = None
 
