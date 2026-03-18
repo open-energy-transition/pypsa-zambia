@@ -35,8 +35,9 @@ The script is triggered by the Snakemake rule
 - ``data/custom_powerplants.csv``
 
 """
-import requests
 from pathlib import Path
+
+import requests
 
 params = snakemake.params
 output = snakemake.output[0]

@@ -163,16 +163,18 @@ if config["enable"].get("retrieve_databundle", True):
             "scripts/retrieve_databundle_light.py"
 
 
-if config['validation']['custom_powerplants'].get('download_data', False):
+if config["validation"]["custom_powerplants"].get("download_data", False):
+
     rule download_custom_powerplants:
         params:
             url="https://sandbox.zenodo.org/records/471583/files/custom_powerplants.csv?download=1",
         output:
-            "data/custom_powerplants.csv"
+            "data/custom_powerplants.csv",
         log:
             "logs/download_custom_powerplants.log",
         script:
             "scripts/download_custom_powerplants.py"
+
 
 if config["validation"]["interconnectors"].get("download_data", False):
 
@@ -189,8 +191,6 @@ if config["validation"]["interconnectors"].get("download_data", False):
             "logs/download_interconnection_data.log",
         script:
             "scripts/download_interconnection_data.py"
-
-
 
 
 if config["enable"].get("download_global_buildings", True):

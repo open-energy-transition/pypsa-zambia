@@ -43,8 +43,9 @@ The script is triggered by the Snakemake rule
 - ``data/sapp_countries.csv``
 
 """
-import requests
 from pathlib import Path
+
+import requests
 
 # Snakemake inputs
 params = snakemake.params
@@ -52,11 +53,13 @@ outputs = snakemake.output
 
 Path("data").mkdir(exist_ok=True)
 
+
 def download(url, path):
     r = requests.get(url)
     r.raise_for_status()
     with open(path, "wb") as f:
         f.write(r.content)
+
 
 download(params.substations_url, outputs.substations)
 download(params.links_url, outputs.links)

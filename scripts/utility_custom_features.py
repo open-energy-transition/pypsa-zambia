@@ -6,8 +6,8 @@
 
 """Utility functions for adding Zambia interconnectors to a PyPSA network."""
 
-import pandas as pd
 import geopandas as gpd
+import pandas as pd
 
 
 def annual_gwh_to_average_mw(energy_gwh, hours_per_year=8760):
@@ -22,6 +22,8 @@ def load_interconnector_data(countries_path, links_path, substations_path):
         pd.read_csv(links_path),
         pd.read_csv(substations_path),
     )
+
+
 def find_nearest_zm_bus(n, lat, lon, distance_crs="EPSG:20935"):
     """Return the nearest Zambian bus to a given latitude and longitude."""
     zm_buses = n.buses[n.buses["country"] == "ZM"].copy()
@@ -30,11 +32,14 @@ def find_nearest_zm_bus(n, lat, lon, distance_crs="EPSG:20935"):
         geometry=gpd.points_from_xy(zm_buses["x"], zm_buses["y"]),
         crs="EPSG:4326",
     ).to_crs(distance_crs)
-    target_point = gpd.GeoSeries.from_xy(
-        [lon], [lat], crs="EPSG:4326"
-    ).to_crs(distance_crs).iloc[0]
+    target_point = (
+        gpd.GeoSeries.from_xy([lon], [lat], crs="EPSG:4326")
+        .to_crs(distance_crs)
+        .iloc[0]
+    )
     distances = zm_buses.geometry.distance(target_point)
     return distances.idxmin()
+
 
 def add_foreign_buses(n, power_pool_countries):
     """Add neighbouring-country buses to the network."""
@@ -46,22 +51,20 @@ def add_foreign_buses(n, power_pool_countries):
     return n
 
 
-def add_cross_border_links(
-    n, power_pool_links, substation_dict, distance_crs
-):
+def add_cross_border_links(n, power_pool_links, substation_dict, distance_crs):
     """Add cross-border links to the network."""
     for _, row in power_pool_links.iterrows():
         name = row["name"]
         if row["from_country"] == "ZM":
-           lat, lon = substation_dict[name]
-           bus0 = find_nearest_zm_bus(n, lat, lon, distance_crs)
+            lat, lon = substation_dict[name]
+            bus0 = find_nearest_zm_bus(n, lat, lon, distance_crs)
         else:
-           bus0 = row["from_country"]
+            bus0 = row["from_country"]
         if row["to_country"] == "ZM":
-           lat, lon = substation_dict[name]
-           bus1 = find_nearest_zm_bus(n, lat, lon, distance_crs)
+            lat, lon = substation_dict[name]
+            bus1 = find_nearest_zm_bus(n, lat, lon, distance_crs)
         else:
-           bus1 = row["to_country"]
+            bus1 = row["to_country"]
 
         if name not in n.links.index:
             n.add(
