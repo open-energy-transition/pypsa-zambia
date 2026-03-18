@@ -4,7 +4,7 @@ SPDX-FileCopyrightText:  PyPSA-Earth and PyPSA-Eur Authors
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
-# PyPSA-Earth. A Flexible Python-based Open Optimisation Model to Study Energy System Futures around the World.
+# PyPSA-Zambia. A Flexible Python-based Open Power System Model.
 
 <p align="left">
 by
@@ -81,6 +81,19 @@ by
    Java(TM) SE Runtime Environment (build 1.8.0_341-b10)
    Java HotSpot(TM) 64-Bit Server VM (build 25.341-b10, mixed mode)
    ```
+
+## Customisation
+
+To build a regional cutout, you can use pre-compiled configuration files:
+- "configs/build_cutout_tutorial_zambia_config.yaml" for a smaller tutorial-styled cutout (good for testing)
+- "configs/build_cutout_zambia_config.yaml" for a full-scale cutout
+
+To use them, you need to go through the following steps:
+1. Comment-out a line in Snakemake which fetches a default configuration
+`configfile: "configs/validation_dispatch_zambia.yaml"``
+2. Add a name of a suitable cutout-building configuration file to Smakemake under `#configfile: "configs/validation_dispatch_zambia.yaml"`, e.g. `configfile: "configs/build_cutout_zambia_config.yaml"`
+3. Set-up Copernicus API
+4. run `build_cutout` rule
 
 ## Running the model in previous versions
 
