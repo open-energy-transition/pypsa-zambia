@@ -179,18 +179,20 @@ if config["validation"]["custom_powerplants"].get("download_data", False):
 if config["validation"]["interconnectors"].get("download_data", False):
 
     rule download_interconnection_data:
-        params:
-            substations_url="https://sandbox.zenodo.org/records/471583/files/zm_substations.csv?download=1",
-            links_url="https://sandbox.zenodo.org/records/471583/files/sapp_links.csv?download=1",
-            countries_url="https://sandbox.zenodo.org/records/471583/files/sapp_countries.csv?download=1",
+        input:
+            substations=HTTP.remote("https://sandbox.zenodo.org/records/471583/files/zm_substations.csv?download=1"),
+            links=HTTP.remote("https://sandbox.zenodo.org/records/471583/files/sapp_links.csv?download=1"),
+            countries=HTTP.remote("https://sandbox.zenodo.org/records/471583/files/sapp_countries.csv?download=1"),
         output:
             substations="data/zm_substations.csv",
             links="data/sapp_links.csv",
             countries="data/sapp_countries.csv",
         log:
             "logs/download_interconnection_data.log",
-        script:
-            "scripts/download_interconnection_data.py"
+        run:
+            copyfile(input['substations'], output['substations'])
+            copyfile(input['links'], output['links'])
+            copyfile(input['countries'], output['countries'])
 
 
 if config["enable"].get("download_global_buildings", True):
