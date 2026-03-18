@@ -1,103 +1,128 @@
-import numpy as np
+# -*- coding: utf-8 -*-
+# SPDX-FileCopyrightText: Contributors to PyPSA-Earth
+# SPDX-FileCopyrightText: Open Energy Transition gGmbH
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+"""Utility functions for adding Zambia interconnectors to a PyPSA network."""
+
 import pandas as pd
+import geopandas as gpd
 
 
-def find_nearest_zm_bus(n, lat, lon):
-    """Find the nearest Zambian bus
-
-    Arguments
-    =========
-    n: pypsa.network
-        The PyPSA network to interrogate
-    lat: shapely.Point
-        Latitude
-    lon: shapely.Point
-        Longitude
-
-    Returns
-    =======
-    str
-        The name of the nearest bus
-    """
-    smallest_distance = 999999999
-    nearest_bus = None
-
-    for bus_name in n.buses.index:
-        if n.buses.loc[bus_name, "country"] == "ZM":
-            bus_lat = n.buses.loc[bus_name, "y"]
-            bus_lon = n.buses.loc[bus_name, "x"]
-
-            distance = np.sqrt((bus_lat - lat) ** 2 + (bus_lon - lon) ** 2)
-
-            if distance < smallest_distance:
-                smallest_distance = distance
-                nearest_bus = bus_name
-    return nearest_bus
+def annual_gwh_to_average_mw(energy_gwh, hours_per_year=8760):
+    """Convert annual energy in GWh to average power in MW."""
+    return energy_gwh * 1000 / hours_per_year
 
 
-# Add Interconnectors
-def add_interconnectors(n, power_pool_countries, power_pool_links, zm_substations):
-    power_pool_countries = pd.read_csv(power_pool_countries)
-    power_pool_links = pd.read_csv(power_pool_links)
-    zm_substations = pd.read_csv(zm_substations)
-    importing_countries = ["MZ", "ZW", "NA", "CD"]
-    exporting_countries = ["MZ", "ZA", "ZW"]
-    # build substation dictionary
-    substation_dict = {}
-    for _, row in zm_substations.iterrows():
-        substation_dict[row["name"]] = (row["lat"], row["lon"])
+def load_interconnector_data(countries_path, links_path, substations_path):
+    """Load interconnector input data from CSV files."""
+    return (
+        pd.read_csv(countries_path),
+        pd.read_csv(links_path),
+        pd.read_csv(substations_path),
+    )
+def find_nearest_zm_bus(n, lat, lon, distance_crs="EPSG:20935"):
+    """Return the nearest Zambian bus to a given latitude and longitude."""
+    zm_buses = n.buses[n.buses["country"] == "ZM"].copy()
+    zm_buses = gpd.GeoDataFrame(
+        zm_buses,
+        geometry=gpd.points_from_xy(zm_buses["x"], zm_buses["y"]),
+        crs="EPSG:4326",
+    ).to_crs(distance_crs)
+    target_point = gpd.GeoSeries.from_xy(
+        [lon], [lat], crs="EPSG:4326"
+    ).to_crs(distance_crs).iloc[0]
+    distances = zm_buses.geometry.distance(target_point)
+    return distances.idxmin()
 
-    # add foreign buses
+def add_foreign_buses(n, power_pool_countries):
+    """Add neighbouring-country buses to the network."""
     for _, row in power_pool_countries.iterrows():
-        bus_name = row["country"]
-        if bus_name not in n.buses.index:
-            n.add("Bus", bus_name, x=row["lon"], y=row["lat"], carrier="AC")
-            n.buses.loc[bus_name, "country"] = row["country"]
+        country = row["country"]
+        if country not in n.buses.index:
+            n.add("Bus", country, x=row["lon"], y=row["lat"], carrier="AC")
+            n.buses.loc[country, "country"] = country
+    return n
 
-    # add links
+
+def add_cross_border_links(
+    n, power_pool_links, substation_dict, distance_crs
+):
+    """Add cross-border links to the network."""
     for _, row in power_pool_links.iterrows():
-        link_name = row["name"]
-        capacity_mw = row["capacity_mw"]
+        name = row["name"]
         if row["from_country"] == "ZM":
-            lat, lon = substation_dict[link_name]
-            bus0 = find_nearest_zm_bus(n, lat, lon)
+           lat, lon = substation_dict[name]
+           bus0 = find_nearest_zm_bus(n, lat, lon, distance_crs)
         else:
-            bus0 = row["from_country"]
+           bus0 = row["from_country"]
         if row["to_country"] == "ZM":
-            lat, lon = substation_dict[link_name]
-            bus1 = find_nearest_zm_bus(n, lat, lon)
+           lat, lon = substation_dict[name]
+           bus1 = find_nearest_zm_bus(n, lat, lon, distance_crs)
         else:
-            bus1 = row["to_country"]
+           bus1 = row["to_country"]
 
-        if link_name not in n.links.index:
+        if name not in n.links.index:
             n.add(
                 "Link",
-                link_name,
+                name,
                 bus0=bus0,
                 bus1=bus1,
                 carrier="AC",
-                p_nom=capacity_mw,
+                p_nom=row["capacity_mw"],
                 efficiency=1.0,
                 p_min_pu=-1.0,
             )
+    return n
+
+
+def add_trade_components(n, power_pool_countries, hours_per_year=8760):
+    """Add import loads and export generators for neighbouring countries."""
     for _, row in power_pool_countries.iterrows():
         country = row["country"]
         if country not in n.buses.index:
             continue
-        if country in importing_countries:
-            p_set = row["demand_gwh"] * 1000 / 8760
+
+        load_name = f"import_{country}"
+        gen_name = f"export_{country}"
+
+        if load_name not in n.loads.index:
             n.add(
-                "Load", f"import_{country}", bus=country, carrier="import", p_set=p_set
+                "Load",
+                load_name,
+                bus=country,
+                carrier="import",
+                p_set=annual_gwh_to_average_mw(row["demand_gwh"], hours_per_year),
             )
-        elif country in exporting_countries:
-            p_nom = row["generation_gwh"] * 1000 / 8760
+
+        if gen_name not in n.generators.index:
             n.add(
                 "Generator",
-                f"export_{country}",
+                gen_name,
                 bus=country,
                 carrier="export",
-                p_nom=p_nom,
+                p_nom=annual_gwh_to_average_mw(row["generation_gwh"], hours_per_year),
                 marginal_cost=row["marginal_cost"],
             )
+    return n
+
+
+def add_interconnectors(
+    n,
+    power_pool_countries,
+    power_pool_links,
+    zm_substations,
+    distance_crs,
+    hours_per_year=8760,
+):
+    """Add foreign buses, interconnectors, and trade components to the network."""
+    substation_dict = {
+        row["name"]: (row["lat"], row["lon"]) for _, row in zm_substations.iterrows()
+    }
+
+    n = add_foreign_buses(n, power_pool_countries)
+    n = add_cross_border_links(n, power_pool_links, substation_dict, distance_crs)
+    n = add_trade_components(n, power_pool_countries, hours_per_year)
 
     return n
