@@ -172,8 +172,8 @@ if config["validation"]["custom_powerplants"].get("download_data", False):
             "data/custom_powerplants.csv",
         log:
             "logs/download_custom_powerplants.log",
-        script:
-            "scripts/download_custom_powerplants.py"
+        run:
+             copyfile({input['url]} {output[0]})
 
 
 if config["validation"]["interconnectors"].get("download_data", False):
