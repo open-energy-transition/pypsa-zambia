@@ -1094,5 +1094,5 @@ validation:
     enable: false
     download_data: false
   custom_powerplants:
-    enable: false      
+    enable: false
     download_data: false
