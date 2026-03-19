@@ -22,6 +22,8 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Only run Github Action test workflows when workflow-relevant files are changed [PR #94](https://github.com/openenergytransition/pypsa-zambia/pull/94)
 
+* Add regional-focused cutouts to the databundles [PR #87](https://github.com/openenergytransition/pypsa-zambia/pull/87)
+
 ## Upcoming release
 
 This part of documentation collects descriptive release notes to capture the main improvements introduced by developing the model before the next release.
