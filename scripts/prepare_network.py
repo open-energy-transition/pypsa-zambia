@@ -457,19 +457,17 @@ if __name__ == "__main__":
     sanitize_carriers(n, snakemake.config)
     sanitize_locations(n)
     if snakemake.config["validation"]["interconnectors"]["enable"]:
-        power_pool_countries, power_pool_links, zm_substations = (
-            load_interconnector_data(
-                snakemake.input.power_pool_countries,
-                snakemake.input.power_pool_links,
-                snakemake.input.focus_country_substations,
-            )
+        power_pool_countries, power_pool_links, substations = load_interconnector_data(
+            snakemake.input.power_pool_countries,
+            snakemake.input.power_pool_links,
+            snakemake.input.substations,
         )
 
         n = add_interconnectors(
             n,
             power_pool_countries,
             power_pool_links,
-            zm_substations,
+            substations,
             distance_crs=snakemake.config["crs"]["distance_crs"],
         )
     else:

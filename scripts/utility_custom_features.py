@@ -24,12 +24,12 @@ def load_interconnector_data(countries_path, links_path, substations_path):
     )
 
 
-def find_nearest_zm_bus(n, lat, lon, distance_crs="EPSG:20935"):
+def find_nearest_bus(n, lat, lon, distance_crs="EPSG:20935"):
     """Return the nearest Zambian bus to a given latitude and longitude."""
-    zm_buses = n.buses[n.buses["country"] == "ZM"].copy()
-    zm_buses = gpd.GeoDataFrame(
-        zm_buses,
-        geometry=gpd.points_from_xy(zm_buses["x"], zm_buses["y"]),
+    buses = n.buses[n.buses["country"] == "ZM"].copy()
+    buses = gpd.GeoDataFrame(
+        buses,
+        geometry=gpd.points_from_xy(buses["x"], buses["y"]),
         crs="EPSG:4326",
     ).to_crs(distance_crs)
     target_point = (
@@ -37,7 +37,7 @@ def find_nearest_zm_bus(n, lat, lon, distance_crs="EPSG:20935"):
         .to_crs(distance_crs)
         .iloc[0]
     )
-    distances = zm_buses.geometry.distance(target_point)
+    distances = buses.geometry.distance(target_point)
     return distances.idxmin()
 
 
@@ -57,12 +57,12 @@ def add_cross_border_links(n, power_pool_links, substation_dict, distance_crs):
         name = row["name"]
         if row["from_country"] == "ZM":
             lat, lon = substation_dict[name]
-            bus0 = find_nearest_zm_bus(n, lat, lon, distance_crs)
+            bus0 = find_nearest_bus(n, lat, lon, distance_crs)
         else:
             bus0 = row["from_country"]
         if row["to_country"] == "ZM":
             lat, lon = substation_dict[name]
-            bus1 = find_nearest_zm_bus(n, lat, lon, distance_crs)
+            bus1 = find_nearest_bus(n, lat, lon, distance_crs)
         else:
             bus1 = row["to_country"]
 
@@ -115,13 +115,13 @@ def add_interconnectors(
     n,
     power_pool_countries,
     power_pool_links,
-    zm_substations,
+    substations,
     distance_crs,
     hours_per_year=8760,
 ):
     """Add foreign buses, interconnectors, and trade components to the network."""
     substation_dict = {
-        row["name"]: (row["lat"], row["lon"]) for _, row in zm_substations.iterrows()
+        row["name"]: (row["lat"], row["lon"]) for _, row in substations.iterrows()
     }
 
     n = add_foreign_buses(n, power_pool_countries)

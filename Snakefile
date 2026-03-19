@@ -168,7 +168,8 @@ if config["validation"]["custom_powerplants"].get("download_data", False):
     rule download_custom_powerplants:
         input:
             url=HTTP.remote(
-                "https://sandbox.zenodo.org/records/471583/files/custom_powerplants.csv?download=1"
+                "https://sandbox.zenodo.org/records/471583/files/custom_powerplants.csv?download=1",
+                keep_local=True,
             ),
         output:
             "data/custom_powerplants.csv",
@@ -183,13 +184,16 @@ if config["validation"]["interconnectors"].get("download_data", False):
     rule download_interconnection_data:
         input:
             substations=HTTP.remote(
-                "https://sandbox.zenodo.org/records/471583/files/zm_substations.csv?download=1"
+                "https://sandbox.zenodo.org/records/471583/files/zm_substations.csv?download=1",
+                keep_local=True,
             ),
             links=HTTP.remote(
-                "https://sandbox.zenodo.org/records/471583/files/sapp_links.csv?download=1"
+                "https://sandbox.zenodo.org/records/471583/files/sapp_links.csv?download=1",
+                keep_local=True,
             ),
             countries=HTTP.remote(
-                "https://sandbox.zenodo.org/records/471583/files/sapp_countries.csv?download=1"
+                "https://sandbox.zenodo.org/records/471583/files/sapp_countries.csv?download=1",
+                keep_local=True,
             ),
         output:
             substations="data/zm_substations.csv",
@@ -854,7 +858,7 @@ rule prepare_network:
         tech_costs=COSTS,
         power_pool_countries="data/sapp_countries.csv",
         power_pool_links="data/sapp_links.csv",
-        focus_country_substations="data/zm_substations.csv",
+        substations="data/zm_substations.csv",
     output:
         "networks/" + RDIR + "elec_s{simpl}_{clusters}_ec_l{ll}_{opts}.nc",
     log:
