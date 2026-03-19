@@ -167,22 +167,30 @@ if config["validation"]["custom_powerplants"].get("download_data", False):
 
     rule download_custom_powerplants:
         input:
-            url=HTTP.remote("https://sandbox.zenodo.org/records/471583/files/custom_powerplants.csv?download=1")
+            url=HTTP.remote(
+                "https://sandbox.zenodo.org/records/471583/files/custom_powerplants.csv?download=1"
+            ),
         output:
             "data/custom_powerplants.csv",
         log:
             "logs/download_custom_powerplants.log",
         run:
-             copyfile({input['url]} {output[0]})
+            copyfile(str(input["url"]), output[0])
 
 
 if config["validation"]["interconnectors"].get("download_data", False):
 
     rule download_interconnection_data:
         input:
-            substations=HTTP.remote("https://sandbox.zenodo.org/records/471583/files/zm_substations.csv?download=1"),
-            links=HTTP.remote("https://sandbox.zenodo.org/records/471583/files/sapp_links.csv?download=1"),
-            countries=HTTP.remote("https://sandbox.zenodo.org/records/471583/files/sapp_countries.csv?download=1"),
+            substations=HTTP.remote(
+                "https://sandbox.zenodo.org/records/471583/files/zm_substations.csv?download=1"
+            ),
+            links=HTTP.remote(
+                "https://sandbox.zenodo.org/records/471583/files/sapp_links.csv?download=1"
+            ),
+            countries=HTTP.remote(
+                "https://sandbox.zenodo.org/records/471583/files/sapp_countries.csv?download=1"
+            ),
         output:
             substations="data/zm_substations.csv",
             links="data/sapp_links.csv",
@@ -190,9 +198,9 @@ if config["validation"]["interconnectors"].get("download_data", False):
         log:
             "logs/download_interconnection_data.log",
         run:
-            copyfile(input['substations'], output['substations'])
-            copyfile(input['links'], output['links'])
-            copyfile(input['countries'], output['countries'])
+            copyfile(str(input["substations"]), output["substations"])
+            copyfile(str(input["links"]), output["links"])
+            copyfile(str(input["countries"]), output["countries"])
 
 
 if config["enable"].get("download_global_buildings", True):

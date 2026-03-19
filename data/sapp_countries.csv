@@ -1,9 +1,0 @@
-country,name,lat,lon,generation_gwh,demand_gwh,marginal_cost
-ZW,Zimbabwe,-17.83,31.05,123,428,0
-MZ,Mozambique,-15.45,32.67,1110,0,0
-ZA,South Africa,-25.75,28.20,1233,0,0
-BW,Botswana,-24.65,25.90,0,672,0
-NA,Namibia,-22.57,17.08,0,1131,0
-CD,DRC,-11.68,27.48,0,642,0
-SZ,Eswatini,-26.31,31.13,0,0,0
-LS,Lesotho,-29.31,27.48,0,0,0
