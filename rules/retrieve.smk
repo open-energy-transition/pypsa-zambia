@@ -41,7 +41,8 @@ from scripts._common import dataset_version
 
 
 if (HYDROBASINS_DATASET := dataset_version("hydrobasins", config))["source"] in [
-    "build"
+    "build",
+    "tutorial",
 ]:
 
     """
@@ -58,8 +59,7 @@ if (HYDROBASINS_DATASET := dataset_version("hydrobasins", config))["source"] in 
     and the British Crown and are used under license. The HydroSHEDS v1 database and
     more information are available at https://www.hydrosheds.org.
     """
-
-    suffixes = ["af", "ar", "as", "au", "eu", "gr", "na", "sa", "si"]
+    suffixes: list = HYDROBASINS_DATASET["region"].split(" ")
     level = config["renewable"]["hydro"]["hydrobasins_level"]
 
     rule retrieve_hydrobasins:
@@ -110,6 +110,7 @@ if (HYDROBASINS_DATASET := dataset_version("hydrobasins", config))["source"] in 
             ),
         run:
             import geopandas as gpd
+            import pandas as pd
 
             gpdf_list = []
             logger.info(f"Merging hydrobasins files into: {output}")

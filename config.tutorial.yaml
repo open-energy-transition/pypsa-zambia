@@ -16,7 +16,7 @@ enable:
 
 data:
   hydrobasins:
-    source: build
+    source: tutorial
     version: latest
   irena:
     source: primary
