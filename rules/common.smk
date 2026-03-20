@@ -17,10 +17,10 @@ def load_data_versions(file_path) -> pd.DataFrame:
     )
 
     # Turn space-separated tags into individual columns
-    data_version_kinds["tags"] = data_versions["tags"].str.split()
-    rows_exploded_by_tags = data_version_kinds.explode("tags")
+    data_versions["tags"] = data_versions["tags"].str.split()
+    rows_exploded_by_tags = data_versions.explode("tags")
     tags_dummies = pd.get_dummies(rows_exploded_by_tags["tags"], dtype=bool)
-    enabled_tags_matrix = dummies.groupby(dummies.index).max()
+    enabled_tags_matrix = tags_dummies.groupby(tags_dummies.index).max()
     data_versions = data_versions.join(enabled_tags_matrix)
 
     return data_versions
@@ -44,9 +44,7 @@ def dataset_version(
         A pandas Series containing the dataset version information, including source, version, tags, and URL
     """
 
-    dataset_config = config["data"][
-        name
-    ]
+    dataset_config = config["data"][name]
 
     # To use PyPSA-Zambia as a snakemake module, the path to the versions.csv file needs to be
     # registered relative to the current file with Snakemake:
