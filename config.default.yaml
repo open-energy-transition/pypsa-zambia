@@ -1100,3 +1100,10 @@ plotting:
     H2: H2
     lines: Transmission Lines
     ror: Run of River
+validation:
+  interconnectors:
+    enable: false
+    download_data: false
+  custom_powerplants:
+    enable: false
+    download_data: false

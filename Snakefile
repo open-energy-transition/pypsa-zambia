@@ -166,6 +166,50 @@ if config["enable"].get("retrieve_databundle", True):
             "scripts/retrieve_databundle_light.py"
 
 
+if config["validation"]["custom_powerplants"].get("download_data", False):
+
+    rule download_custom_powerplants:
+        input:
+            url=HTTP.remote(
+                "https://sandbox.zenodo.org/records/471583/files/custom_powerplants.csv?download=1",
+                keep_local=True,
+            ),
+        output:
+            "data/custom_powerplants.csv",
+        log:
+            "logs/download_custom_powerplants.log",
+        run:
+            copyfile(str(input["url"]), output[0])
+
+
+if config["validation"]["interconnectors"].get("download_data", False):
+
+    rule download_interconnection_data:
+        input:
+            substations=HTTP.remote(
+                "https://sandbox.zenodo.org/records/471583/files/zm_substations.csv?download=1",
+                keep_local=True,
+            ),
+            links=HTTP.remote(
+                "https://sandbox.zenodo.org/records/471583/files/sapp_links.csv?download=1",
+                keep_local=True,
+            ),
+            countries=HTTP.remote(
+                "https://sandbox.zenodo.org/records/471583/files/sapp_countries.csv?download=1",
+                keep_local=True,
+            ),
+        output:
+            substations="data/zm_substations.csv",
+            links="data/sapp_links.csv",
+            countries="data/sapp_countries.csv",
+        log:
+            "logs/download_interconnection_data.log",
+        run:
+            copyfile(str(input["substations"]), output["substations"])
+            copyfile(str(input["links"]), output["links"])
+            copyfile(str(input["countries"]), output["countries"])
+
+
 if config["enable"].get("download_global_buildings", True):
 
     rule download_global_buildings:
@@ -815,6 +859,9 @@ rule prepare_network:
     input:
         "networks/" + RDIR + "elec_s{simpl}_{clusters}_ec.nc",
         tech_costs=COSTS,
+        power_pool_countries="data/sapp_countries.csv",
+        power_pool_links="data/sapp_links.csv",
+        substations="data/zm_substations.csv",
     output:
         "networks/" + RDIR + "elec_s{simpl}_{clusters}_ec_l{ll}_{opts}.nc",
     log:
