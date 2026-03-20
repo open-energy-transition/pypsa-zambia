@@ -18,3 +18,7 @@ assignees: ""
 - [ ] Share csv files in `Processed` folder
 - [ ] Create a metadata file for csv files and place into `Processed`
 - [ ] Upload csv files on Zenodo using the metadata as a description
+- [ ] Contribute a source link to the data collection repositories:
+   - [Awesome-Electrical-Grid-Mapping](https://github.com/open-energy-transition/Awesome-Electrical-Grid-Mapping)
+   - [PyPSA-Earth-Status](https://github.com/pypsa-meets-earth/pypsa-earth-status)
+   - [Awesome-Electricity-Demand](https://github.com/open-energy-transition/Awesome-Electricity-Demand)
