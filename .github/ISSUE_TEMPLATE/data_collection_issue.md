@@ -13,7 +13,7 @@ assignees: ""
 - [ ] Share the data source in a local storage folder:
     - create a dedicated sub-folder for the particular data source
     - include `Raw` and `Processed` folders inside the sub-folder
-    - place the raw source file into `Raw` folder
+    - place the raw source file into `Raw` folder and add `Reference` doc file with url link to the source and a recommended citation if applicable
 - [ ] Extract relevant parts of the source into csv format (e.g. tables for the installed generation)
 - [ ] Share csv files in `Processed` folder
 - [ ] Create a metadata file for csv files and place into `Processed`
