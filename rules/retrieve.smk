@@ -8,6 +8,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from shutil import move, unpack_archive, rmtree, copy2
 from zipfile import ZipFile
+from scripts._common import dataset_version
 
 
 # # load tutorial hydrobasins bundle for Africa only
@@ -39,7 +40,9 @@ from zipfile import ZipFile
 #   - data/hydrobasins/hybas_world.shp
 
 
-if (HYDROBASINS_DATASET := dataset_version("hydrobasins"))["source"] in ["build"]:
+if (HYDROBASINS_DATASET := dataset_version("hydrobasins", config))["source"] in [
+    "build"
+]:
 
     """
     Function to download and unzip the data for hydrobasins from HydroBASINS database
@@ -137,7 +140,7 @@ if (HYDROBASINS_DATASET := dataset_version("hydrobasins"))["source"] in ["build"
 #     output:
 #     - data/IRENA_Statistics_Extract_2025H2.xlsx
 
-if (IRENA_DATASET := dataset_version("irena"))["source"] in ["primary"]:
+if (IRENA_DATASET := dataset_version("irena", config))["source"] in ["primary"]:
 
     rule retrieve_irena_statistics:
         message:
@@ -159,7 +162,7 @@ if (IRENA_DATASET := dataset_version("irena"))["source"] in ["primary"]:
 #       protectedplanet: https://d1gam3xoknrgr2.cloudfront.net/current/WDPA_0126_Public_shp.zip
 #     output: [data/landcover/world_protected_areas/*]
 
-if (LANDCOVER_DATASET := dataset_version("landcover"))["source"] in ["primary"]:
+if (LANDCOVER_DATASET := dataset_version("landcover", config))["source"] in ["primary"]:
 
     folder = LANDCOVER_DATASET["folder"]
     version = LANDCOVER_DATASET["version"]
@@ -199,4 +202,3 @@ if (LANDCOVER_DATASET := dataset_version("landcover"))["source"] in ["primary"]:
                 + f"/WDPA_{version}_Public_shp-points.shp",
                 index=[0, 1, 2],
             ),
-            #    /home/will/repositories/pypsa-zambia/data/landcover/WDPA_Mar2026_Public_shp_1/WDPA_Mar2026_Public_shp-polygons.shp

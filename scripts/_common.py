@@ -2,8 +2,10 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+from functools import lru_cache
+from pathlib import Path
+
 import pandas as pd
-from functools import partial, lru_cache
 
 
 @lru_cache
@@ -27,7 +29,7 @@ def load_data_versions(file_path) -> pd.DataFrame:
 
 
 def dataset_version(
-    name: str,
+    name: str, config: dict, versions_file_path: str = "data/versions.csv"
 ) -> pd.Series:
     """
     Return the dataset version information and url for a given dataset name.
@@ -48,8 +50,8 @@ def dataset_version(
 
     # To use PyPSA-Zambia as a snakemake module, the path to the versions.csv file needs to be
     # registered relative to the current file with Snakemake:
-    fp = workflow.source_path("../data/versions.csv")
-    data_versions = load_data_versions(fp)
+
+    data_versions = load_data_versions(versions_file_path)
 
     dataset = data_versions.loc[
         (data_versions["dataset"] == name)

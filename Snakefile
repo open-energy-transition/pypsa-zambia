@@ -83,7 +83,6 @@ wildcard_constraints:
     planning_horizons="20[2-9][0-9]|2100",
 
 
-include: "rules/common.smk"
 include: "rules/retrieve.smk"
 
 
