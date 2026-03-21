@@ -11,42 +11,13 @@ from zipfile import ZipFile
 from scripts._common import dataset_version
 
 
-# # load tutorial hydrobasins bundle for Africa only
-# bundle_tutorial_hydrobasins:
-#   countries: [Africa]
-#   tutorial: true
-#   category: hydrobasins
-#   destination: "data/hydrobasins"
-#   urls:
-#     hydrobasins:
-#       base_url: https://data.hydrosheds.org/file/HydroBASINS/standard/
-#       suffixes: ["af"]
-#   unzip: true
-#   output:
-#   - data/hydrobasins/hybas_world.shp
-
-# # global data for hydrobasins
-# bundle_hydrobasins:
-#   countries: [Earth]
-#   tutorial: false
-#   category: hydrobasins
-#   destination: "data/hydrobasins"
-#   urls:
-#     hydrobasins:
-#       base_url: https://data.hydrosheds.org/file/HydroBASINS/standard/
-#       suffixes: ["af", "ar", "as", "au", "eu", "gr", "na", "sa", "si"]
-#   unzip: true
-#   output:
-#   - data/hydrobasins/hybas_world.shp
-
-
 if (HYDROBASINS_DATASET := dataset_version("hydrobasins", config))["source"] in [
     "build",
     "tutorial",
 ]:
 
     """
-    Function to download and unzip the data for hydrobasins from HydroBASINS database
+    Rules to download and unzip the data for hydrobasins from HydroBASINS database
     available via https://www.hydrosheds.org/products/hydrobasins
 
     We are using data from the HydroSHEDS version 1 database
@@ -124,22 +95,7 @@ if (HYDROBASINS_DATASET := dataset_version("hydrobasins", config))["source"] in 
             )
             merged.to_file(str(output["shp"]), driver="ESRI Shapefile")
 
-            # IRENA energy statistics dataset including generation, installed capacity, heat production, and related indicators.
-            # Used in build_renewable_profiles.py to derive hydropower generation potentials.
-            # Original source: https://www.irena.org/-/media/Files/IRENA/Agency/Publication/2025/Jul/IRENA_Statistics_Extract_2025H2.xlsx
 
-
-
-
-#   bundle_irena_statistics:
-#     countries: [Earth]
-#     tutorial: false
-#     category: irena
-#     destination: "data"
-#     urls:
-#       direct: https://github.com/pypsa-meets-earth/temporary_storage/raw/refs/heads/main/datasets/IRENA_Statistics_Extract_2025H2.xlsx
-#     output:
-#     - data/IRENA_Statistics_Extract_2025H2.xlsx
 
 if (IRENA_DATASET := dataset_version("irena", config))["source"] in ["primary"]:
 
@@ -153,15 +109,6 @@ if (IRENA_DATASET := dataset_version("irena", config))["source"] in ["primary"]:
         run:
             copy2(str(input["irena_xlsx"]), output["irena_xlsx_local"])
 
-
-#   # data bundle containing the protected data for the whole world
-#   bundle_landcover_earth:
-#     countries: [Earth]
-#     category: landcover
-#     destination: "data/landcover/world_protected_areas"
-#     urls:
-#       protectedplanet: https://d1gam3xoknrgr2.cloudfront.net/current/WDPA_0126_Public_shp.zip
-#     output: [data/landcover/world_protected_areas/*]
 
 if (LANDCOVER_DATASET := dataset_version("landcover", config))["source"] in ["primary"]:
 
