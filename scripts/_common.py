@@ -10,6 +10,17 @@ import pandas as pd
 
 @lru_cache
 def load_data_versions(file_path) -> pd.DataFrame:
+    """Load the dataset versions from a CSV file and process the tags into individual columns.
+
+    Arguments
+    ---------
+    file_path : str
+        The path to the CSV file containing dataset version information.
+    Returns
+    -------
+    pd.DataFrame
+        A DataFrame containing the dataset version information with tags as individual boolean columns.
+    """
     data_versions = pd.read_csv(
         file_path,
         dtype=str,
@@ -40,6 +51,10 @@ def dataset_version(
     Parameters:
     name: str
         The name of the dataset to retrieve version information for.
+    config: dict
+        The configuration dictionary containing dataset information, including source and version.
+    versions_file_path: str, optional
+        The path to the CSV file containing dataset version information (default is 'data/versions.csv').
 
     Returns:
     pd.Series
