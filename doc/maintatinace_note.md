@@ -20,7 +20,7 @@ PyPSA-Zambia project is maintained as a soft-fork which means that it's kept in 
 - Keep your project code separate from upstream code if possible (new files or functions). It helps with merging upstream.
 
 
-Our successfull [experience]((https://github.com/open-energy-transition/pypsa-zambia/pull/109)):
+Our successful [experience]((https://github.com/open-energy-transition/pypsa-zambia/pull/109)):
 ```
 $ git remote -v
 origin  git@github.com:open-energy-transition/pypsa-zambia.git (fetch)
