@@ -318,12 +318,34 @@ def _get_linetype_by_voltage(v_nom, d_linetypes):
     return line_type_min
 
 
-def _set_electrical_parameters_lines(lines_config, voltages, lines):
+def _set_electrical_parameters_lines(
+    lines_config, voltages, lines, linetypes_ac_csv, countries
+):
+    """
+    Set transmission capacity of AC lines
+    """
     if lines.empty:
         lines["type"] = []
         return lines
 
-    linetypes = _get_linetypes_config(lines_config["ac_types"], voltages)
+    line_types_source = lines_config.get("type_source", "automated")
+    if line_types_source == "custom":
+        requested_types = lines_config.get("ac_types")
+    else:
+        linetypes_df = _load_linetypes_csv(linetypes_ac_csv)
+        # TODO Improve filtering for multiple countries
+        country_filter = countries[0]
+
+        if country_filter in linetypes_df.country.values:
+            region_linetypes_df = linetypes_df.query("country == @country_filter")
+        else:
+            region_linetypes_df = linetypes_df.query("country == 'default'")
+
+        requested_types = dict(
+            zip(region_linetypes_df.v_nom, region_linetypes_df.line_type)
+        )
+
+    linetypes = _get_linetypes_config(requested_types, voltages)
 
     lines["carrier"] = "AC"
     lines["dc"] = False
