@@ -539,6 +539,10 @@ def base_network(
     transformers_config,
     voltages_config,
 ):
+    linetypes_ac_csv = inputs["region_linetypes_ac"]
+    linetypes_dc_csv = inputs["region_linetypes_dc"]
+    global_linetypes = inputs["global_linetypes"]
+
     buses = _load_buses_from_osm(inputs.osm_buses).reset_index(drop=True)
     lines = _load_lines_from_osm(inputs.osm_lines).reset_index(drop=True)
     transformers = _load_transformers_from_osm(inputs.osm_transformers, buses)
@@ -546,10 +550,12 @@ def base_network(
 
     lines_ac = lines[~lines.dc].copy()
     lines_dc = lines[lines.dc].copy()
-    lines_ac = _set_electrical_parameters_lines(lines_config, voltages_config, lines_ac)
+    lines_ac = _set_electrical_parameters_lines(
+        lines_config, voltages_config, lines_ac, linetypes_ac_csv, countries
+    )
 
     lines_dc = _set_electrical_parameters_dc_lines(
-        lines_config, voltages_config, lines_dc
+        lines_config, voltages_config, lines_dc, linetypes_ac_csv, countries
     )
 
     transformers = _set_electrical_parameters_transformers(
@@ -582,7 +588,7 @@ def base_network(
     n.import_components_from_dataframe(transformers, "Transformer")
     n.import_components_from_dataframe(converters, "Link")
 
-    _set_lines_s_nom_from_linetypes(n)
+    _set_lines_s_nom_from_linetypes(n, global_linetypes, countries)
 
     _set_countries_and_substations(inputs, base_network_config, countries_config, n)
 
