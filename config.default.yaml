@@ -228,6 +228,7 @@ electricity:
       PV: [solar]
 
 lines:
+  type_source: "automatic" # "custom" or "automatic"  
   ac_types:
     132.: "243-AL1/39-ST1A 20.0"
     220.: "Al/St 240/40 2-bundle 220.0"
