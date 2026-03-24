@@ -279,8 +279,8 @@ def _get_linetypes_config(line_types, voltages):
     Parameters
     ----------
     line_types : dict
-        Dictionary of linetypes: keys are nominal voltages and values are linetypes.
-    voltages : list
+        Dictionary of linetypes: keys are float nominal voltages and values are string linetypes.
+    voltages : list of floats
         List of selected voltages.
 
     Returns
@@ -288,6 +288,7 @@ def _get_linetypes_config(line_types, voltages):
         Dictionary of linetypes for selected voltages.
     """
     # get voltages value that are not available in the line types
+    # TODO Account for the case when no voltages are available in line_types dictionary
     vnoms_diff = set(voltages).symmetric_difference(set(line_types.keys()))
     if vnoms_diff:
         logger.warning(
@@ -578,6 +579,7 @@ def base_network(
         lines_dc = _set_electrical_parameters_links(links_config, lines_dc)
         # parse line information into p_nom required for converters
         lines_dc["p_nom"] = lines_dc.apply(
+            # TODO Account for the regional specifics
             lambda x: x["v_nom"] * n.line_types.i_nom[x["type"]],
             axis=1,
             result_type="reduce",
