@@ -212,7 +212,7 @@ if config["validation"]["line_types"].get("download_data", False):
     rule download_line_types:
         input:
             url=HTTP.remote(
-                "https://sandbox.zenodo.org/records/473405/files/pypsa_line_types%20%281%29.csv?download=1",
+                "https://sandbox.zenodo.org/records/473405/files/pypsa_line_types%20%281%29.csv",
                 keep_local=True,
             ),
         output:
