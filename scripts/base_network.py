@@ -359,12 +359,21 @@ def _set_electrical_parameters_lines(
     return lines
 
 
-def _set_electrical_parameters_dc_lines(lines_config, voltages, lines):
+def _set_electrical_parameters_dc_lines(
+    lines_config, voltages, lines, linetypes_dc_csv, countries
+):
     if lines.empty:
         lines["type"] = []
         return lines
 
-    linetypes = _get_linetypes_config(lines_config["dc_types"], voltages)
+    line_types_source = lines_config.get("type_source", "automated")
+    if line_types_source == "custom":
+        custom_types = lines_config.get("dc_types")
+        linetypes = _get_linetypes_config(custom_types, voltages)
+    else:
+        # TODO Check what happens if requested voltages
+        # are not included into `linetypes_ac_csv` specification
+        linetypes = _load_linetypes_csv(linetypes_dc_csv)
 
     lines["carrier"] = "DC"
     lines["dc"] = True
