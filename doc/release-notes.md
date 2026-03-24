@@ -24,6 +24,10 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Add regional-focused cutouts to the databundles [PR #87](https://github.com/openenergytransition/pypsa-zambia/pull/87)
 
+* Add maintenance note [PR #119](https://github.com/open-energy-transition/pypsa-zambia/pull/119)
+
+* Create templates for data collection [PR #118](https://github.com/open-energy-transition/pypsa-zambia/pull/118)
+
 ## Upcoming release
 
 This part of documentation collects descriptive release notes to capture the main improvements introduced by developing the model before the next release.
