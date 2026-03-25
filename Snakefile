@@ -348,6 +348,7 @@ rule base_network:
         + "base_network/all_transformers_build_network.csv",
         country_shapes="resources/" + RDIR + "shapes/country_shapes.geojson",
         offshore_shapes="resources/" + RDIR + "shapes/offshore_shapes.geojson",
+        line_types="data/line_types.csv",
     output:
         "networks/" + RDIR + "base.nc",
     log:
@@ -859,6 +860,7 @@ rule prepare_network:
         power_pool_countries="data/sapp_countries.csv",
         power_pool_links="data/sapp_links.csv",
         substations="data/zm_substations.csv",
+        line_types="data/line_types.csv",
     output:
         "networks/" + RDIR + "elec_s{simpl}_{clusters}_ec_l{ll}_{opts}.nc",
     log:
