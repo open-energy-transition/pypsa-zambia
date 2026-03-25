@@ -33,6 +33,32 @@ if (HYDROBASINS_DATASET := dataset_version("hydrobasins", config))["source"] in 
     suffixes: list = HYDROBASINS_DATASET["region"].split(" ")
     level = config["renewable"]["hydro"]["hydrobasins_level"]
 
+    def get_hydrobasins(input, output):
+        """Merge the hydrobasins files into a single shapefile
+
+        Arguments
+        ---------
+        input : list
+            List of input files to merge
+        output : dict
+            Dictionary of output files to write the merged shapefile
+        """
+
+        import geopandas as gpd
+        import pandas as pd
+
+        gpdf_list = []
+        logger.info(f"Merging hydrobasins files into: {output}")
+        for f_name in input:
+            if f_name.endswith(".shp"):
+                logger.info(f"Reading hydrobasins file: {f_name}")
+                gpdf_list.append(gpd.read_file(f_name))
+
+        merged = gpd.GeoDataFrame(pd.concat(gpdf_list)).drop_duplicates(
+            subset="HYBAS_ID", ignore_index=True
+        )
+        merged.to_file(str(output["shp"]), driver="ESRI Shapefile")
+
     rule retrieve_hydrobasins:
         message:
             "Retrieving hydrobasins dataset for {wildcards.suffix}"
@@ -80,21 +106,7 @@ if (HYDROBASINS_DATASET := dataset_version("hydrobasins", config))["source"] in 
                 "data/hydrobasins/hybas_world", ".cpg", ".dbf", ".prj", ".shx"
             ),
         run:
-            import geopandas as gpd
-            import pandas as pd
-
-            gpdf_list = []
-            logger.info(f"Merging hydrobasins files into: {output}")
-            for f_name in input:
-                if f_name.endswith(".shp"):
-                    logger.info(f"Reading hydrobasins file: {f_name}")
-                    gpdf_list.append(gpd.read_file(f_name))
-
-            merged = gpd.GeoDataFrame(pd.concat(gpdf_list)).drop_duplicates(
-                subset="HYBAS_ID", ignore_index=True
-            )
-            merged.to_file(str(output["shp"]), driver="ESRI Shapefile")
-
+            get_hydrobasins(input, output)
 
 
 if (IRENA_DATASET := dataset_version("irena", config))["source"] in ["primary"]:
