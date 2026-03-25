@@ -12,6 +12,8 @@ This part of documentation collects descriptive release notes to capture the mai
 
 ### New Features and Major Changes
 
+* Adds data versioning system [PR #74](https://github.com/openenergytransition.org/pypsa-zambia/pull/74)
+
 ### Minor Changes and bug-fixing
 
 * Adds a PyPSA-Zambia specific GitHub Actions workflow for the Zambia model [PR #60](https://github.com/openenergytransition/pypsa-zambia/pull/60)
