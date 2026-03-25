@@ -95,10 +95,10 @@ lines:
   s_max_pu: 0.7
   s_nom_extendable: false
   ac_types:
-    132.: "243-AL1/39-ST1A 20.0"
-    220.: "Al/St 240/40 2-bundle 220.0"
-    330.: "Al/St 240/40 2-bundle 220.0"  # Zambia 330kV: twin bundle
-    380.: "Al/St 240/40 2-bundle 220.0"
+    66.: "ACSR Wolf 66.0"
+    132.: "ACSR Panther 132.0"
+    220.: "ACSR Zebra 220.0"
+    330.: "ACSR Bison 330.0"
 costs:
   year: 2025
 
