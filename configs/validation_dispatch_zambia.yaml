@@ -72,8 +72,6 @@ load_options:
 
 
 electricity:
-  base_voltage: 330.
-  voltages: [66., 88., 132., 220., 330.]
   extendable_carriers:
     Generator: []
     StorageUnit: []
