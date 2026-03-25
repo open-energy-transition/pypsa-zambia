@@ -1,5 +1,5 @@
 ---
-SPDX-FileCopyrightText: Contributors to PyPSA-Eur <https://github.com/pypsa/pypsa-eur>
+SPDX-FileCopyrightText: Contributors to PyPSA-Eur <https://github.com/pypsa/pypsa-eur> and to PyPSA-Earth <https://github.com/pypsa-meets-earth/pypsa-earth>
 SPDX-FileCopyrightText: Contributors to PyPSA-Zambia <https://github.com/pypsa/pypsa-zambia>
 SPDX-License-Identifier: CC-BY-4.0
 ---
