@@ -1107,3 +1107,5 @@ validation:
   custom_powerplants:
     enable: false
     download_data: false
+  line_types:
+    download_data: false

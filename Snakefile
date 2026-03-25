@@ -213,6 +213,22 @@ if config["validation"]["interconnectors"].get("download_data", False):
             copyfile(str(input["countries"]), output["countries"])
 
 
+if config["validation"]["line_types"].get("download_data", False):
+
+    rule download_line_types:
+        input:
+            url=HTTP.remote(
+                "https://sandbox.zenodo.org/records/473405/files/pypsa_line_types%20%281%29.csv",
+                keep_local=True,
+            ),
+        output:
+            "data/line_types.csv",
+        log:
+            "logs/download_line_types.log",
+        run:
+            copyfile(str(input["url"]), output[0])
+
+
 if config["enable"].get("download_global_buildings", True):
 
     rule download_global_buildings:
