@@ -30,6 +30,8 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Create templates for data collection [PR #118](https://github.com/open-energy-transition/pypsa-zambia/pull/118)
 
+* Add release process PR template [PR #126](https://github.com/open-energy-transition/pypsa-zambia/pull/126)
+
 ## Upcoming release
 
 This part of documentation collects descriptive release notes to capture the main improvements introduced by developing the model before the next release.
