@@ -362,6 +362,7 @@ if __name__ == "__main__":
         snakemake.params.electricity,
         Nyears,
     )
+    # TODO Remove adding custom line types once they will be incorporated into a currently used PyPSA version
     custom_line_types = load_custom_line_types(snakemake.input.line_types)
     n = add_custom_line_types(n, custom_line_types)
     s_max_pu = snakemake.params.lines["s_max_pu"]
