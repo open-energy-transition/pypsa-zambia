@@ -12,6 +12,8 @@ This part of documentation collects descriptive release notes to capture the mai
 
 ### New Features and Major Changes
 
+* Adds data versioning system [PR #74](https://github.com/openenergytransition.org/pypsa-zambia/pull/74)
+
 ### Minor Changes and bug-fixing
 
 * Adds a PyPSA-Zambia specific GitHub Actions workflow for the Zambia model [PR #60](https://github.com/openenergytransition/pypsa-zambia/pull/60)
@@ -23,6 +25,13 @@ This part of documentation collects descriptive release notes to capture the mai
 * Only run Github Action test workflows when workflow-relevant files are changed [PR #94](https://github.com/openenergytransition/pypsa-zambia/pull/94)
 
 * Add regional-focused cutouts to the databundles [PR #87](https://github.com/openenergytransition/pypsa-zambia/pull/87)
+* Add voltage levels for the Zambian PowerGrid [PR #122](https://github.com/open-energy-transition/pypsa-zambia/pull/122)
+
+* Add maintenance note [PR #119](https://github.com/open-energy-transition/pypsa-zambia/pull/119)
+
+* Create templates for data collection [PR #118](https://github.com/open-energy-transition/pypsa-zambia/pull/118)
+
+* Add release process PR template [PR #126](https://github.com/open-energy-transition/pypsa-zambia/pull/126)
 
 ## Upcoming release
 
@@ -35,6 +44,8 @@ This part of documentation collects descriptive release notes to capture the mai
 * Drop use of override_components that is no longer needed in newer PyPSA versions [PR #1699](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1699)
 
 * Ensure connectivity of transformers in buses with several transformers [PR #1706](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1706)
+
+* Add Zenodo-based interconnector input data (`sapp_links`, `zm_substations`, and `sapp_country_data`) and bidirectional cross-border link modelling between Zambia and neighbouring countries [PR #88](https://github.com/open-energy-transition/pypsa-zambia/pull/88)
 
 ### Minor Changes and bug-fixing
 

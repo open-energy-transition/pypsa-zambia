@@ -119,3 +119,10 @@ solving:
   solver:
     name: highs
     options: highs-default
+validation:
+  interconnectors:
+    enable: true
+    download_data: true
+  custom_powerplants:
+    enable: true
+    download_data: true

@@ -83,6 +83,9 @@ wildcard_constraints:
     planning_horizons="20[2-9][0-9]|2100",
 
 
+include: "rules/retrieve.smk"
+
+
 if config["custom_rules"] is not []:
     for rule in config["custom_rules"]:
 
@@ -149,7 +152,6 @@ if config["enable"].get("retrieve_databundle", True):
     rule retrieve_databundle_light:
         params:
             bundles_to_download=bundles_to_download,
-            hydrobasins_level=config["renewable"]["hydro"]["hydrobasins_level"],
         output:  #expand(directory('{file}') if isdir('{file}') else '{file}', file=datafiles)
             expand(
                 "{file}", file=datafiles_retrivedatabundle(config, bundles_to_download)
@@ -161,6 +163,70 @@ if config["enable"].get("retrieve_databundle", True):
             "benchmarks/" + RDIR + "retrieve_databundle_light"
         script:
             "scripts/retrieve_databundle_light.py"
+
+
+if config["validation"]["custom_powerplants"].get("download_data", False):
+
+    rule download_custom_powerplants:
+        input:
+            url=HTTP.remote(
+                "https://sandbox.zenodo.org/records/471583/files/custom_powerplants.csv",
+                keep_local=True,
+                additional_request_string="?download=1",
+            ),
+        output:
+            "data/custom_powerplants.csv",
+        log:
+            "logs/download_custom_powerplants.log",
+        run:
+            copyfile(str(input["url"]), output[0])
+
+
+if config["validation"]["interconnectors"].get("download_data", False):
+
+    rule download_interconnection_data:
+        input:
+            substations=HTTP.remote(
+                "https://sandbox.zenodo.org/records/471583/files/zm_substations.csv",
+                keep_local=True,
+                additional_request_string="?download=1",
+            ),
+            links=HTTP.remote(
+                "https://sandbox.zenodo.org/records/471583/files/sapp_links.csv",
+                keep_local=True,
+                additional_request_string="?download=1",
+            ),
+            countries=HTTP.remote(
+                "https://sandbox.zenodo.org/records/471583/files/sapp_countries.csv",
+                keep_local=True,
+                additional_request_string="?download=1",
+            ),
+        output:
+            substations="data/zm_substations.csv",
+            links="data/sapp_links.csv",
+            countries="data/sapp_countries.csv",
+        log:
+            "logs/download_interconnection_data.log",
+        run:
+            copyfile(str(input["substations"]), output["substations"])
+            copyfile(str(input["links"]), output["links"])
+            copyfile(str(input["countries"]), output["countries"])
+
+
+if config["validation"]["line_types"].get("download_data", False):
+
+    rule download_line_types:
+        input:
+            url=HTTP.remote(
+                "https://sandbox.zenodo.org/records/473405/files/pypsa_line_types%20%281%29.csv",
+                keep_local=True,
+            ),
+        output:
+            "data/line_types.csv",
+        log:
+            "logs/download_line_types.log",
+        run:
+            copyfile(str(input["url"]), output[0])
 
 
 if config["enable"].get("download_global_buildings", True):
@@ -812,6 +878,9 @@ rule prepare_network:
     input:
         "networks/" + RDIR + "elec_s{simpl}_{clusters}_ec.nc",
         tech_costs=COSTS,
+        power_pool_countries="data/sapp_countries.csv",
+        power_pool_links="data/sapp_links.csv",
+        substations="data/zm_substations.csv",
     output:
         "networks/" + RDIR + "elec_s{simpl}_{clusters}_ec_l{ll}_{opts}.nc",
     log:
