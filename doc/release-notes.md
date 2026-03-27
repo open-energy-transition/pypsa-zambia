@@ -25,7 +25,6 @@ This part of documentation collects descriptive release notes to capture the mai
 * Only run Github Action test workflows when workflow-relevant files are changed [PR #94](https://github.com/openenergytransition/pypsa-zambia/pull/94)
 
 * Add regional-focused cutouts to the databundles [PR #87](https://github.com/openenergytransition/pypsa-zambia/pull/87)
-* Add Zambia Power System base voltage [PR #122](https://github.com/open-energy-transition/pypsa-zambia/pull/122)
 
 * Add maintenance note [PR #119](https://github.com/open-energy-transition/pypsa-zambia/pull/119)
 
@@ -46,6 +45,7 @@ This part of documentation collects descriptive release notes to capture the mai
 * Ensure connectivity of transformers in buses with several transformers [PR #1706](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1706)
 
 * Add Zenodo-based interconnector input data (`sapp_links`, `zm_substations`, and `sapp_country_data`) and bidirectional cross-border link modelling between Zambia and neighbouring countries [PR #88](https://github.com/open-energy-transition/pypsa-zambia/pull/88)
+* Integrate African transmission line types into PyPSA line type library for improved regional representation.[PR #128](https://github.com/open-energy-transition/pypsa-zambia/pull/128)
 
 ### Minor Changes and bug-fixing
 
