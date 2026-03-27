@@ -14,6 +14,17 @@ enable:
   build_natura_raster: true
   progress_bar: false
 
+data:
+  hydrobasins:
+    source: tutorial
+    version: latest
+  irena:
+    source: primary
+    version: latest
+  landcover:
+    source: primary
+    version: Mar2026
+
 scenario:
   clusters: [6]
   opts: [Co2L-4H]
@@ -66,3 +77,10 @@ solving:
   solver:
     name: glpk
     options: glpk-default
+validation:
+  interconnectors:
+    enable: true
+    download_data: true
+  custom_powerplants:
+    enable: true
+    download_data: true
