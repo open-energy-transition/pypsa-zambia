@@ -40,13 +40,41 @@ To run a modeling scenario, a scenario-specific configuraiton file should be app
 
 ## Validation
 
+Validation implies cross-check of the modelling parameters and outputs agains observations data and is needed to ensure that the model is reproducing reality in a way accurate enough to particular modelling purposes. For power system models, standard validation checks include validation of basic inputs (the overall electricity demand, installed generation capacity, topology of the power grid) and main outputs (generaiton mix).
+
 ### Validation assumptions
+
+Validation is done on the data from the past (2024) which means the need to adjust year-related parameters for the following parameters:
+- commission and de-commission years for installed generaiton capacity;
+- technology costs and performance parameters;
+- scaling parameter for the electricity demand;
+- date of OSM data snapshot (we take the latest OSM data which are likely to represent the validation year `2024` in the most accurate way).
+
+For now, the weather year is taken for a default `2013` year (NB can require adjustments to reprodure hydro operation in a more accurate way).
 
 ### Validation runs
 
-- `validation_dispatch_zambia.yaml` contains definitions for a dispatch run reproducing behaviour of the national power system in a reference year from the past
+A configuration file `validation_dispatch_zambia.yaml` contains definitions for a dispatch run reproducing behaviour of the national power system in a reference year from the past. To get modelling outputs for the validation scenario, the following commands as used:
+
+```
+# good to use a dry-run to make sure that
+# retrieve rules are not triggered accidentially
+snakemake -j 1 solve_all_networks -n
+# actual modelling run
+snakemake -j 1 solve_all_networks
+```
+
+The validation run doesnt's include capacity expansion which allows to run it locally.
 
 ### Validation routine
 
+Once the results are ready, [PyPSA-Earth-Status](https://github.com/open-energy-transition/pypsa-earth-status) workflow can be used to automatically generate diagrams and tables for major validation metrics. To make it work:
+1. Clone [PyPSA-Earth-Status](https://github.com/open-energy-transition/pypsa-earth-status) fork. **NB** There is no need to retrieve data bundles for PyPSA-Earth sub-workflow. All what we need from PyPSA-Earth-Status is the code (a transition from sub-workflows to a fork design should be discussed in the PyPSA-Earth-Status upstream).
+2. Place the solved network and clean osm geojsons for lines and substations into `pypsa-earth-status/resources`.
+3. Adjust paths and country codes `pypsa-earth-status/config.yaml`.
+4. Run `snakemake -j 1 visualize_data` from `pypsa-earth-status` folder
 
+Once a validation run completed, the outputs are available in `pypsa-earth-status/results`.
+
+For more advanced analysis (e.g. checking imports and exports), a validaiton notebook is available in [notebooks](https://github.com/open-energy-transition/pypsa-zambia/tree/main/notebooks) folder.
 
