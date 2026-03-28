@@ -1,11 +1,11 @@
 
 # General design
 
-The workflow is configured using configuraiton files. To ensure reproducibility, all the config files are git-tracked. In particular, `config.yaml` is not included into `Snakefile` and wouldn't have effect on the workflow.
+The workflow is configured using configuration files. To ensure reproducibility, all the config files are git-tracked. In particular, `config.yaml` is not included into `Snakefile` and wouldn't have effect on the workflow.
 
 ## Particular configurations
 
-The following yaml configuration files are available for different types of modelling runs. The folder `configs` stores definitions of the configuration files used in the worflow, and `pypsa-zambia` contains `config.default.yaml` and `config.tutorial.yaml`.
+The following yaml configuration files are available for different types of modelling runs. The folder `configs` stores definitions of the configuration files used in the workflow, and `pypsa-zambia` contains `config.default.yaml` and `config.tutorial.yaml`.
 
 ### Service configurations
 
@@ -17,7 +17,7 @@ A number of files in `configs` are service files used in each run:
  
 ### Scenario configurations
 
-The configuraiton following configuration 
+The configuration following configuration 
 
 #### Project root folder
 
@@ -27,7 +27,7 @@ The following universal files are available directly in `pypsa-zambia` folder:
 
 #### Configuration folder
 
-`configs/scenarios` folder contains an example definition of a configuration file (not difectly relevant for the project).
+`configs/scenarios` folder contains an example definition of a configuration file (not directly relevant for the project).
 
 Specific configuration files are available to build regional-specific cutouts for the country:
 - `build_cutout_zambia_config.yaml` containts parameters used to build a full-scale cutout;
@@ -35,36 +35,36 @@ Specific configuration files are available to build regional-specific cutouts fo
 
 `Customisation` section in the project README describes how to use those configurations when building a cutout for a year of interest.
 
-To run a modeling scenario, a scenario-specific configuraiton file should be applied on top of the service configurations and `config.default.yaml`. Currently, the following configuration files are available:
+To run a modeling scenario, a scenario-specific configuration file should be applied on top of the service configurations and `config.default.yaml`. Currently, the following configuration files are available:
 - `validation_dispatch_zambia.yaml` defines a dispatch modelling run which aims to reproduce a national power system in a specific year in the past and is intended to be used for validation
 
 ## Validation
 
-Validation implies cross-check of the modelling parameters and outputs agains observations data and is needed to ensure that the model is reproducing reality in a way accurate enough to particular modelling purposes. For power system models, standard validation checks include validation of basic inputs (the overall electricity demand, installed generation capacity, topology of the power grid) and main outputs (generaiton mix).
+Validation implies cross-check of the modelling parameters and outputs agains observations data and is needed to ensure that the model is reproducing reality in a way accurate enough to particular modelling purposes. For power system models, standard validation checks include validation of basic inputs (the overall electricity demand, installed generation capacity, topology of the power grid) and main outputs (generation mix).
 
 ### Validation assumptions
 
 Validation is done on the data from the past (2024) which means the need to adjust year-related parameters for the following parameters:
-- commission and de-commission years for installed generaiton capacity;
+- commission and de-commission years for installed generation capacity;
 - technology costs and performance parameters;
 - scaling parameter for the electricity demand;
 - date of OSM data snapshot (we take the latest OSM data which are likely to represent the validation year `2024` in the most accurate way).
 
-For now, the weather year is taken for a default `2013` year (NB can require adjustments to reprodure hydro operation in a more accurate way).
+For now, the weather year is taken for a default `2013` year (NB can require adjustments to reproduce hydro operation in a more accurate way).
 
 ### Validation runs
 
-A configuration file `validation_dispatch_zambia.yaml` contains definitions for a dispatch run reproducing behaviour of the national power system in a reference year from the past. To get modelling outputs for the validation scenario, the following commands as used:
+A configuration file `validation_dispatch_zambia.yaml` contains definitions for a dispatch run reproducing behavior of the national power system in a reference year from the past. To get modelling outputs for the validation scenario, the following commands as used:
 
 ```
 # good to use a dry-run to make sure that
-# retrieve rules are not triggered accidentially
+# retrieve rules are not triggered accidentally
 snakemake -j 1 solve_all_networks -n
 # actual modelling run
 snakemake -j 1 solve_all_networks
 ```
 
-The validation run doesnt's include capacity expansion which allows to run it locally.
+The validation run doesn't include capacity expansion which allows to run it locally.
 
 ### Validation routine
 
