@@ -36,6 +36,8 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Add a description of how to build a cutout [PR #87](https://github.com/open-energy-transition/pypsa-zambia/pull/87)
 
+* Add a modelling note desribing the configurations used and a validation procedure [PR #120](https://github.com/open-energy-transition/pypsa-zambia/pull/120)
+
 ## Upcoming release
 
 This part of documentation collects descriptive release notes to capture the main improvements introduced by developing the model before the next release.
