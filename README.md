@@ -4,7 +4,7 @@ SPDX-FileCopyrightText:  PyPSA-Earth and PyPSA-Eur Authors
 SPDX-License-Identifier: AGPL-3.0-or-later
 -->
 
-# PyPSA-Earth. A Flexible Python-based Open Optimisation Model to Study Energy System Futures around the World.
+# PyPSA-Zambia. A Flexible Python-based Open Power System Model.
 
 <p align="left">
 by
@@ -25,59 +25,6 @@ by
 [![Discord](https://img.shields.io/discord/911692131440148490?logo=discord)](https://discord.gg/AnuJBk23FU)
 [![Google Drive](https://img.shields.io/badge/Google%20Drive-4285F4?style=flat&logo=googledrive&logoColor=white)](https://drive.google.com/drive/folders/13Z8Y9zgsh5IZaDNkkRyo1wkoMgbdUxT5?usp=sharing)
 [![DOI](https://img.shields.io/badge/DOI-10.1016%2Fj.apenergy.2023.121096-blue)](https://doi.org/10.1016/j.apenergy.2023.121096)
-
-
-**PyPSA-Earth: A Global Sector-Coupled Open-Source Multi-Energy System Model**
-
-PyPSA-Earth is the first open-source global cross-sectoral energy system model with high spatial and temporal resolution. The workflow provide capabilities for modelling the energy systems of any country in the world, enabling large-scale collaboration and transparent analysis for an inclusive and sustainable energy future. PyPSA-Earth is suitable for both operational studies and capacity expansion studies. Its sector-coupled modeling capabilities enable features for the detailed optimization of multi-energy systems, covering electricity, heating, transport, industry, hydrogen and more.
-
-All the data needed for a simulation are automatically and flexibly retrieved from open sources. This includes, in particular, energy demand across sectors, generation capacities, medium- to high-voltage networks, and renewable energy potentials. Custom datasets can also be integrated as needed, and kept private if required. At the same time, [PyPSA-Earth-Status](https://github.com/pypsa-meets-earth/pypsa-earth-status) provides functionality to share regional insights. If you are willing to contribute your regional expertise, feel free to open an issue there.
-
-PyPSA-Earth is capable of providing the modelling evidence needed to translate the implications of energy scenarios into actionable regional strategies. By making this tool openly available, we aim to foster collaboration, innovation, and informed decision-making to support sustainable and efficient energy solutions worldwide.
-
-Details on the model are available in the following academic publications:
-
-- *power model* M. Parzen et all. "PyPSA-Earth: A new global open energy system optimization model demonstrated in Africa", Applied Energy, 341, 2023. https://doi.org/10.1016/j.apenergy.2023.121096
-- *sector-coupled model* H. Abdel-Khalek et al. "PyPSA-Earth sector-coupled: A global open-source multi-energy system model showcased for hydrogen applications in countries of the Global South", Applied Energy, 383, 2025. https://doi.org/10.1016/j.apenergy.2025.125316
-
-**PyPSA meets Earth is an independent research initiative developing a powerful energy system model for Earth.** We work on open data, open source modelling, open source solver support and open communities. Stay tuned and join our mission - We look for users, co-developers and leaders!
-
-<p align="center">
-  <img src="https://forum.openmod.org/uploads/db8804/original/1X/ddf041d1b98ca8f8c310f1c6393ec426ab5594cf.png" width=30%>
-  <img src="https://forum.openmod.org/uploads/db8804/original/1X/940b2673cfc31c4a6f01b7908f546d39d67df27e.png" width=23.6%>
-  <img src="https://forum.openmod.org/uploads/db8804/original/1X/6af089c376b19b72ad148e4e4326c162b94db68f.png" width=34.5%>
-</p>
-
-<p align="center"><b> Figure:</b> Example power systems build with PyPSA-Earth.<br>See images of ~193 more countries at <a href="https://zenodo.org/records/10080766">Zenodo</a></p>
-
-
-The diagram below depicts one representative clustered node for the sector-coupled model with its generation, storage and conversion technologies.
-
-<p align="center">
-  <img src="https://ars.els-cdn.com/content/image/1-s2.0-S0306261925000467-gr5_lrg.jpg" width=75%>
-</p>
-
-## Livetracker. Most popular global models:
-
-[![Star History Chart](https://api.star-history.com/svg?repos=pypsa-meets-earth/pypsa-earth,OSeMOSYS/osemosys_global,niclasmattsson/Supergrid,EnergySystemsModellingLab/MUSE_OS,etsap-TIMES/TIMES_model&type=Date&legend=top-left)](https://www.star-history.com/#pypsa-meets-earth/pypsa-earth&OSeMOSYS/osemosys_global&niclasmattsson/Supergrid&EnergySystemsModellingLab/MUSE_OS&etsap-TIMES/TIMES_model&Date)
-
-## How to get involved
-
-There are multiple ways to get involved and learn more about our work:
-1. **Join** [**our Discord Server**](https://discord.gg/AnuJBk23FU) to connect in discussion channels, get help in the support forum, and join our meetings
-2. **Chat on Discord with us** in the following open meetings:
-    - **General initiative meeting** for project news and [high-level code updates](https://docs.google.com/document/d/1r6wm2RBe0DWFngmItpFfSFHA-CnUmVcVTkIKmthdW3g/edit?usp=sharing). Held every [fourth Thursday 16-17:00 (UK time)](https://drive.google.com/file/d/1naH4WwW9drkOkOJ3PLO4fyWdkZQi5-_w/view?usp=share_link) and is a perfect place to meet the community and get a high-level update on PyPSA ecosystem relevant for PyPSA-Earth developments.
-    - **Weekly developers meetings**
-        - Eastern-Hemisphere friendly *Morning meeting* every [Thursday at 09:00 (UK time)](https://drive.google.com/file/d/1PDdmjsKhzyGRo0_YrP4wPQkn2XTNh6jA/view?usp=share_link).
-        - Western-Hemisphere friendly *Evening meeting* every [Thursday 16:00 (UK time)](https://drive.google.com/file/d/1gaLmyV4qGPXsogkeRcAPWjC0ESebUxU-/view?usp=share_link). Every forth Thursday is replaced by the General initiative meeting which has a more high-level perspective, but you can also join to discuss more particular questions.
-3. **Look at public materials** at [**google Drive**](https://drive.google.com/drive/folders/13Z8Y9zgsh5IZaDNkkRyo1wkoMgbdUxT5?usp=sharing) to share to minutes, presentations, lists and documents. Feel gree to get a look!
-4. **Notify your interest** to on-demand meetings:
-    - On-demand meetings
-        - Demand creation and prediction meeting
-        - AI asset detection meeting
-        - Outreach meeting for planning, discussing events, workshops, communication, community activities
-5. Join us and **propose your stream**.
-6. Participate in mapping power grids on [**OpenStreetMap project**](https://osm.org) through the [**MapYourGrid initiative**](https://mapyourgrid.org). Many resources as [video tutorials](https://www.youtube.com/channel/UC52jOcw_6_7iTMW-lXwLrQQ) or [starter-kit](https://mapyourgrid.org/starter-kit/) help to improve open data that is used by PyPSA-Earth to build the grid topology.
 
 ## Installation
 
@@ -133,6 +80,19 @@ There are multiple ways to get involved and learn more about our work:
    Java(TM) SE Runtime Environment (build 1.8.0_341-b10)
    Java HotSpot(TM) 64-Bit Server VM (build 25.341-b10, mixed mode)
    ```
+
+## Customisation
+
+To build a regional cutout, you can use pre-compiled configuration files:
+- "configs/build_cutout_tutorial_zambia_config.yaml" for a smaller tutorial-styled cutout (good for testing)
+- "configs/build_cutout_zambia_config.yaml" for a full-scale cutout
+
+To use them, you need to go through the following steps:
+1. Comment-out a line in Snakemake which fetches a default configuration
+`configfile: "configs/validation_dispatch_zambia.yaml"``
+2. Add a name of a suitable cutout-building configuration file to Smakemake under `#configfile: "configs/validation_dispatch_zambia.yaml"`, e.g. `configfile: "configs/build_cutout_zambia_config.yaml"`
+3. Set-up Copernicus API
+4. run `build_cutout` rule
 
 ## Running the model in previous versions
 
