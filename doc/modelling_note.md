@@ -30,10 +30,9 @@ The following universal files are available directly in `pypsa-zambia` folder:
 `configs/scenarios` folder contains an example definition of a configuration file (not difectly relevant for the project).
 
 Specific configuration files are available to build regional-specific cutouts for the region of interest:
-- containts parameters used to build a full-scale cutout
-- contains parameters user to build a tutorial cutout
-
-`validation_dispatch_zambia.yaml` defines a dispatch modelling run which aims to reproduce a national power system in a specific year in the past and is intended to be used for validation
+- `build_cutout_zambia_config.yaml` containts parameters used to build a full-scale cutout
+- `build_cutout_tutorial_zambia_config.yaml` contains parameters user to build a tutorial cutout
+- `validation_dispatch_zambia.yaml` defines a dispatch modelling run which aims to reproduce a national power system in a specific year in the past and is intended to be used for validation
 
 ## Validation
 
