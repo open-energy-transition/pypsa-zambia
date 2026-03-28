@@ -34,7 +34,7 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Add release process PR template [PR #126](https://github.com/open-energy-transition/pypsa-zambia/pull/126)
 
-* Add a description of how to build a cutout [PR #1767](https://github.com/open-energy-transition/pypsa-zambia/pull/1767)
+* Add a description of how to build a cutout [PR #87](https://github.com/open-energy-transition/pypsa-zambia/pull/87)
 
 ## Upcoming release
 
