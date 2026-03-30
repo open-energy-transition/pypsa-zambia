@@ -10,9 +10,25 @@ SPDX-License-Identifier: CC-BY-4.0
 
 This part of documentation collects descriptive release notes to capture the main improvements introduced by developing the model before the next release.
 
+# PyPSA-Zambia v0.1
+
 ### New Features and Major Changes
 
 * Adds data versioning system [PR #74](https://github.com/openenergytransition.org/pypsa-zambia/pull/74)
+
+* Add Zenodo-based interconnector input data (sapp_links, zm_substations, and sapp_country_data) and bidirectional cross-border link modelling between Zambia and neighbouring countries [PR #88](https://github.com/open-energy-transition/pypsa-zambia/pull/88)
+
+* Provide a reproducible way to build a cutout [PR #86](https://github.com/open-energy-transition/pypsa-zambia/pull/86)
+
+* Retrieve hydrobasins, IRENA and landcover in separate snakemake module [PR #74](https://github.com/open-energy-transition/pypsa-zambia/pull/74)
+
+* Add line_types_data [PR #123](https://github.com/open-energy-transition/pypsa-zambia/pull/123)
+
+* Add a modelling note [PR #120](https://github.com/open-energy-transition/pypsa-zambia/pull/120)
+
+* Add maintenance note [PR #119](https://github.com/open-energy-transition/pypsa-zambia/pull/119)
+
+* Create templates for data collection [PR #118](https://github.com/open-energy-transition/pypsa-zambia/pull/118)
 
 ### Minor Changes and bug-fixing
 
