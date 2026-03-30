@@ -131,7 +131,8 @@ def add_interconnectors(
     return n
 
 
-def load_custom_line_types(line_types):
+def load_custom_line_types(line_types: str) -> pd.DataFrame:
+    """Load and format custom transmission line types for a PyPSA network."""
     custom_line_types = pd.read_csv(line_types)
 
     custom_line_types = custom_line_types.rename(
@@ -145,9 +146,7 @@ def load_custom_line_types(line_types):
             "cross_section (mm²)": "cross_section",
         }
     )
-
     custom_line_types = custom_line_types.set_index("name")
-
     return custom_line_types
 
 
