@@ -52,13 +52,7 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Add voltage levels for the Zambian PowerGrid [PR #122](https://github.com/open-energy-transition/pypsa-zambia/pull/122)
 
-* Add maintenance note [PR #119](https://github.com/open-energy-transition/pypsa-zambia/pull/119)
-
-* Create templates for data collection [PR #118](https://github.com/open-energy-transition/pypsa-zambia/pull/118)
-
 * Add release process PR template [PR #126](https://github.com/open-energy-transition/pypsa-zambia/pull/126)
-
-* Add a modelling note describing the configurations used and a validation procedure [PR #120](https://github.com/open-energy-transition/pypsa-zambia/pull/120)
 
 ## New Features and Major Changes from upstream
 
