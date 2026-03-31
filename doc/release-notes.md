@@ -48,7 +48,7 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Only run Github Action test workflows when workflow-relevant files are changed [PR #94](https://github.com/openenergytransition/pypsa-zambia/pull/94)
 
-* Add regional-focused cutouts to the databundles [PR #87](https://github.com/openenergytransition/pypsa-zambia/pull/87)
+* Add regional-focused cutouts to the databundles [PR #87](https://github.com/open-energy-transition/pypsa-zambia/pull/87)
 
 * Add voltage levels for the Zambian PowerGrid [PR #122](https://github.com/open-energy-transition/pypsa-zambia/pull/122)
 
@@ -57,8 +57,6 @@ This part of documentation collects descriptive release notes to capture the mai
 * Create templates for data collection [PR #118](https://github.com/open-energy-transition/pypsa-zambia/pull/118)
 
 * Add release process PR template [PR #126](https://github.com/open-energy-transition/pypsa-zambia/pull/126)
-
-* Add a description of how to build a cutout [PR #87](https://github.com/open-energy-transition/pypsa-zambia/pull/87)
 
 * Add a modelling note describing the configurations used and a validation procedure [PR #120](https://github.com/open-energy-transition/pypsa-zambia/pull/120)
 
