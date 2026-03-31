@@ -6,6 +6,8 @@ SPDX-License-Identifier: CC-BY-4.0
 
 # Release Notes
 
+Test
+
 ## PyPSA-Zambia release
 
 This part of documentation collects descriptive release notes to capture the main improvements introduced by developing the model before the next release.
