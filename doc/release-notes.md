@@ -6,15 +6,21 @@ SPDX-License-Identifier: CC-BY-4.0
 
 # Release Notes
 
-## PyPSA-Zambia release
+## Upcoming PyPSA-Zambia release
 
 This part of documentation collects descriptive release notes to capture the main improvements introduced by developing the model before the next release.
 
-# PyPSA-Zambia v0.1
+## Upcoming changes from upstream
 
-## New Features from Upstream
+This part of documentation collects descriptive release notes to capture the main improvements introduced by developing the model before the next release.
 
 ### New Features and Major Changes
+
+### Minor Changes and bug-fixing
+
+# PyPSA-Zambia v0.1
+
+## New Features and Major Changes
 
 * Adds data versioning system [PR #74](https://github.com/openenergytransition.org/pypsa-zambia/pull/74)
 
@@ -32,7 +38,7 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Create templates for data collection [PR #118](https://github.com/open-energy-transition/pypsa-zambia/pull/118)
 
-### Minor Changes and bug-fixing
+## Minor Changes and bug-fixing
 
 * Adds a PyPSA-Zambia specific GitHub Actions workflow for the Zambia model [PR #60](https://github.com/openenergytransition/pypsa-zambia/pull/60)
 
@@ -56,11 +62,7 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Add a modelling note describing the configurations used and a validation procedure [PR #120](https://github.com/open-energy-transition/pypsa-zambia/pull/120)
 
-## Upcoming release
-
-This part of documentation collects descriptive release notes to capture the main improvements introduced by developing the model before the next release.
-
-### New Features and Major Changes
+## New Features and Major Changes from upstream
 
 * Use IRENA statistics for 2023 to normalize countries hydropower generation data [PR #1681](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1681)
 
@@ -71,7 +73,7 @@ This part of documentation collects descriptive release notes to capture the mai
 * Add Zenodo-based interconnector input data (`sapp_links`, `zm_substations`, and `sapp_country_data`) and bidirectional cross-border link modelling between Zambia and neighbouring countries [PR #88](https://github.com/open-energy-transition/pypsa-zambia/pull/88)
 * Integrate African transmission line types into PyPSA line type library for improved regional representation.[PR #128](https://github.com/open-energy-transition/pypsa-zambia/pull/128)
 
-### Minor Changes and bug-fixing
+## Minor Changes and bug-fixing from upstream
 
 * Use bus_regions instead of downloading gadm regions again in prepare_gas_network to avoid mismatches in case of simplifying [PR #1662](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1662)
 
