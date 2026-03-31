@@ -213,6 +213,22 @@ if config["validation"]["interconnectors"].get("download_data", False):
             copyfile(str(input["countries"]), output["countries"])
 
 
+if config["validation"]["line_types"].get("download_data", False):
+
+    rule download_line_types:
+        input:
+            url=HTTP.remote(
+                "https://sandbox.zenodo.org/records/473405/files/pypsa_line_types%20%281%29.csv",
+                keep_local=True,
+            ),
+        output:
+            "data/line_types.csv",
+        log:
+            "logs/download_line_types.log",
+        run:
+            copyfile(str(input["url"]), output[0])
+
+
 if config["enable"].get("download_global_buildings", True):
 
     rule download_global_buildings:
@@ -354,6 +370,7 @@ rule base_network:
         + "base_network/all_transformers_build_network.csv",
         country_shapes="resources/" + RDIR + "shapes/country_shapes.geojson",
         offshore_shapes="resources/" + RDIR + "shapes/offshore_shapes.geojson",
+        line_types="data/line_types.csv",
     output:
         "networks/" + RDIR + "base.nc",
     log:
@@ -865,6 +882,7 @@ rule prepare_network:
         power_pool_countries="data/sapp_countries.csv",
         power_pool_links="data/sapp_links.csv",
         substations="data/zm_substations.csv",
+        line_types="data/line_types.csv",
     output:
         "networks/" + RDIR + "elec_s{simpl}_{clusters}_ec_l{ll}_{opts}.nc",
     log:

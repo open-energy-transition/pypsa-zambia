@@ -129,3 +129,28 @@ def add_interconnectors(
     n = add_trade_components(n, power_pool_countries, hours_per_year)
 
     return n
+
+
+def load_custom_line_types(line_types: str) -> pd.DataFrame:
+    """Load and format custom transmission line types for a PyPSA network."""
+    custom_line_types = pd.read_csv(line_types)
+
+    custom_line_types = custom_line_types.rename(
+        columns={
+            "PyPSA Type Name": "name",
+            "f_nom (Hz)": "f_nom",
+            "r_per_length (Ω/km)": "r_per_length",
+            "x_per_length (Ω/km)": "x_per_length",
+            "c_per_length (nF/km)": "c_per_length",
+            "i_nom (kA)": "i_nom",
+            "cross_section (mm²)": "cross_section",
+        }
+    )
+    custom_line_types = custom_line_types.set_index("name")
+    return custom_line_types
+
+
+def add_custom_line_types(n, custom_line_types):
+    """merge custom line_types into the pypsa network"""
+    n.line_types = pd.concat([n.line_types, custom_line_types], axis=0)
+    return n

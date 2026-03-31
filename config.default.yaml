@@ -192,8 +192,8 @@ co2_budget:
     2050: 0.1
 
 electricity:
-  base_voltage: 380.
-  voltages: [132., 220., 300., 380., 500., 750.]
+  base_voltage: 330.
+  voltages: [66., 88., 132., 220., 330.]
   co2limit: 7.75e+7 # European default, 0.05 * 3.1e9*0.5, needs to be adjusted for Africa
   co2base: 1.487e+9 # European default, adjustment to Africa necessary
   agg_p_nom_limits: # enables to set country-wise maximum and minimum generation capacities for generators (e.g. renewables, nuclear, and geothermal)
@@ -240,12 +240,10 @@ electricity:
 
 lines:
   ac_types:
-    132.: "243-AL1/39-ST1A 20.0"
-    220.: "Al/St 240/40 2-bundle 220.0"
-    300.: "Al/St 240/40 3-bundle 300.0"
-    380.: "Al/St 240/40 4-bundle 380.0"
-    500.: "Al/St 240/40 4-bundle 380.0"
-    750.: "Al/St 560/50 4-bundle 750.0"
+    66.: "ACSR Wolf 66.0"
+    132.: "ACSR Panther 132.0"
+    220.: "ACSR Zebra 220.0"
+    330.: "ACSR Zebra 2-bundle 330.0"
   dc_types:
     500.: "HVDC XLPE 1000"
   s_max_pu: 0.7
@@ -1106,4 +1104,6 @@ validation:
     download_data: false
   custom_powerplants:
     enable: false
+    download_data: false
+  line_types:
     download_data: false
