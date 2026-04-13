@@ -8,6 +8,7 @@
 
 import geopandas as gpd
 import pandas as pd
+from pypsa.io import import_components_from_dataframe, import_series_from_dataframe
 
 
 def annual_gwh_to_average_mw(energy_gwh, hours_per_year=8760):
@@ -153,4 +154,89 @@ def load_custom_line_types(line_types: str) -> pd.DataFrame:
 def add_custom_line_types(n, custom_line_types):
     """merge custom line_types into the pypsa network"""
     n.line_types = pd.concat([n.line_types, custom_line_types], axis=0)
+    n.line_types = n.line_types[~n.line_types.index.duplicated(keep="last")]
     return n
+
+
+def map_buses_from_coords(n, df, distance_crs="EPSG:20935", buses_df=None):
+    """Find the nearest bus for each row in df using lat/lon."""
+    candidates = n.buses if buses_df is None else buses_df
+    bus_points = gpd.GeoDataFrame(
+        index=candidates.index,
+        geometry=gpd.points_from_xy(candidates["x"], candidates["y"]),
+        crs="EPSG:4326",
+    ).to_crs(distance_crs)
+    plant_points = gpd.GeoDataFrame(
+        index=df.index,
+        geometry=gpd.points_from_xy(df["lon"], df["lat"]),
+        crs="EPSG:4326",
+    ).to_crs(distance_crs)
+
+    return plant_points.geometry.apply(
+        lambda plant: bus_points.geometry.distance(plant).idxmin()
+    )
+
+
+def disaggregate_plants(n, ppl, fallback="plant", buses_df=None):
+    """Rename ppl rows to real plant names and assign each to its nearest bus."""
+    new_names = []
+    for i in ppl.index:
+        if "name" in ppl.columns:
+            plant_name = ppl.loc[i, "name"]
+            if plant_name is not None and str(plant_name).strip() != "":
+                new_name = str(plant_name) + "-" + str(i)
+            else:
+                new_name = fallback + "-" + str(i)
+        else:
+            new_name = fallback + "-" + str(i)
+        new_names.append(new_name)
+    ppl.index = new_names
+    ppl["bus"] = map_buses_from_coords(n, ppl, buses_df=buses_df)
+
+
+def save_excluded_components(n, component, busmap, exclude_carriers):
+    """
+    Save components we want to protect from aggregation.
+    Works for any component type: "Generator", "Load", "StorageUnit", etc.
+    Pulls out matching rows, remaps their buses, and saves their time-series.
+    """
+    if not exclude_carriers:
+        return pd.DataFrame(), {}
+    component_table = n.df(component)
+    if "carrier" not in component_table.columns:
+        return pd.DataFrame(), {}
+    is_excluded = component_table.carrier.isin(exclude_carriers)
+    if not is_excluded.any():
+        return pd.DataFrame(), {}
+    saved = component_table[is_excluded].copy()
+    saved["bus"] = saved["bus"].map(busmap).fillna(saved["bus"])
+    list_name = n.components[component]["list_name"]
+    ts_container = getattr(n, list_name + "_t")
+    saved_timeseries = {}
+    for attr in ts_container:
+        ts_data = getattr(ts_container, attr)
+        if ts_data.empty:
+            continue
+        cols = ts_data.columns.intersection(saved.index)
+        if not cols.empty:
+            saved_timeseries[attr] = ts_data[cols]
+    return saved, saved_timeseries
+
+
+def restore_excluded_components(n, component, saved_components, saved_timeseries):
+    """
+    Put protected components back into the network after aggregation
+    """
+    if saved_components.empty:
+        return
+    import_components_from_dataframe(n, saved_components, component)
+    for attr, data in saved_timeseries.items():
+        if not data.empty:
+            import_series_from_dataframe(n, data, component, attr)
+
+
+def is_identity_busmap(busmap):
+    """
+    Check if every bus maps to itself.
+    """
+    return (busmap.index == busmap.values).all()
