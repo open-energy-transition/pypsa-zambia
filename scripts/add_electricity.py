@@ -427,14 +427,11 @@ def attach_wind_and_solar(
             plants = df.query("carrier == @tech")
 
             if disaggregate and not plants.empty:
-                # Disaggregated path: one generator per real plant with its actual name.
-                # Each plant gets the capacity-factor profile of its nearest bus.
                 plants = plants.copy().reset_index(drop=True)
                 profile_buses_df = n.buses.loc[
                     n.buses.index.intersection(ds.indexes["bus"])
                 ]
                 disaggregate_plants(n, plants, fallback=tech, buses_df=profile_buses_df)
-
                 profile = ds["profile"].transpose("time", "bus").to_pandas()
                 weight_ds = ds["weight"].to_pandas()
 
@@ -458,7 +455,6 @@ def attach_wind_and_solar(
                     efficiency=costs.at[suptech, "efficiency"],
                 )
             else:
-                # Aggregate path: one generator per bus (original behaviour).
                 if not plants.empty:
                     buses = n.buses.loc[ds.indexes["bus"]]
                     caps = map_country_bus(plants, buses)
