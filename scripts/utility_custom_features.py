@@ -158,18 +158,20 @@ def add_custom_line_types(n, custom_line_types):
     return n
 
 
-def map_buses_from_coords(n, df, distance_crs="EPSG:20935", buses_df=None):
+def map_buses_from_coords(
+    n, df, distance_crs="EPSG:20935", buses_df=None, geo_crs="EPSG:4326"
+):
     """Find the nearest bus for each row in df using lat/lon."""
     candidates = n.buses if buses_df is None else buses_df
     bus_points = gpd.GeoDataFrame(
         index=candidates.index,
         geometry=gpd.points_from_xy(candidates["x"], candidates["y"]),
-        crs="EPSG:4326",
+        crs=geo_crs,
     ).to_crs(distance_crs)
     plant_points = gpd.GeoDataFrame(
         index=df.index,
         geometry=gpd.points_from_xy(df["lon"], df["lat"]),
-        crs="EPSG:4326",
+        crs=geo_crs,
     ).to_crs(distance_crs)
 
     return plant_points.geometry.apply(
@@ -177,8 +179,28 @@ def map_buses_from_coords(n, df, distance_crs="EPSG:20935", buses_df=None):
     )
 
 
-def disaggregate_plants(n, ppl, fallback="plant", buses_df=None):
-    """Rename ppl rows to real plant names and assign each to its nearest bus."""
+def disaggregate_plants(
+    n, ppl, name_fallback="plant", buses_df=None, geo_crs="EPSG:4326"
+):
+    """Rename ppl rows to real plant names and assign each to its nearest bus.
+
+    Parameters
+    ----------
+    n : pypsa.Network
+        The network whose buses are used for geo-matching.
+    ppl : pd.DataFrame
+        Power plant table. Must contain ``lat`` and ``lon`` columns.
+        If a ``name`` column is present, its values are used as the plant name
+        prefix in the new index; otherwise ``name_fallback`` is used.
+    name_fallback : str, optional
+        Prefix used in the new index when a plant has no name (default: "plant").
+        E.g. ``name_fallback="hydro"`` produces index entries like ``"hydro-3"``.
+    buses_df : pd.DataFrame or None, optional
+        Candidate buses for geo-matching. Defaults to all buses in ``n``.
+    geo_crs : str, optional
+        Geographic CRS used to construct GeoDataFrames before reprojection
+        (default: ``"EPSG:4326"``). Should match ``config["crs"]["geo_crs"]``.
+    """
     new_names = []
     for i in ppl.index:
         if "name" in ppl.columns:
@@ -186,12 +208,12 @@ def disaggregate_plants(n, ppl, fallback="plant", buses_df=None):
             if plant_name is not None and str(plant_name).strip() != "":
                 new_name = str(plant_name) + "-" + str(i)
             else:
-                new_name = fallback + "-" + str(i)
+                new_name = name_fallback + "-" + str(i)
         else:
-            new_name = fallback + "-" + str(i)
+            new_name = name_fallback + "-" + str(i)
         new_names.append(new_name)
     ppl.index = new_names
-    ppl["bus"] = map_buses_from_coords(n, ppl, buses_df=buses_df)
+    ppl["bus"] = map_buses_from_coords(n, ppl, buses_df=buses_df, geo_crs=geo_crs)
 
 
 def save_excluded_components(n, component, busmap, exclude_carriers):

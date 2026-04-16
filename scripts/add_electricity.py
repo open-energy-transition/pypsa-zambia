@@ -275,17 +275,14 @@ def load_powerplants(ppl_fn):
         "ccgt, thermal": "CCGT",
         "hard coal": "coal",
     }
-    ppl = read_csv_nafix(ppl_fn, index_col=0, dtype={"bus": "str"})
-    name_col = next((c for c in ppl.columns if c.lower() == "name"), None)
-    original_names = ppl[name_col].copy() if name_col else None
     ppl = (
-        ppl.powerplant.to_pypsa_names()
+        read_csv_nafix(ppl_fn, index_col=0, dtype={"bus": "str"})
+        .powerplant.to_pypsa_names()
         .powerplant.convert_country_to_alpha2()
         .rename(columns=str.lower)
         .drop(columns=["efficiency"])
         .replace({"carrier": carrier_dict})
     )
-    ppl["name"] = original_names
     # drop powerplants with null capacity
     null_ppls = ppl[ppl.p_nom <= 0]
     if not null_ppls.empty:
@@ -372,7 +369,7 @@ def attach_wind_and_solar(
     technologies,
     extendable_carriers,
     line_length_factor,
-    disaggregate=False,
+    disaggregate_flag=False,
 ):
     # TODO: rename tech -> carrier, technologies -> carriers
     _add_missing_carriers_from_costs(n, costs, technologies)
@@ -424,14 +421,21 @@ def attach_wind_and_solar(
             else:
                 capital_cost = costs.at[tech, "capital_cost"]
 
-            plants = df.query("carrier == @tech")
+            if disaggregate_flag and df.query("carrier == @tech").empty:
+                continue
 
-            if disaggregate and not plants.empty:
-                plants = plants.copy().reset_index(drop=True)
+            elif disaggregate_flag and not df.query("carrier == @tech").empty:
+                plants = df.query("carrier == @tech").copy().reset_index(drop=True)
                 profile_buses_df = n.buses.loc[
                     n.buses.index.intersection(ds.indexes["bus"])
                 ]
-                disaggregate_plants(n, plants, fallback=tech, buses_df=profile_buses_df)
+                disaggregate_plants(
+                    n,
+                    plants,
+                    name_fallback=tech,
+                    buses_df=profile_buses_df,
+                    geo_crs=geo_crs,
+                )
                 profile = ds["profile"].transpose("time", "bus").to_pandas()
                 weight_ds = ds["weight"].to_pandas()
 
@@ -455,9 +459,9 @@ def attach_wind_and_solar(
                     efficiency=costs.at[suptech, "efficiency"],
                 )
             else:
-                if not plants.empty:
+                if not df.query("carrier == @tech").empty:
                     buses = n.buses.loc[ds.indexes["bus"]]
-                    caps = map_country_bus(plants, buses)
+                    caps = map_country_bus(df.query("carrier == @tech"), buses)
                     caps = caps.groupby(["bus"]).p_nom.sum()
                     caps = pd.Series(data=caps, index=ds.indexes["bus"]).fillna(0)
                 else:
@@ -490,19 +494,22 @@ def attach_conventional_generators(
     renewable_carriers,
     conventional_config,
     conventional_inputs,
-    disaggregate=False,
+    disaggregate_flag=False,
 ):
     carriers = set(conventional_carriers) | (
         set(extendable_carriers["Generator"]) - set(renewable_carriers)
     )
     _add_missing_carriers_from_costs(n, costs, carriers)
 
-    ppl = ppl.query("carrier in @carriers").join(costs, on="carrier", rsuffix="_r")
-
-    if disaggregate:
-        disaggregate_plants(n, ppl, fallback="plant")
+    if disaggregate_flag:
+        ppl = ppl.query("carrier in @carriers").join(costs, on="carrier", rsuffix="_r")
+        disaggregate_plants(n, ppl, name_fallback="plant", geo_crs=geo_crs)
     else:
-        ppl = ppl.rename(index=lambda s: "C" + str(s))
+        ppl = (
+            ppl.query("carrier in @carriers")
+            .join(costs, on="carrier", rsuffix="_r")
+            .rename(index=lambda s: "C" + str(s))
+        )
         ppl["efficiency"] = ppl.efficiency.fillna(ppl.efficiency)
 
     logger.info(
@@ -551,7 +558,7 @@ def attach_hydro(
     costs,
     ppl,
     hydro_min_inflow_pu=1,
-    disaggregate=False,
+    disaggregate_flag=False,
 ):
     if "hydro" not in snakemake.params.renewable:
         return
@@ -560,16 +567,20 @@ def attach_hydro(
 
     _add_missing_carriers_from_costs(n, costs, carriers)
 
-    ppl = (
-        ppl.query('carrier == "hydro"')
-        .assign(ppl_id=lambda df: df.index)
-        .reset_index(drop=True)
-    )
-
-    if disaggregate:
-        disaggregate_plants(n, ppl, fallback="hydro")
+    if disaggregate_flag:
+        ppl = (
+            ppl.query('carrier == "hydro"')
+            .assign(ppl_id=lambda df: df.index)
+            .reset_index(drop=True)
+        )
+        disaggregate_plants(n, ppl, name_fallback="hydro", geo_crs=geo_crs)
     else:
-        ppl = ppl.rename(index=lambda s: str(s) + " hydro")
+        ppl = (
+            ppl.query('carrier == "hydro"')
+            .assign(ppl_id=lambda df: df.index)
+            .reset_index(drop=True)
+            .rename(index=lambda s: str(s) + " hydro")
+        )
 
     ror = ppl.query('technology == "Run-Of-River"')
     phs = ppl.query('technology == "Pumped Storage"')
@@ -952,7 +963,10 @@ if __name__ == "__main__":
 
     # Snakemake imports:
     demand_profiles = snakemake.input["demand_profiles"]
-    disaggregate = snakemake.params.electricity.get("disaggregate_powerplants", False)
+    disaggregate_flag = snakemake.params.electricity.get(
+        "disaggregate_powerplants", False
+    )
+    geo_crs = snakemake.config.get("crs", {}).get("geo_crs", "EPSG:4326")
 
     costs = load_costs(
         snakemake.input.tech_costs,
@@ -961,6 +975,13 @@ if __name__ == "__main__":
         Nyears,
     )
     ppl = load_powerplants(snakemake.input.powerplants)
+    if disaggregate_flag:
+        raw_ppl = read_csv_nafix(
+            snakemake.input.powerplants, index_col=0, dtype={"bus": "str"}
+        )
+        name_col = next((c for c in raw_ppl.columns if c.lower() == "name"), None)
+        if name_col:
+            ppl["name"] = raw_ppl[name_col]
     if "renewable_carriers" in snakemake.params.electricity:
         renewable_carriers = set(snakemake.params.electricity["renewable_carriers"])
     else:
@@ -994,7 +1015,7 @@ if __name__ == "__main__":
         renewable_carriers,
         snakemake.params.conventional,
         conventional_inputs,
-        disaggregate=disaggregate,
+        disaggregate_flag=disaggregate_flag,
     )
     attach_wind_and_solar(
         n,
@@ -1004,14 +1025,14 @@ if __name__ == "__main__":
         renewable_carriers,
         extendable_carriers,
         snakemake.params.length_factor,
-        disaggregate=disaggregate,
+        disaggregate_flag=disaggregate_flag,
     )
     attach_hydro(
         n,
         costs,
         ppl,
         snakemake.params.renewable["hydro"]["hydro_min_inflow_pu"],
-        disaggregate=disaggregate,
+        disaggregate_flag=disaggregate_flag,
     )
     attach_existing_batteries(n, costs, ppl)
 
