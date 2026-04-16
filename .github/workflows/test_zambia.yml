@@ -51,8 +51,7 @@ jobs:
             - 'Snakefile'
             - 'configs/**'
             - 'envs/**'
-            - '.github/workflows/test.yml'
-            - '.github/workflows/zambia.yml'
+            - '.github/workflows/test_zambia.yml'
             - 'config.*yaml'
             - 'test/**'
 
