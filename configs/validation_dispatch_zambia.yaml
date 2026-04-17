@@ -16,7 +16,7 @@ enable:
 scenario:
   simpl: [""]
   ll: ["v1.0"]
-  clusters: [10]
+  clusters: ["all"]
   opts: [Co2L-3h]
 
 snapshots:
@@ -99,13 +99,13 @@ lines:
     66.: "ACSR Wolf 66.0"
     132.: "ACSR Panther 132.0"
     220.: "ACSR Zebra 220.0"
-    330.: "ACSR Zebra 2-bundle 330.0"
+    330.: "ACSR Bison 330.0"
 costs:
   year: 2025
 
 cluster_options:
   simplify_network:
-    exclude_carriers: []  # Required when disaggregate_powerplants is true to prevent named plants from being re-aggregated in simplify_network coal, oil, hydro, ror, PHS, solar, biomass
+    exclude_carriers: [coal, oil, hydro, ror, PHS, biomass]  # Required when disaggregate_powerplants is true to prevent named plants from being re-aggregated in simplify_network
 
 
 sector:

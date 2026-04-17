@@ -369,7 +369,6 @@ def attach_wind_and_solar(
     technologies,
     extendable_carriers,
     line_length_factor,
-    disaggregate_flag=False,
 ):
     # TODO: rename tech -> carrier, technologies -> carriers
     _add_missing_carriers_from_costs(n, costs, technologies)
@@ -421,68 +420,30 @@ def attach_wind_and_solar(
             else:
                 capital_cost = costs.at[tech, "capital_cost"]
 
-            if disaggregate_flag and df.query("carrier == @tech").empty:
-                continue
-
-            elif disaggregate_flag and not df.query("carrier == @tech").empty:
-                plants = df.query("carrier == @tech").copy().reset_index(drop=True)
-                profile_buses_df = n.buses.loc[
-                    n.buses.index.intersection(ds.indexes["bus"])
-                ]
-                disaggregate_plants(
-                    n,
-                    plants,
-                    name_fallback=tech,
-                    buses_df=profile_buses_df,
-                    geo_crs=geo_crs,
-                )
-                profile = ds["profile"].transpose("time", "bus").to_pandas()
-                weight_ds = ds["weight"].to_pandas()
-
-                # Build a (time × plant) profile DataFrame by selecting each plant's bus column
-                plant_profiles = profile[plants["bus"].values].copy()
-                plant_profiles.columns = plants.index
-
-                n.madd(
-                    "Generator",
-                    plants.index,
-                    bus=plants["bus"],
-                    carrier=tech,
-                    p_nom=plants["p_nom"],
-                    p_nom_extendable=tech in extendable_carriers["Generator"],
-                    p_nom_min=plants["p_nom"],
-                    p_nom_max=plants["p_nom"],
-                    p_max_pu=plant_profiles,
-                    weight=plants["bus"].map(weight_ds),
-                    marginal_cost=costs.at[suptech, "marginal_cost"],
-                    capital_cost=capital_cost,
-                    efficiency=costs.at[suptech, "efficiency"],
-                )
+            if not df.query("carrier == @tech").empty:
+                buses = n.buses.loc[ds.indexes["bus"]]
+                caps = map_country_bus(df.query("carrier == @tech"), buses)
+                caps = caps.groupby(["bus"]).p_nom.sum()
+                caps = pd.Series(data=caps, index=ds.indexes["bus"]).fillna(0)
             else:
-                if not df.query("carrier == @tech").empty:
-                    buses = n.buses.loc[ds.indexes["bus"]]
-                    caps = map_country_bus(df.query("carrier == @tech"), buses)
-                    caps = caps.groupby(["bus"]).p_nom.sum()
-                    caps = pd.Series(data=caps, index=ds.indexes["bus"]).fillna(0)
-                else:
-                    caps = pd.Series(index=ds.indexes["bus"]).fillna(0)
+                caps = pd.Series(index=ds.indexes["bus"]).fillna(0)
 
-                n.madd(
-                    "Generator",
-                    ds.indexes["bus"],
-                    " " + tech,
-                    bus=ds.indexes["bus"],
-                    carrier=tech,
-                    p_nom=caps,
-                    p_nom_extendable=tech in extendable_carriers["Generator"],
-                    p_nom_min=caps,
-                    p_nom_max=ds["p_nom_max"].to_pandas(),
-                    p_max_pu=ds["profile"].transpose("time", "bus").to_pandas(),
-                    weight=ds["weight"].to_pandas(),
-                    marginal_cost=costs.at[suptech, "marginal_cost"],
-                    capital_cost=capital_cost,
-                    efficiency=costs.at[suptech, "efficiency"],
-                )
+            n.madd(
+                "Generator",
+                ds.indexes["bus"],
+                " " + tech,
+                bus=ds.indexes["bus"],
+                carrier=tech,
+                p_nom=caps,
+                p_nom_extendable=tech in extendable_carriers["Generator"],
+                p_nom_min=caps,
+                p_nom_max=ds["p_nom_max"].to_pandas(),
+                p_max_pu=ds["profile"].transpose("time", "bus").to_pandas(),
+                weight=ds["weight"].to_pandas(),
+                marginal_cost=costs.at[suptech, "marginal_cost"],
+                capital_cost=capital_cost,
+                efficiency=costs.at[suptech, "efficiency"],
+            )
 
 
 def attach_conventional_generators(
@@ -1025,7 +986,6 @@ if __name__ == "__main__":
         renewable_carriers,
         extendable_carriers,
         snakemake.params.length_factor,
-        disaggregate_flag=disaggregate_flag,
     )
     attach_hydro(
         n,
