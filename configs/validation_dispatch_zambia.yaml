@@ -101,7 +101,7 @@ lines:
     330.: "ACSR Zebra 2-bundle 330.0"
 costs:
   year: 2025
-  marginal_cost: # EUR/MWh — IRP Table 9 (Zambia 2023), converted at 0.7532 EUR/USD
+  marginal_cost: # EUR/MWh — IRP Table 5 (Zambia 2023), converted at 0.7532 EUR/USD
     solar: 0
     onwind: 0
     offwind: 0.015
