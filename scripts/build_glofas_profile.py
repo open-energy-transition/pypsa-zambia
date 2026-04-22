@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText:  PyPSA-Earth and PyPSA-Eur Authors
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 import pandas as pd
 import xarray as xr
 from _helpers import configure_logging, create_logger
