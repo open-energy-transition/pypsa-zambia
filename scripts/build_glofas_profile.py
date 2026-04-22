@@ -86,7 +86,9 @@ if __name__ == "__main__":
 
     inflow_ppl_df = extract_inflow_df(ppl_df=ppls, glofas_xr=glofas_xr)
 
-    ds.to_netcdf(snakemake.output.profile)
+    inflow_xr = transform_to_xr(inflow_ppl_df)
+
+    inflow_xr.to_netcdf(snakemake.output.profile)
 
 
 
