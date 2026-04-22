@@ -566,15 +566,12 @@ HYDRO_PROFILES = {
 def inputs_hydro(w):
     return HYDRO_PROFILES if w.technology == "hydro" else {}
 
+
 rule build_glofas_profile:
     input:
-        powerplants="resources/"
-        + RDIR
-        + "powerplants.csv",
-        glofas="cutouts/"
-        + CDIR
+        powerplants="resources/" + RDIR + "powerplants.csv",
+        glofas="cutouts/" + CDIR + "zm-2013-glofas.nc",
         # TODO replace hardcoding
-        + "zm-2013-glofas.nc",
     output:
         profile="resources/" + RDIR + "renewable_profiles/profile_hydro_glofas.nc",
     log:
@@ -586,6 +583,7 @@ rule build_glofas_profile:
         mem_mb=ATLITE_NPROCESSES * 5000,
     script:
         "scripts/build_glofas_profile.py"
+
 
 rule build_renewable_profiles:
     params:
