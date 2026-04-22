@@ -1,4 +1,6 @@
   hydro:
+    source: custom # use "era5" for a regular cutout workflow and "custom" for custom renewable profiles
+    path: cutouts/profile_hydro_glofas.nc
     cutout: cutout-2013-era5
     hydrobasins_level: 6
     resource:
