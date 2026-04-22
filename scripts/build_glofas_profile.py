@@ -1,6 +1,7 @@
 import pandas as pd
 import xarray as xr
 
+from _helpers import configure_logging, create_logger
 from add_electricity import load_powerplants
 
 logger = create_logger(__name__)
