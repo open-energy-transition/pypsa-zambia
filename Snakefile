@@ -568,10 +568,10 @@ def inputs_hydro(w):
 
 
 rule build_glofas_profile:
+    # TODO replace hardcoding
     input:
         powerplants="resources/" + RDIR + "powerplants.csv",
         glofas="cutouts/" + CDIR + "zm-2013-glofas.nc",
-        # TODO replace hardcoding
     output:
         profile="resources/" + RDIR + "renewable_profiles/profile_hydro_glofas.nc",
     log:
