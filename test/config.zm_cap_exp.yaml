@@ -4,7 +4,7 @@
 
 ### CHANGES TO CONFIG.TUTORIAL.YAML ###
 run:
-  name: "zm_dispatch"
+  name: "zm_cap_exp"
   shared_cutouts: true
   base_config: config.tutorial.yaml  # base configuration file
 # enable:
