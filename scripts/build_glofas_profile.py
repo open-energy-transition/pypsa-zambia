@@ -18,7 +18,8 @@ def extract_inflow_df(
     glofas_copy_xr = glofas_xr.copy(deep=True)
 
     # TODO Account for the case when there is no hydro generation
-    ppl_hydro_df = ppl_df.query("Fueltype=='Hydro'")
+    # NB 'technology' contains data on 'Reservoir' and 'Run-Of-River'
+    ppl_hydro_df = ppl_df.query("carrier=='hydro'")
     
     ppl_hydro_lat = xr.DataArray(
         ppl_hydro_df["lat"].to_numpy(),
