@@ -72,8 +72,11 @@ def transform_to_xr(inflow_df: pd.DataFrame) -> pd.DataFrame:
     return hydro_xr
 
 if __name__ == "__main__":
-    if "snakemake" not in globals():
-        from _helpers import mock_snakemake
+
+    # TODO Avoid excessive import
+    from _helpers import mock_snakemake
+    # if "snakemake" not in globals():
+    #     from _helpers import mock_snakemake
 
     snakemake = mock_snakemake("build_glofas_profile")
     configure_logging(snakemake)
