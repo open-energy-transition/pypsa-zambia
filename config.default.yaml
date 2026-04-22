@@ -278,6 +278,7 @@ atlite:
 
 renewable:
   onwind:
+    source: era5 # use "era5" for a regular cutout workflow and "custom" for custom renewable profiles 
     cutout: cutout-2013-era5
     resource:
       method: wind
@@ -305,6 +306,7 @@ renewable:
     clip_p_max_pu: 1.e-2
     extendable: true
   offwind-ac:
+    source: era5 # use "era5" for a regular cutout workflow and "custom" for custom renewable profiles   
     cutout: cutout-2013-era5
     resource:
       method: wind
@@ -323,6 +325,7 @@ renewable:
     clip_p_max_pu: 1.e-2
     extendable: true
   offwind-dc:
+    source: era5 # use "era5" for a regular cutout workflow and "custom" for custom renewable profiles   
     cutout: cutout-2013-era5
     resource:
       method: wind
@@ -342,6 +345,7 @@ renewable:
     clip_p_max_pu: 1.e-2
     extendable: true
   solar:
+    source: era5 # use "era5" for a regular cutout workflow and "custom" for custom renewable profiles     
     cutout: cutout-2013-era5
     resource:
       method: pv
@@ -363,6 +367,8 @@ renewable:
     clip_p_max_pu: 1.e-2
     extendable: true
   hydro:
+    source: custom # use "era5" for a regular cutout workflow and "custom" for custom renewable profiles 
+    path: cutouts/profile_hydro_glofas.nc
     cutout: cutout-2013-era5
     hydrobasins_level: 6
     resource:
@@ -385,6 +391,7 @@ renewable:
     multiplier: 1.1 # multiplier applied after the normalization of the hydro production; default 1.0
     hydro_min_inflow_pu: 1.0 # [hour] A threshold of energy to power ratio to classify hydro powerplants as reservoirs in case type is missed
   csp:
+    source: era5 # use "era5" for a regular cutout workflow and "custom" for custom renewable profiles    
     cutout: cutout-2013-era5
     resource:
       method: csp
