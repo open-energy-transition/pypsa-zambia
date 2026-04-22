@@ -662,9 +662,11 @@ rule add_electricity:
         length_factor=config["lines"]["length_factor"],
     input:
         **{
-            f"profile_{tech}": "resources/"
-            + RDIR
-            + f"renewable_profiles/profile_{tech}.nc"
+            f"profile_{tech}": (
+                config["renewable"][tech]["path"]
+                if config["renewable"][tech].get("source", "era5") == "custom"
+                else f"resources/{RDIR}renewable_profiles/profile_{tech}.nc"
+            )
             for tech in config["renewable"]
             if tech in config["electricity"]["renewable_carriers"]
         },
