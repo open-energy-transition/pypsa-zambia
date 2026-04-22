@@ -39,6 +39,7 @@ This part of documentation collects descriptive release notes to capture the mai
 * Only run Github Action test workflows when workflow-relevant files are changed [PR #94](https://github.com/open-energy-transition/pypsa-zambia/pull/94)
 
 * Add regional-focused cutouts to the databundles [PR #87](https://github.com/open-energy-transition/pypsa-zambia/pull/87)
+* Add regional-focused marginal costs, efficiencies and hydro reservoir data [PR #171](https://github.com/open-energy-transition/pypsa-zambia/pull/171)
 
 
 ## Minor Changes and bug-fixing

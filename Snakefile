@@ -170,7 +170,7 @@ if config["validation"]["custom_powerplants"].get("download_data", False):
     rule download_custom_powerplants:
         input:
             url=HTTP.remote(
-                "https://sandbox.zenodo.org/records/471583/files/custom_powerplants.csv",
+                "https://sandbox.zenodo.org/records/491391/files/custom_powerplants.csv",
                 keep_local=True,
                 additional_request_string="?download=1",
             ),
