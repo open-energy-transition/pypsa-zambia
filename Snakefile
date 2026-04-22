@@ -573,7 +573,7 @@ rule build_glofas_profile:
         powerplants="resources/" + RDIR + "powerplants.csv",
         glofas="cutouts/" + CDIR + "zm-2013-glofas.nc",
     output:
-        profile="resources/" + RDIR + "renewable_profiles/profile_hydro_glofas.nc",
+        profile="cutouts/" + CDIR + "profile_hydro_glofas.nc",
     log:
         "logs/" + RDIR + "build_glofas_profile.log",
     benchmark:
