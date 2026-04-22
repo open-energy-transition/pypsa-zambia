@@ -6,11 +6,11 @@ from add_electricity import load_powerplants
 logger = create_logger(__name__)
 
 def extract_inflow_df(
-    ppl_df: pd.Dataframe,
+    ppl_df: pd.DataFrame,
     glofas_xr: xr.Dataset,
     # TODO Implement normalisation
     k: int=1
-    ): -> pd.Dataframe
+    ) -> pd.DataFrame:
     """
     Extract inflow for locations of hydropowerplants
     """
@@ -49,7 +49,7 @@ def extract_inflow_df(
 
     return ppl_hydro_inflow_df
 
-def transform_to_xr(inflow_df: pd.Dataframe): -> xr.Dataset
+def transform_to_xr(inflow_df: pd.DataFrame) -> pd.DataFrame:
     """
     Transform dataframe into xarray dataset with structure 
     of hydro renewable profile
