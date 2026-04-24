@@ -418,7 +418,7 @@ databundles:
   bundle_hydro_profile_full_zm:
     countries: [ZM]
     tutorial: true    
-    category: hydro_profile
+    category: data
     destination: "cutouts"
     urls:
       zenodo: https://sandbox.zenodo.org/records/493138/files/profile_hydro_glofas_2013.nc?download=1
@@ -427,7 +427,7 @@ databundles:
   bundle_hydro_profile_tutorial_zm:
     countries: [ZM]
     tutorial: false    
-    category: hydro_profile
+    category: data
     destination: "cutouts"
     urls:
       zenodo: https://sandbox.zenodo.org/records/493138/files/profile_hydro_glofas_2013.nc?download=1
