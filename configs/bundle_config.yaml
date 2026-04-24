@@ -417,22 +417,22 @@ databundles:
   # custom inflow profile for Zambia
   hydro_profile_full_zm:
     countries: [ZM]
-    tutorial: true    
+    tutorial: true
     category: data
     urls:
       direct: https://sandbox.zenodo.org/records/493138/files/profile_hydro_glofas_2013.nc?download=1
     unzip: false
     output:
-    - cutouts/profile_hydro_glofas_2013.nc  
+    - cutouts/profile_hydro_glofas_2013.nc
 
   hydro_profile_tutorial_zm:
     countries: [ZM]
-    tutorial: false    
+    tutorial: false
     category: data
     urls:
       direct: https://sandbox.zenodo.org/records/493138/files/profile_hydro_glofas_2013.nc?download=1
     unzip: false
-    output: 
+    output:
     - cutouts/profile_hydro_glofas_2013.nc
 
     # # Backup tutorial bundles with no gadm-like data; for reference:
