@@ -367,8 +367,7 @@ renewable:
     clip_p_max_pu: 1.e-2
     extendable: true
   hydro:
-    source: custom # use "era5" for a regular cutout workflow and "custom" for custom renewable profiles
-    path: cutouts/profile_hydro_glofas.nc
+    source: era5 # use "era5" for a regular cutout workflow and "custom" for custom renewable profiles
     cutout: cutout-2013-era5
     hydrobasins_level: 6
     resource:

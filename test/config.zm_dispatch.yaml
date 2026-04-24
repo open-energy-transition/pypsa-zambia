@@ -94,6 +94,14 @@ renewable:
     max_depth: false
     min_shore_distance: false
     max_shore_distance: false
+  hydro:
+    source: custom # use "era5" for a regular cutout workflow and "custom" for custom renewable profiles
+    path: cutouts/profile_hydro_glofas_2013.nc
+    extendable: false
+    normalization:
+      method: irena
+      year: 2013
+    multiplier: 0.65
   csp:
     natura: false
     copernicus: false
