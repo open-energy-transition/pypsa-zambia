@@ -389,7 +389,7 @@ databundles:
     disable_by_opt:
       build_cutout: [all]
 
-  # national-level cutouts for Africa
+  # national-level cutouts for Zambia
   # 0.5 GB
   bundle_cutouts_africa_zm:
     countries: [ZM]
