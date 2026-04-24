@@ -421,7 +421,7 @@ databundles:
     category: hydro
     destination: "cutouts/hydro"
     urls:
-      direct: https://sandbox.zenodo.org/records/493138/files/profile_hydro_glofas_2013.nc
+      direct: https://sandbox.zenodo.org/records/493174/files/glofas_profile_2013.nc
     unzip: false
     output: [cutouts/hydro/glofas_profile_2013.nc]
 
@@ -431,7 +431,7 @@ databundles:
     category: hydro
     destination: "cutouts/hydro"
     urls:
-      direct: https://sandbox.zenodo.org/records/493138/files/profile_hydro_glofas_2013.nc
+      direct: https://sandbox.zenodo.org/records/493174/files/glofas_profile_2013_tutorial.nc
     unzip: false
     output: [cutouts/hydro/glofas_profile_2013_tutorial.nc]
 
