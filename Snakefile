@@ -156,7 +156,7 @@ if config["enable"].get("retrieve_databundle", True):
             expand(
                 "{file}", file=datafiles_retrivedatabundle(config, bundles_to_download)
             ),
-            directory("data/landcover"),
+            # directory("data/landcover"),
         log:
             "logs/" + RDIR + "retrieve_databundle.log",
         benchmark:
