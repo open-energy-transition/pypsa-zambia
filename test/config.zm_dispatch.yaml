@@ -26,6 +26,9 @@ snapshots:
   inclusive: "left" # end is not inclusive
 countries: ["ZM"]
 
+enable:
+  build_natura_raster: false # If 'true', then an exclusion raster will be build. Otherwise use pregenerated raster.
+
 download_osm_data_nprocesses: 4
 
 load_options:
