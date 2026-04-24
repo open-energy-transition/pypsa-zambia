@@ -569,6 +569,8 @@ def inputs_hydro(w):
 
 
 rule build_glofas_profile:
+    params:
+        snapshots=config["snapshots"],
     # TODO replace hardcoding
     input:
         powerplants="resources/" + RDIR + "powerplants.csv",
