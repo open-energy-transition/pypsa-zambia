@@ -8,9 +8,8 @@ Closes # <-- add issue number for the release issue -->
   - [ ] create new header for PyPSA-Zambia release
   - [ ] move "next release" notes under header
   - [ ] add "next release" headers
-- [ ] Create annotated tag `git tag -a vX.Y -m "Release vX.Y"` on the release branch
-- [ ] Push the tag to the server e.g. `git push origin vX.Y`
-- [ ] Create  the draft release on Github selecting the tag you just pushed
+- [ ] Ensure the release branch named `release_vX.Y`, is merged into main
+- [ ] Create  the draft release on Github and create a new tag, ensure you are on the main branch.
 - [ ] Update the release notes on Github with a copy of the release notes from the documentation
 - [ ] Append any artefacts such as:
   - [ ] installer packages
