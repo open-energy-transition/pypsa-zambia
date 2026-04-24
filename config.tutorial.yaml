@@ -11,7 +11,7 @@ countries: ["NG", "BJ"]
 enable:
   retrieve_databundle: true
   retrieve_databundle_sector: true
-  build_natura_raster: false
+  build_natura_raster: true
   progress_bar: false
 
 data:
