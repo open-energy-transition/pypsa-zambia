@@ -414,6 +414,25 @@ databundles:
     disable_by_opt:
       build_cutout: [all]
 
+  # custom inflow profile for Zambia
+  bundle_hydro_profile_zm:
+    countries: [ZM]
+    tutorial: true    
+    category: hydro_profile
+    destination: "cutouts"
+    urls:
+      zenodo: https://sandbox.zenodo.org/records/493138/files/profile_hydro_glofas_2013.nc?download=1
+    output: [cutouts/profile_hydro_glofas_2013.nc]     
+
+  bundle_hydro_profile_zm:
+    countries: [ZM]
+    tutorial: false    
+    category: hydro_profile
+    destination: "cutouts"
+    urls:
+      zenodo: https://sandbox.zenodo.org/records/493138/files/profile_hydro_glofas_2013.nc?download=1
+    output: [cutouts/profile_hydro_glofas_2013.nc]         
+
     # # Backup tutorial bundles with no gadm-like data; for reference:
     # # https://github.com/pypsa-meets-earth/pypsa-earth/issues/1258
 
