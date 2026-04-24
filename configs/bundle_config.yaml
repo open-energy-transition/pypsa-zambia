@@ -419,18 +419,18 @@ databundles:
     countries: [ZM]
     tutorial: false
     category: hydro
-    destination: "cutouts"    
+    destination: "cutouts/hydro"
     urls:
       direct: https://sandbox.zenodo.org/records/493138/files/profile_hydro_glofas_2013.nc
     unzip: false
     output:
-    - cutouts/profile_hydro_glofas_2013.nc
+    - cutouts/hydro/profile_hydro_glofas_2013.nc
 
   hydro_profile_tutorial_zm:
     countries: [ZM]
     tutorial: true
     category: hydro
-    destination: "cutouts"    
+    destination: "cutoutshydro//hydro"    
     urls:
       direct: https://sandbox.zenodo.org/records/493138/files/profile_hydro_glofas_2013.nc
     unzip: false
