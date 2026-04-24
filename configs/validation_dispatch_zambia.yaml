@@ -54,7 +54,7 @@ renewable:
     extendable: false
   hydro:
     source: custom # use "era5" for a regular cutout workflow and "custom" for custom renewable profiles
-    path: cutouts/hydro/profile_hydro_glofas_2013.nc
+    path: cutouts/hydro/glofas_profile_2013.nc
     extendable: false
     normalization:
       method: irena

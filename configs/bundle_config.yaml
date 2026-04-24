@@ -423,7 +423,7 @@ databundles:
     urls:
       direct: https://sandbox.zenodo.org/records/493138/files/profile_hydro_glofas_2013.nc
     unzip: false
-    output: [cutouts/hydro/profile_hydro_glofas_2013.nc]
+    output: [cutouts/hydro/glofas_profile_2013.nc]
 
   hydro_profile_tutorial_zm:
     countries: [ZM]
@@ -433,7 +433,7 @@ databundles:
     urls:
       direct: https://sandbox.zenodo.org/records/493138/files/profile_hydro_glofas_2013.nc
     unzip: false
-    output: [cutouts/hydro/profile_hydro_glofas_2013.nc]
+    output: [cutouts/hydro/glofas_profile_2013_tutorial.nc]
 
   bundle_natura_earth_tutorial:
     countries: [Earth]
