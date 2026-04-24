@@ -430,7 +430,7 @@ databundles:
     countries: [ZM]
     tutorial: true
     category: hydro
-    destination: "cutoutshydro//hydro"    
+    destination: "cutoutshydro//hydro"
     urls:
       direct: https://sandbox.zenodo.org/records/493138/files/profile_hydro_glofas_2013.nc
     unzip: false
