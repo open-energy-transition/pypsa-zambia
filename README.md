@@ -13,42 +13,42 @@ by
 <a/>
 </p>
 
-## Development Status: **Stable and Active**
+## Development Status: **Under Development**
 
-[![Test workflows](https://github.com/pypsa-meets-earth/pypsa-earth/actions/workflows/test.yml/badge.svg)](https://github.com/pypsa-meets-earth/pypsa-earth/actions/workflows/test.yml)
+[![Test workflows](https://github.com/open-energy-transition/pypsa-zambia/actions/workflows/test.yml/badge.svg)](https://github.com/open-energy-transition/pypsa-zambia/actions/workflows/test.yml)
 [![Documentation Status](https://readthedocs.org/projects/pypsa-earth/badge/?version=latest)](https://pypsa-earth.readthedocs.io/en/latest/?badge=latest)
-![Size](https://img.shields.io/github/repo-size/pypsa-meets-earth/pypsa-earth)
+![Size](https://img.shields.io/github/repo-size/open-energy-transition/pypsa-zambia)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPLv3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
-[![REUSE status](https://api.reuse.software/badge/github.com/pypsa-meets-earth/pypsa-earth)](https://api.reuse.software/info/github.com/pypsa-meets-earth/pypsa-earth)
+[![REUSE status](https://api.reuse.software/badge/github.com/open-energy-transition/pypsa-zambia)](https://api.reuse.software/info/github.com/open-energy-transition/pypsa-zambia)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/pypsa-meets-earth/pypsa-earth/main.svg)](https://results.pre-commit.ci/latest/github/pypsa-meets-earth/pypsa-earth/main)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/open-energy-transition/pypsa-zambia/main.svg)](https://results.pre-commit.ci/latest/github/open-energy-transition/pypsa-zambia/main)
 [![Discord](https://img.shields.io/discord/911692131440148490?logo=discord)](https://discord.gg/AnuJBk23FU)
 [![Google Drive](https://img.shields.io/badge/Google%20Drive-4285F4?style=flat&logo=googledrive&logoColor=white)](https://drive.google.com/drive/folders/13Z8Y9zgsh5IZaDNkkRyo1wkoMgbdUxT5?usp=sharing)
 [![DOI](https://img.shields.io/badge/DOI-10.1016%2Fj.apenergy.2023.121096-blue)](https://doi.org/10.1016/j.apenergy.2023.121096)
 
 ## Installation
 
-1. Open your terminal at a location where you want to install pypsa-earth. Type the following in your terminal to download the package from GitHub:
+1. Open your terminal at a location where you want to install pypsa-zambia. Type the following in your terminal to download the package from GitHub:
 
    ```bash
-   .../some/path/without/spaces % git clone https://github.com/pypsa-meets-earth/pypsa-earth.git
+   .../some/path/without/spaces % git clone https://github.com/open-energy-transition/pypsa-zambia.git
    ```
 2. The python package requirements are curated in the `envs/{your operating system}64.lock.yaml` file.
    - On linux, the environment can be installed using:
      ```bash
-     .../pypsa-earth % conda env create -f envs/linux-64.lock.yaml
+     .../pypsa-zambia % conda env create -f envs/linux-64.lock.yaml
      ```
    - On newest macOS (arm-based), the environment can be installed using:
      ```bash
-     .../pypsa-earth % conda env create -f envs/osx-arm64.lock.yaml
+     .../pypsa-zambia % conda env create -f envs/osx-arm64.lock.yaml
      ```
      On non-arm macOS, the environment can be installed using:
      ```bash
-     .../pypsa-earth % conda env create -f envs/osx-64.lock.yaml
+     .../pypsa-zambia % conda env create -f envs/osx-64.lock.yaml
      ```
     - On Windows, the environment can be installed using:
       ```bash
-      .../pypsa-earth % conda env create -f envs/win-64.lock.yaml
+      .../pypsa-zambia % conda env create -f envs/win-64.lock.yaml
      ```
 
    If the above takes longer than 30 min, you might want to try mamba for faster installation:
@@ -56,21 +56,21 @@ by
    ```bash
    (base) conda install -c conda-forge mamba
 
-   .../pypsa-earth % mamba env create -f envs/{{your operating system}}64.lock.yaml
+   .../pypsa-zambia % mamba env create -f envs/{{your operating system}}64.lock.yaml
    ```
 3. (optional) In step 2, three solvers are installed: HiGHs, glpk and gurobi. HiGHs is the recommended open-source solver. Gurobi is generally faster, but requires a license for full functionality, which is [freely available to academics](https://www.gurobi.com/features/academic-named-user-license/) (see instructions website).
 
 4. To use jupyter lab (new jupyter notebooks) **continue** with the [ipython kernel installation](http://echrislynch.com/2019/02/01/adding-an-environment-to-jupyter-notebooks/) and test if your jupyter lab works:
 
    ```bash
-   .../pypsa-earth % ipython kernel install --user --name=pypsa-earth
-   .../pypsa-earth % jupyter lab
+   .../pypsa-zambia % ipython kernel install --user --name=pypsa-earth
+   .../pypsa-zambia % jupyter lab
    ```
 5. Verify or install a java redistribution from the [official website](https://www.oracle.com/java/technologies/downloads/) or equivalent.
    To verify the successful installation the following code can be tested from bash:
 
    ```bash
-   .../pypsa-earth % java -version
+   .../pypsa-zambia % java -version
    ```
 
    The expected output should resemble the following:
@@ -94,16 +94,9 @@ To use them, you need to go through the following steps:
 3. Set-up Copernicus API
 4. run `build_cutout` rule
 
-## Running the model in previous versions
+## Validation
 
-The model can be run in previous versions by checking out the respective tag. For instance, to run the model in version 0.8.0, which is the last version before the recent PyPSA update, the following command can be used:
-
-```bash
-git checkout v0.8.0
-```
-After checking out the tag, the model can be run as usual. Please make sure to use the environment built for the respective version.
-
-
+A set of notebooks which provides ingights on outputs of the model and ways to analyse them are available in [zambia-dev-notebooks](https://github.com/open-energy-transition/zambia-dev-notebooks) repo.
 
 ## Test run on tutorial
 
@@ -120,22 +113,13 @@ After checking out the tag, the model can be run as usual. Please make sure to u
 
   Remove the -n to do a real run. Follow the tutorial of PyPSA-Eur 1 and 2 on [YouTube](https://www.youtube.com/watch?v=ty47YU1_eeQ) to continue with an analysis.
 
-
-
-
-
-## Training
-
-- We recently updated some [hackathon material](https://github.com/pypsa-meets-earth/documentation) for PyPSA-Earth. The hackathon contains jupyter notebooks with exercises. After going through the 1 day theoretical and practical material you should have a suitable coding setup and feel confident about contributing.
-- The get a general feeling about the PyPSA functionality, we further recommend going through the [PyPSA](https://github.com/PyPSA/PyPSA/tree/master/examples) and [Atlite](https://github.com/PyPSA/atlite/tree/master/examples) examples.
-
 ## Questions and Issues
 
-- We are happy to answer questions and help with issues **if they are public**. Through being public the wider community can benefit from the raised points. Some tips. **Bugs** and **feature requests** should be raised in the [**GitHub Issues**](https://github.com/pypsa-meets-earth/pypsa-earth/issues/new/choose). **General workflow** or **user questions** as well as discussion points should be posted at the [**GitHub Discussions**](https://github.com/pypsa-meets-earth/pypsa-earth/discussions/categories/q-a) tab. Happy coding.
+- We are happy to answer questions and help with issues **if they are public**. Through being public the wider community can benefit from the raised points. Some tips. **Bugs** and **feature requests** should be raised in the [**GitHub Issues**](https://github.com/open-energy-transition/pypsa-zambia/issues/new/choose). **General workflow** or **user questions** as well as discussion points should be posted at the [**GitHub Discussions**](https://github.com/open-energy-transition/pypsa-zambia/discussions/categories/q-a) tab. Happy coding.
 
 ## Documentation
 
-The documentation is available here: [documentation](https://pypsa-earth.readthedocs.io/en/latest/index.html).
+Specific documentation for PyPSA-Zambia is under development. General documentation for PyPSA-Earth is available [here](https://pypsa-earth.readthedocs.io/en/latest/index.html) and can be used to get information on installation and customisation procedures, design of the model and philosophy of the workflow, as well as to access tutorial and support materials.
 
 ## Collaborators
 
