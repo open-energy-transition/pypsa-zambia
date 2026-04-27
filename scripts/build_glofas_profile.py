@@ -49,12 +49,14 @@ def extract_inflow_df(
     ppl_hydro_daily_inflow_df.columns.name = "plant"
 
     ppl_hydro_daily_inflow_df.index = pd.to_datetime(ppl_hydro_daily_inflow_df.index)
-    
+
     start = snapshots["start"]
-    end = snapshots["end"]    
+    end = snapshots["end"]
 
     snapshots = pd.date_range(start, end, freq="1d")
-    ppl_hydro_daily_cut_inflow_df = ppl_hydro_daily_inflow_df.loc[ppl_hydro_daily_inflow_df.index.isin(snapshots)]
+    ppl_hydro_daily_cut_inflow_df = ppl_hydro_daily_inflow_df.loc[
+        ppl_hydro_daily_inflow_df.index.isin(snapshots)
+    ]
 
     ppl_hydro_inflow_df = ppl_hydro_daily_cut_inflow_df.resample("1h").interpolate(
         method="linear"
@@ -96,7 +98,9 @@ if __name__ == "__main__":
     ppls = load_powerplants(snakemake.input.powerplants)
     glofas_xr = xr.open_dataset(snakemake.input.glofas)
 
-    inflow_ppl_df = extract_inflow_df(snapshots=snakemake.params.snapshots, ppl_df=ppls, glofas_xr=glofas_xr)
+    inflow_ppl_df = extract_inflow_df(
+        snapshots=snakemake.params.snapshots, ppl_df=ppls, glofas_xr=glofas_xr
+    )
 
     inflow_xr = transform_to_xr(inflow_ppl_df)
 
