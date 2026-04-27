@@ -53,8 +53,7 @@ renewable:
     correction_factor: 0.854337
     extendable: false
   hydro:
-    source: custom # use "era5" for a regular cutout workflow and "custom" for custom renewable profiles
-    path: cutouts/hydro/glofas_profile_2013.nc
+    source: era5 # use "era5" for a regular cutout workflow and "custom" for custom renewable profiles
     extendable: false
     normalization:
       method: irena
