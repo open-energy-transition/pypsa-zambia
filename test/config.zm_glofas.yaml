@@ -4,7 +4,7 @@
 
 ### CHANGES TO CONFIG.TUTORIAL.YAML ###
 run:
-  name: "zm_dispatch"
+  name: "zm_glofas"
   shared_cutouts: true
   base_config: config.tutorial.yaml  # base configuration file
 
@@ -92,7 +92,8 @@ renewable:
     min_shore_distance: false
     max_shore_distance: false
   hydro:
-    source: era5 # use "era5" for a regular cutout workflow and "custom" for custom renewable profiles
+    source: custom # use "era5" for a regular cutout workflow and "custom" for custom renewable profiles
+    path: cutouts/hydro/glofas_profile_2013_tutorial.nc
     extendable: false
     normalization:
       method: irena
