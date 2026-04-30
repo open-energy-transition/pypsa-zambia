@@ -38,6 +38,7 @@ configfile: "config.default.yaml"
 configfile: "configs/bundle_config.yaml"
 configfile: "configs/powerplantmatching_config.yaml"
 configfile: "configs/validation_dispatch_zambia.yaml"
+configfile: "configs/validation_dispatch_zambia_25.yaml"
 
 
 check_config_version(config=config)
