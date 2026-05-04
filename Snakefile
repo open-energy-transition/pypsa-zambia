@@ -2295,7 +2295,7 @@ if config["foresight"] == "myopic":
 
 rule run_scenario:
     input:
-        diff_config="configs/scenarios/config.{scenario_name}.yaml",
+        diff_config="configs/scenarios_zambia/config.{scenario_name}.yaml",
     output:
         touchfile=touch("results/{scenario_name}/scenario.done"),
         copyconfig="results/{scenario_name}/config.yaml",
@@ -2343,6 +2343,6 @@ rule run_all_scenarios:
             "results/{scenario_name}/scenario.done",
             scenario_name=[
                 c.stem.replace("config.", "")
-                for c in Path("configs/scenarios").glob("config.*.yaml")
+                for c in Path("configs/scenarios_zambia").glob("config.*.yaml")
             ],
         ),
