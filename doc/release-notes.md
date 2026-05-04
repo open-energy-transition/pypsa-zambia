@@ -10,6 +10,12 @@ SPDX-License-Identifier: CC-BY-4.0
 
 This part of documentation collects descriptive release notes to capture the main improvements introduced by developing the model before the next release.
 
+## New Features and Major Changes
+
+### Minor Changes and bug-fixing
+
+* advance testing infrastructure to update the objective reference values, ensure that run artifacts are always available, add a manual run trigger, and amend an example on adding a new test [PR #166](https://github.com/open-energy-transition/pypsa-zambia/pull/166)
+
 ## Upcoming changes from upstream
 
 This part of documentation collects descriptive release notes to capture the main improvements introduced by developing the model before the next release.
