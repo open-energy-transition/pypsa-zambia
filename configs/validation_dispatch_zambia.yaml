@@ -145,3 +145,5 @@ validation:
     download_data: true
   line_types:
     download_data: true
+  mining_data:
+    download_data: true

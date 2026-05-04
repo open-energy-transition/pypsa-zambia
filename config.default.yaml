@@ -1114,3 +1114,5 @@ validation:
     download_data: false
   line_types:
     download_data: false
+  mining_data:
+    download_data: false

@@ -21,7 +21,7 @@ costs:
     lifetime: 25
     CO2 intensity: 0
     discount rate: 0.07
-  marginal_cost: # EUR/MWh — IRP Table 5 (Zambia 2023), converted at 0.7532 EUR/USD
+  marginal_cost: # EUR/MWh — IRP Table 9 (Zambia 2023), converted at 0.7532 EUR/USD
     solar: 0
     onwind: 0
     offwind: 0.015
