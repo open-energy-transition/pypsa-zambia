@@ -254,10 +254,14 @@ def build_demand_profiles(
     shapes = gpd.read_file(admin_shapes).set_index("GADM_ID")
     shapes["geometry"] = shapes["geometry"].apply(lambda x: make_valid(x))
 
+    demand_weights = snakemake.params.load_options.get(
+        "demand_weights", {"gdp": 0.24, "mining": 0.76}
+    )
+    w_gdp = demand_weights["gdp"]
+    w_mining = demand_weights["mining"]
+
     def upsample(cntry, group):
-        """
-        Distributes load in country according to population and gdp.
-        """
+        """Distributes load in country according to mining demand and gdp."""
         l = gegis_load.loc[gegis_load.region_code == cntry]["Electricity demand"]
         if len(group) == 1:
             return pd.DataFrame({group.index[0]: l})
@@ -267,15 +271,11 @@ def build_demand_profiles(
             gdp_n = pd.Series(
                 transfer.dot(shapes_cntry["gdp"].fillna(1.0).values), index=group.index
             )
-            pop_n = pd.Series(
-                transfer.dot(shapes_cntry["pop"].fillna(1.0).values), index=group.index
+            mining_n = pd.Series(
+                transfer.dot(shapes_cntry["mining"].fillna(0.0).values),
+                index=group.index,
             )
-
-            # relative factors 0.6 and 0.4 have been determined from a linear
-            # regression on the country to EU continent load data
-            # (refer to vresutils.load._upsampling_weights)
-            # TODO: require adjustment for Africa
-            factors = normed(0.6 * normed(gdp_n) + 0.4 * normed(pop_n))
+            factors = normed(w_mining * normed(mining_n) + w_gdp * normed(gdp_n))
             if factors.sum() == 0:
                 logger.warning(
                     f"Upsampling factors for {cntry} are all zero, returning uniform distribution across {len(factors)} shapes."
