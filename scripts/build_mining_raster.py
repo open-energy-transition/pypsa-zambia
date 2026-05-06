@@ -26,4 +26,5 @@ if __name__ == "__main__":
         provincial_demand=provincial_demand,
         mining_polygons=mining_polygons,
         output_path=snakemake.output.mining_raster,
+        area_crs=snakemake.params.area_crs,
     )

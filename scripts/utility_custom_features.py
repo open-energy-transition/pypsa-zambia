@@ -171,16 +171,22 @@ def build_mining_raster(
     provincial_demand,
     mining_polygons,
     output_path,
-    resolution=0.01,
-    crs="EPSG:4326",
+    resolution=1000,
+    geo_crs="EPSG:4326",
+    area_crs="ESRI:54009",
 ):
     """
     Create a mining demand raster for Zambia.
 
     Inputs:
-    - provincial_demand_path: CSV with province, mining_demand_gwh
-    - mining_polygons_path: CSV with province, area_km2, geometry_wkt
-    - output_path: output GeoTIFF path
+    - provincial_demand (pd.DataFrame): columns [province, mining_demand_gwh]
+    - mining_polygons (pd.DataFrame): columns [province, area_km2, geometry_wkt].
+      Each polygon carries a native "province" field, so demand is assigned by
+      direct attribute lookup — no spatial intersection is required.
+    - output_path (str): path for the output GeoTIFF file
+    - resolution (int): raster resolution in units of area_crs (default: 1000 m)
+    - geo_crs (str): CRS of the input WKT geometries (default: EPSG:4326)
+    - area_crs (str): CRS used for area calculations and raster output (default: ESRI:54009)
 
     Output values are in MWh/km²/year.
     """
@@ -195,17 +201,17 @@ def build_mining_raster(
         * 1000
         / mines["province_area_km2"]
     )
-    # Convert WKT to geometries
+    # Convert WKT to geometries, then reproject to area_crs for rasterization
     gdf = gpd.GeoDataFrame(
         mines,
         geometry=mines["geometry_wkt"].apply(wkt.loads),
-        crs=crs,
-    )
-    # Zambia bounding box
-    lon_min, lat_min, lon_max, lat_max = 21.9, -18.1, 33.7, -8.2
-    width = round((lon_max - lon_min) / resolution)
-    height = round((lat_max - lat_min) / resolution)
-    transform = from_bounds(lon_min, lat_min, lon_max, lat_max, width, height)
+        crs=geo_crs,
+    ).to_crs(area_crs)
+    # Derive bounding box from reprojected data
+    x_min, y_min, x_max, y_max = gdf.total_bounds
+    width = round((x_max - x_min) / resolution)
+    height = round((y_max - y_min) / resolution)
+    transform = from_bounds(x_min, y_min, x_max, y_max, width, height)
     # Rasterize mining demand
     shapes = zip(gdf.geometry, gdf["demand_mwh_per_km2"])
 
@@ -225,7 +231,7 @@ def build_mining_raster(
         width=width,
         count=1,
         dtype="float32",
-        crs=crs,
+        crs=area_crs,
         transform=transform,
         nodata=0,
     ) as dst:

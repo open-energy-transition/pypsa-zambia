@@ -378,6 +378,8 @@ rule build_shapes:
 
 
 rule build_mining_raster:
+    params:
+        area_crs=config["crs"]["area_crs"],
     input:
         provincial_demand="data/mining/zambia_provincial_mining_demand.csv",
         mining_polygons="data/mining/zambia_pangaea_mining_polygons.csv",
