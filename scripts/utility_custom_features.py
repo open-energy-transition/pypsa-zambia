@@ -162,7 +162,7 @@ def map_buses_from_coords(
     n, df, buses_df=None, distance_crs="EPSG:20935", geo_crs="EPSG:4326"
 ):
     """Find the nearest bus for each row in df using lat/lon.
-    
+
     Parameters
     ----------
     n : pypsa.Network
@@ -172,7 +172,7 @@ def map_buses_from_coords(
     buses_df : pd.DataFrame or None, optional
         Candidate buses for geo-matching. Defaults to all buses in ``n``.
     distance_crs : str, optional
-        Geographic CRS used to measure distances.        
+        Geographic CRS used to measure distances.
     geo_crs : str, optional
         Geographic CRS used to construct GeoDataFrames before reprojection.
     """
@@ -194,15 +194,15 @@ def map_buses_from_coords(
 
 
 def disaggregate_plants(
-    n, ppl, name_fallback="plant", buses_df=None, geo_crs="EPSG:4326"
+    n, df, name_fallback="plant", buses_df=None, geo_crs="EPSG:4326"
 ):
-    """Rename ppl rows to real plant names and assign each to its nearest bus.
+    """Rename df rows to real plant names and assign each to its nearest bus.
 
     Parameters
     ----------
     n : pypsa.Network
         The network whose buses are used for geo-matching.
-    ppl : pd.DataFrame
+    df : pd.DataFrame
         Power plant table. Must contain ``lat`` and ``lon`` columns.
         If a ``name`` column is present, its values are used as the plant name
         prefix in the new index; otherwise ``name_fallback`` is used.
@@ -216,9 +216,9 @@ def disaggregate_plants(
         (default: ``"EPSG:4326"``). Should match ``config["crs"]["geo_crs"]``.
     """
     new_names = []
-    for i in ppl.index:
-        if "name" in ppl.columns:
-            plant_name = ppl.loc[i, "name"]
+    for i in df.index:
+        if "name" in df.columns:
+            plant_name = df.loc[i, "name"]
             if plant_name is not None and str(plant_name).strip() != "":
                 new_name = str(plant_name) + "-" + str(i)
             else:
@@ -226,16 +226,36 @@ def disaggregate_plants(
         else:
             new_name = name_fallback + "-" + str(i)
         new_names.append(new_name)
-    ppl.index = new_names
-    ppl["bus"] = map_buses_from_coords(n, ppl, buses_df=buses_df, geo_crs=geo_crs)
-    return ppl
+    df.index = new_names
+    df["bus"] = map_buses_from_coords(n, df, buses_df=buses_df, geo_crs=geo_crs)
+    return df
 
 
 def save_excluded_components(n, component, busmap, exclude_carriers):
     """
     Save components we want to protect from aggregation.
+
     Works for any component type: "Generator", "Load", "StorageUnit", etc.
     Pulls out matching rows, remaps their buses, and saves their time-series.
+
+    Parameters
+    ----------
+    n : pypsa.Network
+        The network containing the components to save.
+    component : str
+        Component type to filter, e.g. ``"Generator"`` or ``"StorageUnit"``.
+    busmap : pd.Series
+        Maps old bus names to new bus names (as produced by clustering).
+    exclude_carriers : list of str
+        Carriers whose components should be saved and excluded from aggregation.
+
+    Returns
+    -------
+    saved : pd.DataFrame
+        Static component table for the excluded components, with buses remapped.
+    saved_timeseries : dict of str -> pd.DataFrame
+        Time-varying attributes (e.g. ``p_max_pu``) for the excluded components.
+        Empty dict if none exist.
     """
     if not exclude_carriers:
         return pd.DataFrame(), {}
@@ -246,7 +266,7 @@ def save_excluded_components(n, component, busmap, exclude_carriers):
     if not is_excluded.any():
         return pd.DataFrame(), {}
     saved = component_table[is_excluded].copy()
-    saved["bus"] = saved["bus"].map(busmap).fillna(saved["bus"])
+    saved["bus"] = saved["bus"].replace(busmap)
     list_name = n.components[component]["list_name"]
     ts_container = getattr(n, list_name + "_t")
     saved_timeseries = {}
