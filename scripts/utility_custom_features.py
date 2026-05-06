@@ -190,6 +190,8 @@ def add_mining_data(df_gadm, mining_raster_path):
             # Total demand (GWh/year)
             df_gadm.loc[idx, "mining"] = (intensity * pixel_area_km2).sum() / 1000.0
     return df_gadm
+
+
 def load_mining_data(provincial_demand_path, mining_polygons_path):
     """Load mining raster input data from CSV files."""
     return (pd.read_csv(provincial_demand_path), pd.read_csv(mining_polygons_path))
