@@ -16,7 +16,7 @@ enable:
 scenario:
   simpl: [""]
   ll: ["v1.0"]
-  clusters: [32]
+  clusters: [10]
   opts: [Co2L-3h]
 
 snapshots:
