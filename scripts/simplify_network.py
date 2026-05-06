@@ -281,6 +281,9 @@ def _aggregate_and_move_components(
     if is_identity_busmap(busmap):
         logger.info("No bus merging → keep all power plants separate")
         return
+    if is_identity_busmap(busmap):
+        logger.info("No bus merging → keep all power nodes separate")
+        return
 
     def replace_components(n, c, df, pnl):
         n.mremove(c, n.df(c).index)
