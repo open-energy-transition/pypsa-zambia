@@ -4,10 +4,16 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-"""Utility functions for adding Zambia interconnectors to a PyPSA network."""
+import logging
 
 import geopandas as gpd
 import pandas as pd
+import rasterio
+from rasterio.features import rasterize
+from rasterio.transform import from_bounds
+from shapely import wkt
+
+logger = logging.getLogger(__name__)
 
 
 def annual_gwh_to_average_mw(energy_gwh, hours_per_year=8760):
@@ -154,3 +160,81 @@ def add_custom_line_types(n, custom_line_types):
     """merge custom line_types into the pypsa network"""
     n.line_types = pd.concat([n.line_types, custom_line_types], axis=0)
     return n
+
+
+def load_mining_data(provincial_demand_path, mining_polygons_path):
+    """Load mining raster input data from CSV files."""
+    return (pd.read_csv(provincial_demand_path), pd.read_csv(mining_polygons_path))
+
+
+def build_mining_raster(
+    provincial_demand,
+    mining_polygons,
+    output_path,
+    resolution=1000,
+    geo_crs="EPSG:4326",
+    area_crs="ESRI:54009",
+):
+    """
+    Create a mining demand raster for Zambia.
+
+    Inputs:
+    - provincial_demand (pd.DataFrame): columns [province, mining_demand_gwh]
+    - mining_polygons (pd.DataFrame): columns [province, area_km2, geometry_wkt].
+      Each polygon carries a native "province" field, so demand is assigned by
+      direct attribute lookup — no spatial intersection is required.
+    - output_path (str): path for the output GeoTIFF file
+    - resolution (int): raster resolution in units of area_crs (default: 1000 m)
+    - geo_crs (str): CRS of the input WKT geometries (default: EPSG:4326)
+    - area_crs (str): CRS used for area calculations and raster output (default: ESRI:54009)
+
+    Output values are in MWh/km²/year.
+    """
+
+    demand = provincial_demand.set_index("province")
+    mines = mining_polygons
+    # Total mining area per province
+    mines["province_area_km2"] = mines.groupby("province")["area_km2"].transform("sum")
+    # Demand intensity
+    mines["demand_mwh_per_km2"] = (
+        mines["province"].map(demand["mining_demand_gwh"])
+        * 1000
+        / mines["province_area_km2"]
+    )
+    # Convert WKT to geometries, then reproject to area_crs for rasterization
+    gdf = gpd.GeoDataFrame(
+        mines,
+        geometry=mines["geometry_wkt"].apply(wkt.loads),
+        crs=geo_crs,
+    ).to_crs(area_crs)
+    # Derive bounding box from reprojected data
+    x_min, y_min, x_max, y_max = gdf.total_bounds
+    width = round((x_max - x_min) / resolution)
+    height = round((y_max - y_min) / resolution)
+    transform = from_bounds(x_min, y_min, x_max, y_max, width, height)
+    # Rasterize mining demand
+    shapes = zip(gdf.geometry, gdf["demand_mwh_per_km2"])
+
+    raster = rasterize(
+        shapes,
+        out_shape=(height, width),
+        transform=transform,
+        fill=0,
+        dtype="float32",
+    )
+    # Save raster
+    with rasterio.open(
+        output_path,
+        "w",
+        driver="GTiff",
+        height=height,
+        width=width,
+        count=1,
+        dtype="float32",
+        crs=area_crs,
+        transform=transform,
+        nodata=0,
+    ) as dst:
+        dst.write(raster, 1)
+
+    return output_path

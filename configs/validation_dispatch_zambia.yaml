@@ -69,6 +69,7 @@ load_options:
   weather_year: 2013
   prediction_year: 2030
   scale: 0.85  # scaled the model demand by a factor of 14.4/19.34 to match the national value
+  zambia_demand_distribution: true
 
 
 electricity:
@@ -144,4 +145,6 @@ validation:
     enable: true
     download_data: true
   line_types:
+    download_data: true
+  mining_data:
     download_data: true

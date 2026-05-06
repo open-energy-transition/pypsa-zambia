@@ -177,6 +177,7 @@ load_options:
   weather_year: 2013 # Load scenarios available with different weather year (different renewable potentials)
   prediction_year: 2030 # Load scenarios available with different prediction year (GDP, population)
   scale: 1 # scales all load time-series, i.e. 2 = doubles load
+  zambia_demand_distribution: false # if true, distributes load using mining and GDP rasters (Zambia-specific)
 
 co2_budget:
   enable: false
@@ -1113,4 +1114,6 @@ validation:
     enable: false
     download_data: false
   line_types:
+    download_data: false
+  mining_data:
     download_data: false

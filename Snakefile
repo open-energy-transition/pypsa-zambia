@@ -229,6 +229,33 @@ if config["validation"]["line_types"].get("download_data", False):
             copyfile(str(input["url"]), output[0])
 
 
+if config["validation"]["mining_data"].get("download_data", False):
+
+    rule retrieve_mining_data:
+        input:
+            provincial_demand=HTTP.remote(
+                "https://sandbox.zenodo.org/records/495635/files/zambia_provincial_mining_demand.csv",
+                keep_local=True,
+                additional_request_string="?download=1",
+            ),
+            mining_polygons=HTTP.remote(
+                "https://sandbox.zenodo.org/records/495635/files/zambia_pangaea_mining_polygons.csv",
+                keep_local=True,
+                additional_request_string="?download=1",
+            ),
+        output:
+            provincial_demand="data/mining/zambia_provincial_mining_demand.csv",
+            mining_polygons="data/mining/zambia_pangaea_mining_polygons.csv",
+        log:
+            "logs/retrieve_mining_data.log",
+        run:
+            import os
+
+            os.makedirs("data/mining", exist_ok=True)
+            copyfile(str(input["provincial_demand"]), output["provincial_demand"])
+            copyfile(str(input["mining_polygons"]), output["mining_polygons"])
+
+
 if config["enable"].get("download_global_buildings", True):
 
     rule download_global_buildings:
@@ -347,6 +374,22 @@ rule build_shapes:
         mem_mb=3096,
     script:
         "scripts/build_shapes.py"
+
+
+rule build_mining_raster:
+    params:
+        area_crs=config["crs"]["area_crs"],
+    input:
+        provincial_demand="data/mining/zambia_provincial_mining_demand.csv",
+        mining_polygons="data/mining/zambia_pangaea_mining_polygons.csv",
+    output:
+        mining_raster="resources/" + RDIR + "mining/mining_raster.tif",
+    log:
+        "logs/" + RDIR + "build_mining_raster.log",
+    benchmark:
+        "benchmarks/" + RDIR + "build_mining_raster"
+    script:
+        "scripts/build_mining_raster.py"
 
 
 rule base_network:
