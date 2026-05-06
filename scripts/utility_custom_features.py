@@ -214,6 +214,7 @@ def disaggregate_plants(
         new_names.append(new_name)
     ppl.index = new_names
     ppl["bus"] = map_buses_from_coords(n, ppl, buses_df=buses_df, geo_crs=geo_crs)
+    return ppl
 
 
 def save_excluded_components(n, component, busmap, exclude_carriers):
