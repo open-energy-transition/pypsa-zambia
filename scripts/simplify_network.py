@@ -301,9 +301,10 @@ def _aggregate_and_move_components(
     )
 
     generator_strategies = aggregation_strategies["generators"]
-    excl_gens, excl_gens_pnl = save_excluded_components(
-        n, "Generator", busmap, exclude_carriers
-    )
+    if disaggregate_flag:
+        excl_gens, excl_gens_pnl = save_excluded_components(
+            n, "Generator", busmap, exclude_carriers
+        )
     carriers = set(n.generators.carrier) - set(exclude_carriers)
     generators, generators_pnl = aggregateoneport(
         n,
