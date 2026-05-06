@@ -359,7 +359,6 @@ rule build_shapes:
         # nuts3pop='data/bundle/nama_10r_3popgdp.tsv.gz',
         # nuts3gdp='data/bundle/nama_10r_3gdp.tsv.gz',
         eez="data/eez/eez_v11.gpkg",
-        mining_raster="resources/" + RDIR + "mining/mining_raster.tif",
     output:
         country_shapes="resources/" + RDIR + "shapes/country_shapes.geojson",
         offshore_shapes="resources/" + RDIR + "shapes/offshore_shapes.geojson",
