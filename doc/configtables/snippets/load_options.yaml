@@ -6,3 +6,4 @@ load_options:
   demand_weights:
     mining: 0.76
     gdp: 0.24
+  zambia_demand_distribution: false # if true, distributes load using mining and GDP rasters (Zambia-specific)
