@@ -272,7 +272,7 @@ def restore_excluded_components(n, component, saved_components, saved_timeseries
             import_series_from_dataframe(n, data, component, attr)
 
 
-def is_identity_busmap(busmap):
+def busmap_keeps_topology(busmap):
     """
     Check if every bus maps to itself.
     """
