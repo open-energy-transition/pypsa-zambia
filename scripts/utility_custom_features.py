@@ -161,7 +161,21 @@ def add_custom_line_types(n, custom_line_types):
 def map_buses_from_coords(
     n, df, buses_df=None, distance_crs="EPSG:20935", geo_crs="EPSG:4326"
 ):
-    """Find the nearest bus for each row in df using lat/lon."""
+    """Find the nearest bus for each row in df using lat/lon.
+    
+    Parameters
+    ----------
+    n : pypsa.Network
+        The network whose buses are used for geo-matching.
+    df : pd.DataFrame
+        Power plant table. Must contain ``lat`` and ``lon`` columns.
+    buses_df : pd.DataFrame or None, optional
+        Candidate buses for geo-matching. Defaults to all buses in ``n``.
+    distance_crs : str, optional
+        Geographic CRS used to measure distances.        
+    geo_crs : str, optional
+        Geographic CRS used to construct GeoDataFrames before reprojection.
+    """
     candidates = n.buses if buses_df is None else buses_df
     bus_points = gpd.GeoDataFrame(
         index=candidates.index,
