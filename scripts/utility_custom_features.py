@@ -159,7 +159,7 @@ def add_custom_line_types(n, custom_line_types):
 
 
 def map_buses_from_coords(
-    n, df, distance_crs="EPSG:20935", buses_df=None, geo_crs="EPSG:4326"
+    n, df, buses_df=None, distance_crs="EPSG:20935", geo_crs="EPSG:4326"
 ):
     """Find the nearest bus for each row in df using lat/lon."""
     candidates = n.buses if buses_df is None else buses_df
