@@ -12,9 +12,12 @@ This part of documentation collects descriptive release notes to capture the mai
 
 ## New Features and Major Changes
 
+* Power Plant disaggregation allowing power plants to retain individual identities [PR #153](https://github.com/open-energy-transition/pypsa-zambia/pull/153)
+
+* Ability to use custom hydro inflow data in the workflow [PR #178](https://github.com/open-energy-transition/pypsa-zambia/pull/178)
+
 ### Minor Changes and bug-fixing
 
-* advance testing infrastructure to update the objective reference values, ensure that run artifacts are always available, add a manual run trigger, and amend an example on adding a new test [PR #166](https://github.com/open-energy-transition/pypsa-zambia/pull/166)
 
 ## Upcoming changes from upstream
 
@@ -23,6 +26,21 @@ This part of documentation collects descriptive release notes to capture the mai
 ### New Features and Major Changes
 
 ### Minor Changes and bug-fixing
+
+
+# PyPSA-Zambia v0.2
+
+## New Features and Major Changes
+
+
+## Minor Changes and bug-fixing
+* advance testing infrastructure to update the objective reference values, ensure that run artifacts are always available, add a manual run trigger, and amend an example on adding a new test [PR #166](https://github.com/open-energy-transition/pypsa-zambia/pull/166)
+
+* Updated readme to align more closely with the Zambian context. Fixed overall consistency [PR #170](https://github.com/open-energy-transition/pypsa-zambia/pull/170)
+
+* Add regional-focused marginal costs, efficiencies and hydro reservoir data [PR #171](https://github.com/open-energy-transition/pypsa-zambia/pull/171)
+
+* Improved instructions for creating version release [PR #181](https://github.com/open-energy-transition/pypsa-zambia/pull/181)
 
 # PyPSA-Zambia v0.1
 
@@ -45,7 +63,6 @@ This part of documentation collects descriptive release notes to capture the mai
 * Only run Github Action test workflows when workflow-relevant files are changed [PR #94](https://github.com/open-energy-transition/pypsa-zambia/pull/94)
 
 * Add regional-focused cutouts to the databundles [PR #87](https://github.com/open-energy-transition/pypsa-zambia/pull/87)
-* Add regional-focused marginal costs, efficiencies and hydro reservoir data [PR #171](https://github.com/open-energy-transition/pypsa-zambia/pull/171)
 
 
 ## Minor Changes and bug-fixing
