@@ -318,7 +318,7 @@ def _aggregate_and_move_components(
     if disaggregate_flag:
         restore_excluded_components(n, "Generator", excl_gens, excl_gens_pnl)
     for one_port in aggregate_one_ports:
-        if one_port == "StorageUnit" and exclude_carriers:
+        if one_port == "StorageUnit" and disaggregate_flag:
             excl_sus, excl_sus_pnl = save_excluded_components(
                 n, "StorageUnit", busmap, exclude_carriers
             )
