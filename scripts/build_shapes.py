@@ -36,7 +36,6 @@ from shapely.geometry import MultiPolygon
 from shapely.ops import unary_union
 from shapely.validation import make_valid
 from tqdm import tqdm
-from utility_custom_features import load_mining_data
 
 logger = create_logger(__name__)
 
@@ -1439,10 +1438,6 @@ if __name__ == "__main__":
     tolerance = snakemake.params.build_shape_options["simplify_tolerance"]
     simplify_gadm = snakemake.params.build_shape_options["simplify_gadm"]
     minarea = snakemake.params.build_shape_options["minarea"]
-    if snakemake.config["load_options"]["zambia_demand_distribution"]:
-        provincial_demand_path, mining_polygons_path = load_mining_data(
-            snakemake.input.provincial_demand, snakemake.input.mining_polygons
-        )
 
     country_shapes = countries(
         countries_list,

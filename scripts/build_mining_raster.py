@@ -6,19 +6,25 @@
 
 import logging
 import os
-import sys
 
-sys.path.insert(0, os.path.dirname(__file__))
-
+from _helpers import configure_logging
 from utility_custom_features import build_mining_raster, load_mining_data
 
 logging.basicConfig(level=logging.INFO)
 
 if __name__ == "__main__":
-    provincial_demand, mining_polygons = load_mining_data(
-        snakemake.input.provincial_demand,
-        snakemake.input.mining_polygons,
-    )
+
+    if "snakemake" not in globals():
+        from _helpers import mock_snakemake
+
+        snakemake = mock_snakemake("build_mining_raster")
+
+    configure_logging(snakemake)
+
+    if snakemake.config["load_options"]["zambia_demand_distribution"]:
+        provincial_demand, mining_polygons = load_mining_data(
+            snakemake.input.provincial_demand, snakemake.input.mining_polygons
+        )
 
     os.makedirs(os.path.dirname(snakemake.output.mining_raster), exist_ok=True)
 
