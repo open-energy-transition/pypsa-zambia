@@ -117,7 +117,7 @@ costs:
 
 cluster_options:
   simplify_network:
-    exclude_carriers: [coal, oil, hydro, ror, PHS, biomass]  # Required when disaggregate_powerplants is true to prevent named plants from being re-aggregated in simplify_network
+    exclude_carriers: [coal, oil, hydro, ror, PHS, biomass]  # used to customise simplification, required when disaggregate_powerplants is true to prevent named plants from being re-aggregated in simplify_network
 
 
 sector:
