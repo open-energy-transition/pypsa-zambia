@@ -2355,7 +2355,9 @@ rule run_scenario:
             base_config_path = (
                 yaml.full_load(f)
                 .get("run", {})
-                .get("base_config", "config.default.yaml")
+                # TODO Improve naming to make it clear that `model_run_config.yaml`
+                # is a merge of config.default and validation_dispatch_zambia config
+                .get("base_config", "model_run_config.yaml")
             )
 
             # Ensure the scenario name matches the name of the configuration
