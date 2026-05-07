@@ -6,14 +6,14 @@ SPDX-License-Identifier: CC-BY-4.0
 
 # Welcome to the PyPSA-Zambia documentation
 
-[![GitHub release](https://img.shields.io/github/v/release/openenergytransition/pypsa-zambia?include_prereleases)](https://github.com/openenergytransition/pypsa-zambia/releases)
-[![CI](https://github.com/openenergytransition/pypsa-zambia/actions/workflows/test.yml/badge.svg)](https://github.com/openenergytransition/pypsa-zambia/actions/workflows/test.yml)
+[![GitHub release](https://img.shields.io/github/v/release/open-energy-transition/pypsa-zambia?include_prereleases)](https://github.com/open-energy-transition/pypsa-zambia/releases)
+[![CI](https://github.com/open-energy-transition/pypsa-zambia/actions/workflows/test.yml/badge.svg)](https://github.com/open-energy-transition/pypsa-zambia/actions/workflows/test.yml)
 [![Documentation Status](https://readthedocs.org/projects/pypsa-zambia/badge/?version=latest)](https://pypsa-zambia.readthedocs.io/en/latest/?badge=latest)
-[![GitHub repo size](https://img.shields.io/github/repo-size/openenergytransition/pypsa-zambia)](https://github.com/openenergytransition/pypsa-zambia)
+[![GitHub repo size](https://img.shields.io/github/repo-size/open-energy-transition/pypsa-zambia)](https://github.com/open-energy-transition/pypsa-zambia)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPLv3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
-[![REUSE status](https://api.reuse.software/badge/github.com/openenergytransition/pypsa-zambia)](https://api.reuse.software/info/github.com/openenergytransition/pypsa-zambia)
+[![REUSE status](https://api.reuse.software/badge/github.com/open-energy-transition/pypsa-zambia)](https://api.reuse.software/info/github.com/open-energy-transition/pypsa-zambia)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/openenergytransition/pypsa-zambia/main.svg)](https://results.pre-commit.ci/latest/github/openenergytransition/pypsa-zambia/main)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/open-energy-transition/pypsa-zambia/main.svg)](https://results.pre-commit.ci/latest/github/open-energy-transition/pypsa-zambia/main)
 [![Discord](https://img.shields.io/discord/911692131440148490?logo=discord)](https://discord.gg/AnuJBk23FU)
 [![Google Drive](https://img.shields.io/badge/Google%20Drive-4285F4?style=flat&logo=googledrive&logoColor=white)](https://drive.google.com/drive/folders/1U7fgktbxlaGzWxT2C0-Xv-_ffWCxAKZz)
 
