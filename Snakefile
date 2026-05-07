@@ -26,6 +26,9 @@ from retrieve_databundle_light import (
     datafiles_retrivedatabundle,
     get_best_bundles_in_snakemake,
 )
+
+from scripts.utility_custom_features import load_mining_data, build_mining_raster
+
 from pathlib import Path
 
 
@@ -389,8 +392,16 @@ rule build_mining_raster:
         "logs/" + RDIR + "build_mining_raster.log",
     benchmark:
         "benchmarks/" + RDIR + "build_mining_raster"
-    script:
-        "scripts/build_mining_raster.py"
+    run:
+        provincial_demand, mining_polygons = load_mining_data(
+            input.provincial_demand, input.mining_polygons
+        )
+        build_mining_raster(
+        provincial_demand=provincial_demand,
+        mining_polygons=mining_polygons,
+        output_path=output.mining_raster,
+        area_crs=params.area_crs,
+    )
 
 
 rule base_network:
