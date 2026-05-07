@@ -26,6 +26,9 @@ from retrieve_databundle_light import (
     datafiles_retrivedatabundle,
     get_best_bundles_in_snakemake,
 )
+
+from scripts.utility_custom_features import load_mining_data, build_mining_raster
+
 from pathlib import Path
 
 
@@ -346,34 +349,59 @@ rule build_osm_network:
         "scripts/build_osm_network.py"
 
 
-rule build_shapes:
-    params:
-        build_shape_options=config["build_shape_options"],
-        crs=config["crs"],
-        countries=config["countries"],
-        subregion=config["subregion"],
-    input:
-        # naturalearth='data/bundle/naturalearth/ne_10m_admin_0_countries.shp',
-        # eez='data/bundle/eez/World_EEZ_v8_2014.shp',
-        # nuts3='data/bundle/NUTS_2013_60M_SH/data/NUTS_RG_60M_2013.shp',
-        # nuts3pop='data/bundle/nama_10r_3popgdp.tsv.gz',
-        # nuts3gdp='data/bundle/nama_10r_3gdp.tsv.gz',
-        eez="data/eez/eez_v11.gpkg",
-    output:
-        country_shapes="resources/" + RDIR + "shapes/country_shapes.geojson",
-        offshore_shapes="resources/" + RDIR + "shapes/offshore_shapes.geojson",
-        africa_shape="resources/" + RDIR + "shapes/africa_shape.geojson",
-        gadm_shapes="resources/" + RDIR + "shapes/gadm_shapes.geojson",
-        subregion_shapes="resources/" + RDIR + "shapes/subregion_shapes.geojson",
-    log:
-        "logs/" + RDIR + "build_shapes.log",
-    benchmark:
-        "benchmarks/" + RDIR + "build_shapes"
-    threads: 1
-    resources:
-        mem_mb=3096,
-    script:
-        "scripts/build_shapes.py"
+# Ensure mining data is only used if Zambia-specific load-options are set in config
+if config["load_options"]["zambia_demand_distribution"]:
+
+    rule build_shapes:
+        params:
+            build_shape_options=config["build_shape_options"],
+            crs=config["crs"],
+            countries=config["countries"],
+            subregion=config["subregion"],
+        input:
+            eez="data/eez/eez_v11.gpkg",
+            mining_raster="resources/" + RDIR + "mining/mining_raster.tif",
+        output:
+            country_shapes="resources/" + RDIR + "shapes/country_shapes.geojson",
+            offshore_shapes="resources/" + RDIR + "shapes/offshore_shapes.geojson",
+            africa_shape="resources/" + RDIR + "shapes/africa_shape.geojson",
+            gadm_shapes="resources/" + RDIR + "shapes/gadm_shapes.geojson",
+            subregion_shapes="resources/" + RDIR + "shapes/subregion_shapes.geojson",
+        log:
+            "logs/" + RDIR + "build_shapes.log",
+        benchmark:
+            "benchmarks/" + RDIR + "build_shapes"
+        threads: 1
+        resources:
+            mem_mb=3096,
+        script:
+            "scripts/build_shapes.py"
+
+else:
+
+    rule build_shapes:
+        params:
+            build_shape_options=config["build_shape_options"],
+            crs=config["crs"],
+            countries=config["countries"],
+            subregion=config["subregion"],
+        input:
+            eez="data/eez/eez_v11.gpkg",
+        output:
+            country_shapes="resources/" + RDIR + "shapes/country_shapes.geojson",
+            offshore_shapes="resources/" + RDIR + "shapes/offshore_shapes.geojson",
+            africa_shape="resources/" + RDIR + "shapes/africa_shape.geojson",
+            gadm_shapes="resources/" + RDIR + "shapes/gadm_shapes.geojson",
+            subregion_shapes="resources/" + RDIR + "shapes/subregion_shapes.geojson",
+        log:
+            "logs/" + RDIR + "build_shapes.log",
+        benchmark:
+            "benchmarks/" + RDIR + "build_shapes"
+        threads: 1
+        resources:
+            mem_mb=3096,
+        script:
+            "scripts/build_shapes.py"
 
 
 rule build_mining_raster:
@@ -388,8 +416,16 @@ rule build_mining_raster:
         "logs/" + RDIR + "build_mining_raster.log",
     benchmark:
         "benchmarks/" + RDIR + "build_mining_raster"
-    script:
-        "scripts/build_mining_raster.py"
+    run:
+        provincial_demand, mining_polygons = load_mining_data(
+            input.provincial_demand, input.mining_polygons
+        )
+        build_mining_raster(
+            provincial_demand=provincial_demand,
+            mining_polygons=mining_polygons,
+            output_path=output.mining_raster,
+            area_crs=params.area_crs,
+        )
 
 
 rule base_network:
