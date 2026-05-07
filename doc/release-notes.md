@@ -32,13 +32,12 @@ This part of documentation collects descriptive release notes to capture the mai
 
 ## New Features and Major Changes
 
+* Add regional-focused marginal costs, efficiencies and hydro reservoir data [PR #171](https://github.com/open-energy-transition/pypsa-zambia/pull/171)
 
 ## Minor Changes and bug-fixing
 * advance testing infrastructure to update the objective reference values, ensure that run artifacts are always available, add a manual run trigger, and amend an example on adding a new test [PR #166](https://github.com/open-energy-transition/pypsa-zambia/pull/166)
 
 * Updated readme to align more closely with the Zambian context. Fixed overall consistency [PR #170](https://github.com/open-energy-transition/pypsa-zambia/pull/170)
-
-* Add regional-focused marginal costs, efficiencies and hydro reservoir data [PR #171](https://github.com/open-energy-transition/pypsa-zambia/pull/171)
 
 * Improved instructions for creating version release [PR #181](https://github.com/open-energy-transition/pypsa-zambia/pull/181)
 
