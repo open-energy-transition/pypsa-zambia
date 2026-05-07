@@ -10,8 +10,8 @@ import logging
 import geopandas as gpd
 import numpy as np
 import pandas as pd
-from pypsa.io import import_components_from_dataframe, import_series_from_dataframe
 import rasterio
+from pypsa.io import import_components_from_dataframe, import_series_from_dataframe
 from rasterio.features import rasterize
 from rasterio.mask import mask
 from rasterio.transform import from_bounds
@@ -306,6 +306,8 @@ def busmap_keeps_topology(busmap):
     Check if every bus maps to itself.
     """
     return (busmap.index == busmap.values).all()
+
+
 def add_mining_data(df_gadm, mining_raster_path):
     """
     Add mining electricity demand (GWh/year) to each province.
