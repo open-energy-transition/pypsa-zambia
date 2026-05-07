@@ -110,7 +110,7 @@ from pypsa.clustering.spatial import (
 from pypsa.io import import_components_from_dataframe, import_series_from_dataframe
 from scipy.sparse.csgraph import connected_components, dijkstra
 from utility_custom_features import (
-    is_identity_busmap,
+    busmap_keeps_topology,
     restore_excluded_components,
     save_excluded_components,
 )
@@ -278,10 +278,10 @@ def _aggregate_and_move_components(
     aggregation_strategies=dict(),
     exclude_carriers=None,
 ):
-    if is_identity_busmap(busmap):
+    if busmap_keeps_topology(busmap):
         logger.info("No bus merging → keep all power plants separate")
         return
-    if is_identity_busmap(busmap):
+    if busmap_keeps_topology(busmap):
         logger.info("No bus merging → keep all power nodes separate")
         return
 
