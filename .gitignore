@@ -76,3 +76,4 @@ screenlog*
 site/
 doc/img/gen_*.svg
 Zambia_validation.ipynb
+regression_pypsa_zambia.ipynb
