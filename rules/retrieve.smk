@@ -177,6 +177,7 @@ if (LANDCOVER_DATASET := dataset_version("landcover", config))["source"] in ["pr
                 index=[0, 1, 2],
             ),
 
+
 rule download_custom_powerplants:
     input:
         url=HTTP.remote(
@@ -220,6 +221,7 @@ rule download_interconnection_data:
         copyfile(str(input["links"]), output["links"])
         copyfile(str(input["countries"]), output["countries"])
 
+
 rule download_line_types:
     input:
         url=HTTP.remote(
@@ -232,6 +234,7 @@ rule download_line_types:
         "logs/download_line_types.log",
     run:
         copyfile(str(input["url"]), output[0])
+
 
 rule retrieve_mining_data:
     input:
@@ -257,6 +260,7 @@ rule retrieve_mining_data:
         copyfile(str(input["provincial_demand"]), output["provincial_demand"])
         copyfile(str(input["mining_polygons"]), output["mining_polygons"])
 
+
 if config["enable"].get("retrieve_cost_data", True):
 
     rule retrieve_cost_data:
@@ -275,4 +279,4 @@ if config["enable"].get("retrieve_cost_data", True):
         resources:
             mem_mb=5000,
         run:
-            move(input[0], output[0])            
+            move(input[0], output[0])
