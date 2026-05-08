@@ -89,7 +89,6 @@ if __name__ == "__main__":
     # TODO Avoid excessive import
     from _helpers import mock_snakemake
 
-
     snakemake = mock_snakemake("build_glofas_profile")
     configure_logging(snakemake)
 
