@@ -177,95 +177,85 @@ if (LANDCOVER_DATASET := dataset_version("landcover", config))["source"] in ["pr
                 index=[0, 1, 2],
             ),
 
-if config["validation"]["custom_powerplants"].get("download_data", False):
-
-    rule download_custom_powerplants:
-        input:
-            url=HTTP.remote(
-                "https://sandbox.zenodo.org/records/491391/files/custom_powerplants.csv",
-                keep_local=True,
-                additional_request_string="?download=1",
-            ),
-        output:
-            "data/custom_powerplants.csv",
-        log:
-            "logs/download_custom_powerplants.log",
-        run:
-            copyfile(str(input["url"]), output[0])
+rule download_custom_powerplants:
+    input:
+        url=HTTP.remote(
+            "https://sandbox.zenodo.org/records/491391/files/custom_powerplants.csv",
+            keep_local=True,
+            additional_request_string="?download=1",
+        ),
+    output:
+        "data/custom_powerplants.csv",
+    log:
+        "logs/download_custom_powerplants.log",
+    run:
+        copyfile(str(input["url"]), output[0])
 
 
-if config["validation"]["interconnectors"].get("download_data", False):
+rule download_interconnection_data:
+    input:
+        substations=HTTP.remote(
+            "https://sandbox.zenodo.org/records/471583/files/zm_substations.csv",
+            keep_local=True,
+            additional_request_string="?download=1",
+        ),
+        links=HTTP.remote(
+            "https://sandbox.zenodo.org/records/471583/files/sapp_links.csv",
+            keep_local=True,
+            additional_request_string="?download=1",
+        ),
+        countries=HTTP.remote(
+            "https://sandbox.zenodo.org/records/471583/files/sapp_countries.csv",
+            keep_local=True,
+            additional_request_string="?download=1",
+        ),
+    output:
+        substations="data/zm_substations.csv",
+        links="data/sapp_links.csv",
+        countries="data/sapp_countries.csv",
+    log:
+        "logs/download_interconnection_data.log",
+    run:
+        copyfile(str(input["substations"]), output["substations"])
+        copyfile(str(input["links"]), output["links"])
+        copyfile(str(input["countries"]), output["countries"])
 
-    rule download_interconnection_data:
-        input:
-            substations=HTTP.remote(
-                "https://sandbox.zenodo.org/records/471583/files/zm_substations.csv",
-                keep_local=True,
-                additional_request_string="?download=1",
-            ),
-            links=HTTP.remote(
-                "https://sandbox.zenodo.org/records/471583/files/sapp_links.csv",
-                keep_local=True,
-                additional_request_string="?download=1",
-            ),
-            countries=HTTP.remote(
-                "https://sandbox.zenodo.org/records/471583/files/sapp_countries.csv",
-                keep_local=True,
-                additional_request_string="?download=1",
-            ),
-        output:
-            substations="data/zm_substations.csv",
-            links="data/sapp_links.csv",
-            countries="data/sapp_countries.csv",
-        log:
-            "logs/download_interconnection_data.log",
-        run:
-            copyfile(str(input["substations"]), output["substations"])
-            copyfile(str(input["links"]), output["links"])
-            copyfile(str(input["countries"]), output["countries"])
+rule download_line_types:
+    input:
+        url=HTTP.remote(
+            "https://sandbox.zenodo.org/records/473405/files/pypsa_line_types%20%281%29.csv",
+            keep_local=True,
+        ),
+    output:
+        "data/line_types.csv",
+    log:
+        "logs/download_line_types.log",
+    run:
+        copyfile(str(input["url"]), output[0])
 
+rule retrieve_mining_data:
+    input:
+        provincial_demand=HTTP.remote(
+            "https://sandbox.zenodo.org/records/495635/files/zambia_provincial_mining_demand.csv",
+            keep_local=True,
+            additional_request_string="?download=1",
+        ),
+        mining_polygons=HTTP.remote(
+            "https://sandbox.zenodo.org/records/495635/files/zambia_pangaea_mining_polygons.csv",
+            keep_local=True,
+            additional_request_string="?download=1",
+        ),
+    output:
+        provincial_demand="data/mining/zambia_provincial_mining_demand.csv",
+        mining_polygons="data/mining/zambia_pangaea_mining_polygons.csv",
+    log:
+        "logs/retrieve_mining_data.log",
+    run:
+        import os
 
-if config["validation"]["line_types"].get("download_data", False):
-
-    rule download_line_types:
-        input:
-            url=HTTP.remote(
-                "https://sandbox.zenodo.org/records/473405/files/pypsa_line_types%20%281%29.csv",
-                keep_local=True,
-            ),
-        output:
-            "data/line_types.csv",
-        log:
-            "logs/download_line_types.log",
-        run:
-            copyfile(str(input["url"]), output[0])
-
-
-if config["validation"]["mining_data"].get("download_data", False):
-
-    rule retrieve_mining_data:
-        input:
-            provincial_demand=HTTP.remote(
-                "https://sandbox.zenodo.org/records/495635/files/zambia_provincial_mining_demand.csv",
-                keep_local=True,
-                additional_request_string="?download=1",
-            ),
-            mining_polygons=HTTP.remote(
-                "https://sandbox.zenodo.org/records/495635/files/zambia_pangaea_mining_polygons.csv",
-                keep_local=True,
-                additional_request_string="?download=1",
-            ),
-        output:
-            provincial_demand="data/mining/zambia_provincial_mining_demand.csv",
-            mining_polygons="data/mining/zambia_pangaea_mining_polygons.csv",
-        log:
-            "logs/retrieve_mining_data.log",
-        run:
-            import os
-
-            os.makedirs("data/mining", exist_ok=True)
-            copyfile(str(input["provincial_demand"]), output["provincial_demand"])
-            copyfile(str(input["mining_polygons"]), output["mining_polygons"])
+        os.makedirs("data/mining", exist_ok=True)
+        copyfile(str(input["provincial_demand"]), output["provincial_demand"])
+        copyfile(str(input["mining_polygons"]), output["mining_polygons"])
 
 if config["enable"].get("retrieve_cost_data", True):
 
