@@ -9,8 +9,8 @@ tutorial: true
 countries: ["NG", "BJ"]
 
 enable:
-  retrieve_databundle: true
-  retrieve_databundle_sector: true
+  retrieve_databundle: false
+  retrieve_databundle_sector: false
   build_natura_raster: true
   progress_bar: false
 
@@ -77,10 +77,17 @@ solving:
   solver:
     name: glpk
     options: glpk-default
+
+# Zambia-specific parameters --------------------------------------------------
+
 validation:
   interconnectors:
-    enable: true
-    download_data: true
+    enable: false
+    download_data: false
   custom_powerplants:
-    enable: true
-    download_data: true
+    enable: false
+    download_data: false
+  line_types:
+    download_data: false
+  mining_data:
+    download_data: false
