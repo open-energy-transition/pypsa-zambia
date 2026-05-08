@@ -479,20 +479,6 @@ if not config["enable"].get("build_natura_raster", False):
             shutil.copyfile(input[0], output[0])
 
 
-country_data = config["costs"].get("country_specific_data", "")
-countries = config.get("countries", [])
-
-if country_data and countries == [country_data]:
-    cost_directory = f"{country_data}/"
-elif country_data:
-    cost_directory = f"{country_data}/"
-    warnings.warn(
-        f"'country_specific_data' is set to '{country_data}', but 'countries' is {countries}. Make sure the '{country_data}' directory exists and that this is intentional."
-    )
-else:
-    cost_directory = ""
-
-
 rule build_demand_profiles:
     params:
         snapshots=config["snapshots"],
