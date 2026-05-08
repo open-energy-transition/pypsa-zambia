@@ -69,6 +69,9 @@ load_options:
   weather_year: 2013
   prediction_year: 2030
   scale: 0.85  # scaled the model demand by a factor of 14.4/19.34 to match the national value
+  demand_weights:
+    mining: 0.76
+    gdp: 0.24
   zambia_demand_distribution: true
 
 
