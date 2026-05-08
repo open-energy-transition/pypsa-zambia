@@ -94,4 +94,3 @@ validation:
 
 load_options:
   zambia_demand_distribution: false # if true, distributes load using mining and GDP rasters (Zambia-specific)
-

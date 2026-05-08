@@ -167,6 +167,7 @@ if config["enable"].get("retrieve_databundle", True):
         script:
             "scripts/retrieve_databundle_light.py"
 
+
 if config["enable"].get("download_global_buildings", True):
 
     rule download_global_buildings:
