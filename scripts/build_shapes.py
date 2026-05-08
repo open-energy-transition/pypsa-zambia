@@ -36,6 +36,7 @@ from shapely.geometry import MultiPolygon
 from shapely.ops import unary_union
 from shapely.validation import make_valid
 from tqdm import tqdm
+from utility_custom_features import add_mining_data
 
 logger = create_logger(__name__)
 
@@ -1289,6 +1290,7 @@ def gadm(
     simplify_gadm=True,
     tolerance=0.01,
     minarea=0.01,
+    mining_raster_path=None,
 ):
     if out_logging:
         logger.info("Stage 3 of 5: Creation GADM GeoDataFrame")
@@ -1330,6 +1332,9 @@ def gadm(
             out_logging,
             name_file_nc="GDP_PPP_1990_2015_5arcmin_v2.nc",
         )
+
+    if mining_raster_path is not None:
+        add_mining_data(df_gadm, mining_raster_path)
 
     # renaming 3 letter to 2 letter ISO code before saving GADM file
     # In the case of a contested territory in the form 'Z00.00_0', save 'AA.00_0'
@@ -1482,6 +1487,7 @@ if __name__ == "__main__":
         simplify_gadm=simplify_gadm,
         tolerance=tolerance,
         minarea=minarea,
+        mining_raster_path=snakemake.input.mining_raster,
     )
 
     save_to_geojson(gadm_shapes, out.gadm_shapes)
