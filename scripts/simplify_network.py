@@ -1023,6 +1023,7 @@ if __name__ == "__main__":
     )
     hvdc_as_lines = snakemake.params.electricity["hvdc_as_lines"]
     aggregation_strategies = snakemake.params.aggregation_strategies
+    disaggregate_flag = snakemake.params.disaggregate_flag
 
     # Aggregation strategies must be set for all columns
     update_config_dictionary(
