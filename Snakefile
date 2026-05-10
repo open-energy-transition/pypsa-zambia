@@ -76,9 +76,9 @@ if config.get("update_consol_config", False):
         config,
         fl_name="config.zm.model_config_var.yaml",
         output_dir="configs",
-        config_exclude=config_technical,        
+        config_exclude=config_technical,
     )
-    
+
     # provide the full list of config dictionary used by Snakemake
     write_config(
         config,

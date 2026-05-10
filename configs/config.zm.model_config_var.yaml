@@ -1,8 +1,11 @@
 # SPDX-FileCopyrightText:  PyPSA-Earth and PyPSA-Eur Authors
-# SPDX-License-Identifier: AGPL-3.0-or-later
-#
 
-atlite:
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+#
+
+
+atlite:
   cutouts:
     cutout-2013-era5:
       dx: 0.3
@@ -225,8 +228,7 @@ electricity:
     contingency: 0
     epsilon_load: 0.02
     epsilon_vres: 0.02
-  powerplants_filter: (DateOut >= 2024 or DateOut != DateOut) and (DateIn <= 2024
-    or DateIn != DateIn)
+  powerplants_filter: (DateOut >= 2024 or DateOut != DateOut) and (DateIn <= 2024 or DateIn != DateIn)
   renewable_carriers:
   - solar
   - onwind

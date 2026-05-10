@@ -1,8 +1,11 @@
 # SPDX-FileCopyrightText:  PyPSA-Earth and PyPSA-Eur Authors
-# SPDX-License-Identifier: AGPL-3.0-or-later
-#
 
-EXTERNAL_DATABASE:
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+#
+
+
+EXTERNAL_DATABASE:
   fn: /data/davidef/git/pypsa-earth/resources/powerplants_osm2pm.csv
   reliability_score: 5
   store_locally: false
@@ -54,52 +57,52 @@ clean_name:
   remove_common_words: false
   remove_duplicated_words: true
   replace:
-    ? ''
-    : - I
-      - II
-      - III
-      - IV
-      - V
-      - VI
-      - VII
-      - VIII
-      - IX
-      - X
-      - XI
-      - parque
-      - grupo
-      - station
-      - power
-      - plant
-      - unit
-      - kraftwerk
-      - kw
-      - hkw
-      - nuclear
-      - thermal
-      - heizkraftwerk
-      - eolico
-      - project
-      - hydroelectric
-      - pumped
-      - storage
-      - france
-      - austria
-      - sweden
-      - serbia
-      - ukraine
-      - switzerland
-      - slovakia
-      - croatia
-      - poland
-      - slovenia
-      - portugal
-      - bosnia
-      - and
-      - herzegovina
-      - \w
+    '':
+    - I
+    - II
+    - III
+    - IV
+    - V
+    - VI
+    - VII
+    - VIII
+    - IX
+    - X
+    - XI
+    - parque
+    - grupo
+    - station
+    - power
+    - plant
+    - unit
+    - kraftwerk
+    - kw
+    - hkw
+    - nuclear
+    - thermal
+    - heizkraftwerk
+    - eolico
+    - project
+    - hydroelectric
+    - pumped
+    - storage
+    - france
+    - austria
+    - sweden
+    - serbia
+    - ukraine
+    - switzerland
+    - slovakia
+    - croatia
+    - poland
+    - slovenia
+    - portugal
+    - bosnia
+    - and
+    - herzegovina
+    - \w
     ' ': '[^a-zA-Z]'
-    ss: "\xDF"
+    ss: "ß"
 clean_osm_data_options:
   add_line_endings: true
   generator_name_method: OSM
@@ -607,8 +610,7 @@ electricity:
     contingency: 0
     epsilon_load: 0.02
     epsilon_vres: 0.02
-  powerplants_filter: (DateOut >= 2024 or DateOut != DateOut) and (DateIn <= 2024
-    or DateIn != DateIn)
+  powerplants_filter: (DateOut >= 2024 or DateOut != DateOut) and (DateIn <= 2024 or DateIn != DateIn)
   renewable_carriers:
   - solar
   - onwind
@@ -629,7 +631,7 @@ enable:
   retrieve_cost_data: true
   retrieve_databundle: false
   retrieve_databundle_sector: false
-entsoe_token: null
+entsoe_token:
 existing_capacities:
   conventional_carriers:
   - lignite
@@ -732,7 +734,7 @@ fully_included_sources:
 - GWPT
 - GHPT
 git_commit: 18c0df62d4eb5f962a5d92f885c84809891a5d60 Add pre-commit fixes
-google_api_key: null
+google_api_key:
 industry:
   reference_year: 2015
 lines:
@@ -766,7 +768,7 @@ load_options:
 logging:
   format: '%(levelname)s:%(name)s:%(message)s'
   level: INFO
-matched_data_url: null
+matched_data_url:
 matching_sources:
 - GEO
 - GPD
