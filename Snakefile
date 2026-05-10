@@ -2390,8 +2390,7 @@ rule run_scenario:
         # get base configuration file from diff config
         with open(input.diff_config) as f:
             base_config_path = (
-                yaml.full_load(f)
-                .get("run", {})
+                yaml.full_load(f).get("run", {})
                 # TODO Improve naming to make it clear that `model_run_config.yaml`
                 # is a merge of config.default and validation_dispatch_zambia config
                 .get("base_config", "model_run_config.yaml")
