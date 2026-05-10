@@ -1,13 +1,22 @@
 # SPDX-FileCopyrightText:  PyPSA-Earth and PyPSA-Eur Authors
-# SPDX-License-Identifier: AGPL-3.0-or-later
-#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
 
-atlite:
+atlite:
   cutouts:
     cutout-2013-era5:
       dx: 0.3
       dy: 0.3
       module: era5
+      time:
+      - '2013-01-01'
+      - '2014-01-01'
+      x:
+      - 21.5
+      - 33.7
+      y:
+      - -18.8
+      - -7.8
   nprocesses: 4
 augmented_line_connection:
   add_to_snakefile: false
@@ -135,10 +144,9 @@ costs:
   output_currency: EUR
   rooftop_share: 0.14
   technology_data_version: v0.13.2
-  year: 2030
+  year: 2025
 countries:
-- NG
-- BJ
+- ZM
 crs:
   area_crs: ESRI:54009
   distance_crs: EPSG:3857
@@ -183,19 +191,17 @@ electricity:
   co2base: 1487000000.0
   co2limit: 77500000.0
   conventional_carriers:
-  - nuclear
   - oil
   - OCGT
   - CCGT
   - coal
-  - lignite
   - geothermal
   - biomass
-  custom_powerplants: false
+  custom_powerplants: replace
   estimate_renewable_capacities:
     p_nom_max: false
     p_nom_min: 1
-    stats: irena
+    stats: false
     technology_mapping:
       Offshore:
       - offwind-ac
@@ -206,17 +212,10 @@ electricity:
       - solar
     year: 2023
   extendable_carriers:
-    Generator:
-    - solar
-    - onwind
-    - offwind-ac
-    - offwind-dc
-    - OCGT
+    Generator: []
     Link: []
     StorageUnit: []
-    Store:
-    - battery
-    - H2
+    Store: []
   hvdc_as_lines: false
   max_hours:
     H2: 168
@@ -226,12 +225,11 @@ electricity:
     contingency: 0
     epsilon_load: 0.02
     epsilon_vres: 0.02
-  powerplants_filter: (DateOut >= 2022 or DateOut != DateOut) and (DateIn <= 2023 or DateIn != DateIn)
+  powerplants_filter: (DateOut >= 2024 or DateOut != DateOut) and (DateIn <= 2024
+    or DateIn != DateIn)
   renewable_carriers:
   - solar
   - onwind
-  - offwind-ac
-  - offwind-dc
   - hydro
   voltages:
   - 66.0
@@ -299,7 +297,7 @@ export:
 foresight: overnight
 fossil_reserves:
   oil: 100
-git_commit: f8717c0f406c55d371f5b40653d06321bba50b6c Merge branch 'main' into feature/enable_scenarios
+git_commit: 18c0df62d4eb5f962a5d92f885c84809891a5d60 Add pre-commit fixes
 industry:
   reference_year: 2015
 lines:
@@ -312,6 +310,7 @@ lines:
     500.0: HVDC XLPE 1000
   length_factor: 1.25
   s_max_pu: 0.7
+  s_nom_extendable: false
   s_nom_max: .inf
   s_nom_max_min: -.inf
   under_construction: zero
@@ -321,11 +320,14 @@ links:
   p_nom_max_min: -.inf
   under_construction: zero
 load_options:
+  demand_weights:
+    gdp: 0.24
+    mining: 0.76
   prediction_year: 2030
-  scale: 1
+  scale: 0.85
   ssp: ssp2-2.6
   weather_year: 2013
-  zambia_demand_distribution: false
+  zambia_demand_distribution: true
 logging:
   format: '%(levelname)s:%(name)s:%(message)s'
   level: INFO
@@ -632,7 +634,7 @@ renewable:
       - 90
     csp_model: advanced
     cutout: cutout-2013-era5
-    extendable: true
+    extendable: false
     natura: true
     potential: simple
     resource:
@@ -646,15 +648,15 @@ renewable:
     - hydro
     clip_min_inflow: 1.0
     cutout: cutout-2013-era5
-    extendable: true
+    extendable: false
     hydro_max_hours: energy_capacity_totals_by_country
     hydro_max_hours_default: 6.0
     hydro_min_inflow_pu: 1.0
     hydrobasins_level: 6
-    multiplier: 1.1
+    multiplier: 0.65
     normalization:
       method: irena
-      year: 2023
+      year: 2013
     resource:
       flowspeed: 1.0
       hydrobasins: data/hydrobasins/hybas_world.shp
@@ -667,7 +669,7 @@ renewable:
       - 80
       - 200
     cutout: cutout-2013-era5
-    extendable: true
+    extendable: false
     max_depth: 50
     max_shore_distance: 30000
     natura: true
@@ -683,7 +685,7 @@ renewable:
       - 80
       - 200
     cutout: cutout-2013-era5
-    extendable: true
+    extendable: false
     max_depth: 50
     min_shore_distance: 30000
     natura: true
@@ -716,8 +718,9 @@ renewable:
       - 124
       - 125
       - 126
+    correction_factor: 0.93
     cutout: cutout-2013-era5
-    extendable: true
+    extendable: false
     natura: true
     potential: simple
     resource:
@@ -737,7 +740,7 @@ renewable:
       - 100
     correction_factor: 0.854337
     cutout: cutout-2013-era5
-    extendable: true
+    extendable: false
     natura: true
     potential: simple
     resource:
@@ -747,16 +750,17 @@ renewable:
 results_dir: results/
 run:
   allow_scenario_failure: false
-  name: ''
+  name: validation_dispatch_zambia_2024
   sector_name: ''
   shared_cutouts: true
+  update_consol_config: true
 scenario:
   clusters:
   - 10
   demand:
   - AB
   ll:
-  - copt
+  - v1.0
   opts:
   - Co2L-3h
   planning_horizons:
@@ -796,7 +800,7 @@ sector:
   boilers: true
   cc: true
   cc_fraction: 0.9
-  chp: true
+  chp: false
   co2_network: true
   co2_sequestration_cost: 10
   co2_sequestration_potential: 200
@@ -848,16 +852,16 @@ sector:
   efficiency_heat_oil_to_elec: 0.9
   electricity_distribution_grid: true
   enable:
-    agriculture: true
-    aviation: true
-    biomass: true
-    heat: true
+    agriculture: false
+    aviation: false
+    biomass: false
+    heat: false
     industry: true
-    land_transport: true
-    rail_transport: true
-    residential: true
-    services: true
-    shipping: true
+    land_transport: false
+    rail_transport: false
+    residential: false
+    services: false
+    shipping: false
   fischer_tropsch: true
   gas:
     network: false
@@ -989,8 +993,8 @@ solving:
     skip_iterations: true
     track_iterations: false
   solver:
-    name: gurobi
-    options: gurobi-default
+    name: highs
+    options: highs-default
   solver_options:
     cbc-default: {}
     copt-default:
@@ -1059,13 +1063,13 @@ transformers:
 tutorial: false
 validation:
   custom_powerplants:
-    download_data: false
-    enable: false
+    download_data: true
+    enable: true
   interconnectors:
-    download_data: false
-    enable: false
+    download_data: true
+    enable: true
   line_types:
-    download_data: false
+    download_data: true
   mining_data:
-    download_data: false
+    download_data: true
 version: 0.8.0
