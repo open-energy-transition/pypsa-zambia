@@ -226,8 +226,7 @@ electricity:
     contingency: 0
     epsilon_load: 0.02
     epsilon_vres: 0.02
-  powerplants_filter: (DateOut >= 2022 or DateOut != DateOut) and (DateIn <= 2023
-    or DateIn != DateIn)
+  powerplants_filter: (DateOut >= 2022 or DateOut != DateOut) and (DateIn <= 2023 or DateIn != DateIn)
   renewable_carriers:
   - solar
   - onwind

@@ -37,10 +37,13 @@ HTTP = HTTPRemoteProvider()
 
 copy_default_files()
 
+
 configfile: "configs/bundle_config.yaml"
 configfile: "configs/powerplantmatching_config.yaml"
 
+
 config_technical = config.copy()
+
 
 configfile: "config.default.yaml"
 configfile: "configs/validation_dispatch_zambia.yaml"
@@ -74,7 +77,7 @@ if config.get("update_consol_config", False):
         output_dir="",
         config_exclude=config_technical,
     )
-    
+
     # provide the full list of config dictionary used by Snakemake
     write_config(
         config,
