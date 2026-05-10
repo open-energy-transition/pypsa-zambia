@@ -71,18 +71,19 @@ SDIR = config["summary_dir"].strip("/") + f"/{SECDIR}"
 RESDIR = config["results_dir"].strip("/") + f"/{SECDIR}"
 
 if config.get("update_consol_config", False):
+
     write_config(
         config,
-        fl_name="model_run_config.yaml",
-        output_dir="",
-        config_exclude=config_technical,
+        fl_name="config.zm.model_config_var.yaml",
+        output_dir="configs",
+        config_exclude=config_technical,        
     )
-
+    
     # provide the full list of config dictionary used by Snakemake
     write_config(
         config,
-        fl_name="full_run_config.yaml",
-        output_dir="",
+        fl_name="config.zm.tech_config_var.yaml",
+        output_dir="configs",
         config_exclude=None,
     )
 
