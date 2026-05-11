@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Extract metadata for the datasets used from `data/versions.csv` and 
-add them into `doc/data_inventory.csv` 
+Extract metadata for the datasets used from `data/versions.csv` and
+add them into `doc/data_inventory.csv`
 
 How it runs:
     - Automatically via the 'update-data-inventory' pre-commit hook
@@ -9,10 +9,10 @@ How it runs:
 """
 
 import re
+from pathlib import Path
 
 import pandas as pd
 
-from pathlib import Path
 
 def update_inventory(versions_csv="versions.csv", inventory_csv="data_inventory.csv"):
     """
@@ -30,10 +30,17 @@ def update_inventory(versions_csv="versions.csv", inventory_csv="data_inventory.
     )
 
     inventory_df = pd.read_csv(inventory_csv)
-    missed_versions_df = versions_df.loc[~versions_df["dataset"].isin(inventory_df["Short name"]), ["dataset", "url"]]
+    missed_versions_df = versions_df.loc[
+        ~versions_df["dataset"].isin(inventory_df["Short name"]), ["dataset", "url"]
+    ]
 
     inventory_df = pd.concat(
-        [inventory_df, missed_versions_df.rename(columns={"dataset": "Short name", "url": "Link to website"})],
+        [
+            inventory_df,
+            missed_versions_df.rename(
+                columns={"dataset": "Short name", "url": "Link to website"}
+            ),
+        ],
         ignore_index=True,
     )
 
@@ -44,11 +51,7 @@ def main():
     versions_file = Path("data", "versions.csv")
     inventory_file = Path("doc", "data_inventory.csv")
 
-    update_inventory(
-        versions_csv=versions_file,
-        inventory_csv=inventory_file
-    )
-
+    update_inventory(versions_csv=versions_file, inventory_csv=inventory_file)
 
 
 if __name__ == "__main__":
