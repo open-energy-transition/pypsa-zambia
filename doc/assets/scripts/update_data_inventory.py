@@ -32,7 +32,10 @@ def update_inventory(versions_csv="versions.csv", inventory_csv="data_inventory.
 
     inventory_df = pd.read_csv(inventory_csv)
     missed_versions_df = versions_df.loc[
-        ~versions_df["dataset"].isin(inventory_df["Short name"]), ["dataset", "url"]
+        ~versions_df["dataset"]
+        .str.lower()
+        .isin(inventory_df["Short name"].str.lower()),
+        ["dataset", "url"],
     ]
 
     if missed_versions_df.empty:
