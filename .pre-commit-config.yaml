@@ -120,6 +120,8 @@ repos:
   - id: update-data-inventory
     name: Update date inventory
     entry: python3 doc/assets/scripts/update_data_inventory.py
-    language: system
+    language: python
+    additional_dependencies:
+      - pandas
     # files: data/versions.csv
-    pass_filenames: false
+    # pass_filenames: false
