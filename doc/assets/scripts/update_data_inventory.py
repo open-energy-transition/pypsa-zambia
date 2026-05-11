@@ -34,17 +34,28 @@ def update_inventory(versions_csv="versions.csv", inventory_csv="data_inventory.
         ~versions_df["dataset"].isin(inventory_df["Short name"]), ["dataset", "url"]
     ]
 
-    inventory_df = pd.concat(
-        [
-            inventory_df,
-            missed_versions_df.rename(
-                columns={"dataset": "Short name", "url": "Link to website"}
-            ),
-        ],
-        ignore_index=True,
-    )
+    if missed_versions_df.empty:
+        return
 
-    inventory_df.to_csv(inventory_csv, index=False)
+    rows_to_append = missed_versions_df.rename(
+        columns={"dataset": "Short name", "url": "Link to website"}
+    ).assign(**{"Long name": "", "Description": "", "Owner": "", "License": ""})[
+        [
+            "Short name",
+            "Long name",
+            "Description",
+            "Owner",
+            "Link to website",
+            "License",
+        ]
+    ]
+
+    rows_to_append.to_csv(
+        inventory_csv,
+        mode="a",
+        index=False,
+        header=False,
+    )
 
 
 def main():
