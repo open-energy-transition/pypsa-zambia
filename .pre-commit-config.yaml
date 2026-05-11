@@ -122,6 +122,6 @@ repos:
     entry: python3 doc/assets/scripts/update_data_inventory.py
     language: python
     additional_dependencies:
-      - pandas
+    - pandas
     # files: data/versions.csv
     # pass_filenames: false
