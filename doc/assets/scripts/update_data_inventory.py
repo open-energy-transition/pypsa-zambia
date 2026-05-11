@@ -29,9 +29,6 @@ def update_inventory(versions_csv="versions.csv", inventory_csv="data_inventory.
         .drop_duplicates("dataset", keep="first")[["dataset", "url"]]
     )
 
-    print("versions_df")
-    print(versions_df)
-
     inventory_df = pd.read_csv(inventory_csv)
     missed_versions_df = versions_df.loc[~versions_df["dataset"].isin(inventory_df["Short name"]), ["dataset", "url"]]
 
@@ -39,9 +36,6 @@ def update_inventory(versions_csv="versions.csv", inventory_csv="data_inventory.
         [inventory_df, missed_versions_df.rename(columns={"dataset": "Short name", "url": "Link to website"})],
         ignore_index=True,
     )
-
-    print("inventory_df")
-    print(inventory_df)
 
     inventory_df.to_csv(inventory_csv, index=False)
 
