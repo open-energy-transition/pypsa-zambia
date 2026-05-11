@@ -8,6 +8,7 @@ How it runs:
     - Manually: python doc/assets/scripts/extract_config_snippets.py
 """
 
+import csv
 import re
 from pathlib import Path
 
@@ -55,6 +56,7 @@ def update_inventory(versions_csv="versions.csv", inventory_csv="data_inventory.
         mode="a",
         index=False,
         header=False,
+        quoting=csv.QUOTE_MINIMAL,
     )
 
 
