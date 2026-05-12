@@ -5,6 +5,6 @@ landcover,Mar2026,primary,latest supported,earth,2020-04-07,ESA WorldCover 2020,
 hydrobasins,v1.c,tutorial,latest supported,af,2014-07-01,Global watershed boundaries,data.hydrosheds.org/file/hydrobasins/standard
 hydro_profile,v1.0,primary,latest supported,zm,2024-06-01,Global hydro profiles with full zonal mean data,sandbox.zenodo.org/records/493174/files/glofas_profile_2013.nc
 hydro_profile,v1.0,custom tutorial,latest supported,zm,2024-06-01,Global hydro profiles with tutorial zonal mean data,sandbox.zenodo.org/records/493174/files/glofas_profile_2013_tutorial.nc
-natura_earth,v1.0,custom tutorial,latest supported,earth,2024-06-01,Natura Earth tutorial dataset,sandbox.zenodo.org/records/323567/files/natura_wpda_CC0.zip
+natura_earth,v1.0,tutorial,latest supported,earth,2024-06-01,Natura Earth tutorial dataset,sandbox.zenodo.org/records/323567/files/natura_wpda_CC0.zip
 natura_earth,v1.0,custom full url_backup,latest supported,earth,2024-06-01,Natura Earth tutorial dataset,drive.google.com/file/d/1H-Y7p8UgnbEzJgo9qPc54BpDXS8loX7Y
 natura_earth,v1.0,custom full,latest supported,earth,2024-06-01,Natura Earth dataset,sandbox.zenodo.org/records/323567/files/natura_wpda_CC0.zip
