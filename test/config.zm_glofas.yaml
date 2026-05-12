@@ -22,6 +22,7 @@ countries: ["ZM"]
 
 enable:
   build_natura_raster: false # If 'true', then an exclusion raster will be build. Otherwise use pregenerated raster.
+  retrieve_databundle: true
 
 download_osm_data_nprocesses: 4
 
