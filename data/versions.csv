@@ -7,4 +7,4 @@ hydro_profile,v1.0,primary,latest supported,zm,2024-06-01,Global hydro profiles 
 hydro_profile,v1.0,tutorial,latest supported,zm,2024-06-01,Global hydro profiles with tutorial zonal mean data,sandbox.zenodo.org/records/493174/files/glofas_profile_2013_tutorial.nc
 natura_earth,v1.0,tutorial,latest supported,earth,2024-06-01,Natura Earth tutorial dataset,sandbox.zenodo.org/records/323567/files/natura_wpda_CC0.zip
 natura_earth,v1.0,archive,latest supported,earth,2024-06-01,Natura Earth tutorial dataset,drive.google.com/file/d/1H-Y7p8UgnbEzJgo9qPc54BpDXS8loX7Y
-natura_earth,v1.0,custom full,latest supported,earth,2024-06-01,Natura Earth dataset,sandbox.zenodo.org/records/323567/files/natura_wpda_CC0.zip
+natura_earth,v1.0,primary,latest supported,earth,2024-06-01,Natura Earth dataset,sandbox.zenodo.org/records/323567/files/natura_wpda_CC0.zip
