@@ -20,11 +20,13 @@ def update_inventory(versions_csv="versions.csv", inventory_csv="data_inventory.
     Extract meta-data on the latest datasets available to run the workflow
     from `versions_csv` and place them into `inventory_csv`
     """
-    priority_order = {"primary": 0, "build": 1, "archive": 2, "tutorial": 3}
+    priority_order = {"primary": 0, "build": 1, "archive": 2}
     category_type = pd.CategoricalDtype(categories=priority_order, ordered=True)
 
+    versions_df = pd.read_csv(versions_csv)
+
     versions_df = (
-        pd.read_csv(versions_csv)
+        versions_df[versions_df["source"].str.lower().isin(priority_order.keys())]
         .assign(priority=lambda d: d["source"].str.lower().astype(category_type))
         .sort_values(["dataset", "priority"])
         .drop_duplicates("dataset", keep="first")[["dataset", "url"]]
