@@ -14,7 +14,7 @@ Relevant Settings
 Inputs
 ------
 - ``resources/powerplants.csv`` is a file with locations of power plants
-- ``cutouts/{country}-{year}-glofas.nc`` is GloFAS file used as an input 
+- ``cutouts/{country}-{year}-glofas.nc`` is GloFAS file used as an input
 
 Outputs
 -------
