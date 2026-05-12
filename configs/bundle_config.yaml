@@ -415,25 +415,25 @@ databundles:
       build_cutout: [all]
 
   # custom inflow profile for Zambia
-  hydro_profile_full_zm:
-    countries: [ZM]
-    tutorial: false
-    category: hydro
-    destination: "cutouts/hydro"
-    urls:
-      direct: https://sandbox.zenodo.org/records/493174/files/glofas_profile_2013.nc
-    unzip: false
-    output: [cutouts/hydro/glofas_profile_2013.nc]
+  # hydro_profile_full_zm:
+  #   countries: [ZM]
+  #   tutorial: false
+  #   category: hydro
+  #   destination: "cutouts/hydro"
+  #   urls:
+  #     direct: https://sandbox.zenodo.org/records/493174/files/glofas_profile_2013.nc
+  #   unzip: false
+  #   output: [cutouts/hydro/glofas_profile_2013.nc]
 
-  hydro_profile_tutorial_zm:
-    countries: [ZM]
-    tutorial: true
-    category: hydro
-    destination: "cutouts/hydro"
-    urls:
-      direct: https://sandbox.zenodo.org/records/493174/files/glofas_profile_2013_tutorial.nc
-    unzip: false
-    output: [cutouts/hydro/glofas_profile_2013_tutorial.nc]
+  # hydro_profile_tutorial_zm:
+  #   countries: [ZM]
+  #   tutorial: true
+  #   category: hydro
+  #   destination: "cutouts/hydro"
+  #   urls:
+  #     direct: https://sandbox.zenodo.org/records/493174/files/glofas_profile_2013_tutorial.nc
+  #   unzip: false
+  #   output: [cutouts/hydro/glofas_profile_2013_tutorial.nc]
 
   bundle_natura_earth_tutorial:
     countries: [Earth]
