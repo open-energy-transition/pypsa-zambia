@@ -38,10 +38,10 @@ dataset with the following columns:
 - `version`: The version identifier, typically following the original
     data source\'s versioning (e.g., `2025-08-14`).
 - `source`: The source type - `primary` (original data source),
-    `archive` (mirrored copy on `data.pypsa.org`), or `build` (generated
-    from other data).
-- `tags`: Space-separated tags like `latest`, `supported` or
-    `deprecated`.
+    `archive` (mirrored copy on `data.pypsa.org` or PyPSA-meets-Earth [gdrive](https://drive.google.com/drive/folders/1jJvWcDTZpOUhNmge1qr-kosiK_qJTc0K) ), `build` (generated
+ from other data).
+- `tags`: Space-separated tags like `latest`, `supported`,
+    `deprecated` or `tutorial`.
 - `added`: The date when this entry was added to the registry.
 - `note`: Optional notes about the dataset or version.
 - `url`: The download URL for the data.
