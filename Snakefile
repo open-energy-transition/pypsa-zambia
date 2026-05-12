@@ -784,6 +784,7 @@ rule add_electricity:
 rule simplify_network:
     params:
         aggregation_strategies=config["cluster_options"]["aggregation_strategies"],
+        disaggregate_flag=config["electricity"].get("disaggregate_powerplants", False),
         renewable=config["renewable"],
         crs=config["crs"],
         cluster_options=config["cluster_options"],
@@ -2397,7 +2398,7 @@ if config["foresight"] == "myopic":
 
 rule run_scenario:
     input:
-        diff_config="configs/scenarios/config.{scenario_name}.yaml",
+        diff_config="configs/scenarios_zambia/config.{scenario_name}.yaml",
     output:
         touchfile=touch("results/{scenario_name}/scenario.done"),
         copyconfig="results/{scenario_name}/config.yaml",
@@ -2412,9 +2413,10 @@ rule run_scenario:
         # get base configuration file from diff config
         with open(input.diff_config) as f:
             base_config_path = (
-                yaml.full_load(f)
-                .get("run", {})
-                .get("base_config", "config.default.yaml")
+                yaml.full_load(f).get("run", {})
+                # TODO Improve naming to make it clear that `model_run_config.yaml`
+                # is a merge of config.default and validation_dispatch_zambia config
+                .get("base_config", "model_run_config.yaml")
             )
 
             # Ensure the scenario name matches the name of the configuration
@@ -2445,6 +2447,6 @@ rule run_all_scenarios:
             "results/{scenario_name}/scenario.done",
             scenario_name=[
                 c.stem.replace("config.", "")
-                for c in Path("configs/scenarios").glob("config.*.yaml")
+                for c in Path("configs/scenarios_zambia").glob("config.*.yaml")
             ],
         ),
