@@ -1,6 +1,32 @@
 # SPDX-FileCopyrightText:  PyPSA-Earth and PyPSA-Eur Authors
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
+"""
+Create a custom inflow profile to be used in a modelling workflow
+by using GloFAS dataset
+
+Relevant Settings
+-----------------
+.. code:: yaml
+
+    snapshots:
+
+Inputs
+------
+- ``resources/powerplants.csv`` is a file with locations of power plants
+- ``cutouts/{country}-{year}-glofas.nc`` is GloFAS file used as an input 
+
+Outputs
+-------
+
+- ``cutouts/profile_hydro_glofas.nc``
+
+Description
+-----------
+A custom hydro profile is built using GloFAS data on inflow directly
+instead of using a usual atlite workflow based on ERA5
+
+"""
 
 import pandas as pd
 import xarray as xr
