@@ -150,7 +150,10 @@ rule plot_all_summaries:
 
 if config["enable"].get("retrieve_databundle", True):
 
-    bundles_to_download = get_best_bundles_in_snakemake(config)
+    # Exclude categories which are implemented in retrieve rules (retrieve.smk)
+    bundles_to_download = get_best_bundles_in_snakemake(
+        config, exclude_categories=["natura", "hydrobasins"]
+    )
 
     rule retrieve_databundle_light:
         params:
