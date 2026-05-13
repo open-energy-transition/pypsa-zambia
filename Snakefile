@@ -18,6 +18,7 @@ from _helpers import (
     get_last_commit_message,
     check_config_version,
     copy_default_files,
+    update_cutout_config,
     BASE_DIR,
     write_config,
     branch,  # Remove if Snakemake >= 8.3.0
@@ -62,6 +63,7 @@ config["scenario"]["unc"] = [
     f"m{i}" for i in range(config["monte_carlo"]["options"]["samples"])
 ]
 
+config = update_cutout_config(config)
 
 run = config.get("run", {})
 RDIR = run["name"] + "/" if run.get("name") else ""
@@ -88,11 +90,6 @@ if config.get("update_consol_config", False):
     )
 
 load_data_paths = get_load_paths_gegis("data", config)
-
-if config["enable"].get("retrieve_cost_data", True):
-    COSTS = "resources/" + RDIR + f"costs_{config['costs']['year']}.csv"
-else:
-    COSTS = "data/costs.csv"
 ATLITE_NPROCESSES = config["atlite"].get("nprocesses", 4)
 
 
@@ -173,11 +170,15 @@ rule plot_all_summaries:
 
 if config["enable"].get("retrieve_databundle", True):
 
-    bundles_to_download = get_best_bundles_in_snakemake(config)
+    bundles_to_download = get_best_bundles_in_snakemake(
+        config, exclude_categories=["cutouts"]
+    )
 
     rule retrieve_databundle_light:
         params:
             bundles_to_download=bundles_to_download,
+            # TODO fix legacy input
+            hydrobasins_level=config["renewable"]["hydro"]["hydrobasins_level"],
         output:  #expand(directory('{file}') if isdir('{file}') else '{file}', file=datafiles)
             expand(
                 "{file}", file=datafiles_retrivedatabundle(config, bundles_to_download)
@@ -381,6 +382,7 @@ if config["load_options"]["zambia_demand_distribution"]:
             crs=config["crs"],
             countries=config["countries"],
             subregion=config["subregion"],
+            subregion_offshore="resources/" + RDIR + "shapes/subregion_offshore.geojson",
         input:
             eez="data/eez/eez_v11.gpkg",
             mining_raster="resources/" + RDIR + "mining/mining_raster.tif",
@@ -390,6 +392,7 @@ if config["load_options"]["zambia_demand_distribution"]:
             africa_shape="resources/" + RDIR + "shapes/africa_shape.geojson",
             gadm_shapes="resources/" + RDIR + "shapes/gadm_shapes.geojson",
             subregion_shapes="resources/" + RDIR + "shapes/subregion_shapes.geojson",
+            subregion_offshore="resources/" + RDIR + "shapes/subregion_offshore.geojson",
         log:
             "logs/" + RDIR + "build_shapes.log",
         benchmark:
@@ -416,6 +419,7 @@ else:
             africa_shape="resources/" + RDIR + "shapes/africa_shape.geojson",
             gadm_shapes="resources/" + RDIR + "shapes/gadm_shapes.geojson",
             subregion_shapes="resources/" + RDIR + "shapes/subregion_shapes.geojson",
+            subregion_offshore="resources/" + RDIR + "shapes/subregion_offshore.geojson",
         log:
             "logs/" + RDIR + "build_shapes.log",
         benchmark:
@@ -449,6 +453,36 @@ rule build_mining_raster:
             output_path=output.mining_raster,
             area_crs=params.area_crs,
         )
+
+
+def retrieve_subregion(script_name):
+    """
+    Select whether scripts related to subregions should be retrieved.
+
+    Offshore subregion shapes can be generated from subregion shapes, or provided as a separate custom file.
+    """
+    subregion_config = config.get("subregion", {"apply_on": []})
+
+    if script_name not in subregion_config["apply_on"]:
+        return {}
+
+    method = subregion_config["method"]
+    subregion_offshore = "resources/" + RDIR + "shapes/offshore_shapes.geojson"
+
+    if method == "gadm":
+        subregion_shapes = "resources/" + RDIR + "shapes/subregion_shapes.geojson"
+    elif method == "custom":
+        subregion_shapes = subregion_config["path_custom_shapes"]
+        if subregion_config["path_custom_offshore"]:
+            subregion_offshore = subregion_config["path_custom_offshore"]
+    else:
+        return {}
+
+    return {
+        "subregion_shapes": subregion_shapes,
+        "subregion_offshore": subregion_offshore,
+        "original_shapes": "resources/" + RDIR + "shapes/country_shapes.geojson",
+    }
 
 
 rule base_network:
@@ -492,6 +526,7 @@ rule build_bus_regions:
         crs=config["crs"],
         countries=config["countries"],
     input:
+        **retrieve_subregion("cluster_network"),
         country_shapes="resources/" + RDIR + "shapes/country_shapes.geojson",
         offshore_shapes="resources/" + RDIR + "shapes/offshore_shapes.geojson",
         base_network="networks/" + RDIR + "base.nc",
@@ -514,33 +549,34 @@ rule build_bus_regions:
         "scripts/build_bus_regions.py"
 
 
-def terminate_if_cutout_exists(config=config):
+def terminate_if_cutout_exists(w):
     """
     Check if any of the requested cutout files exist.
     If that's the case, terminate execution to avoid data loss.
-    """
-    config_cutouts = [
-        d_value["cutout"] for tc, d_value in config["renewable"].items()
-    ] + list(config["atlite"]["cutouts"].keys())
 
-    for ct in set(config_cutouts):
-        cutout_fl = "cutouts/" + CDIR + ct + ".nc"
-        if os.path.exists(cutout_fl):
-            raise Exception(
-                "An option `build_cutout` is enabled, while a cutout file '"
-                + cutout_fl
-                + "' still exists and risks to be overwritten. If this is an intended behavior, please move or delete this file and re-run the rule. Otherwise, just disable the `build_cutout` and `retrieve_cutout` rule in the config file."
-            )
+    Tutorial cutouts should be removed once they are no longer needed.
+    """
+    cutout_fl = "cutouts/" + CDIR + f"{w.cutout}.nc"
+
+    if os.path.exists(cutout_fl) and not config["tutorial"]:
+        raise Exception(
+            f"An option `build_cutout` or `retrieve_cutout` is enabled, while a cutout file '{cutout_fl}' "
+            "still exists and risks to be overwritten. If this is an intended behavior, "
+            "please move, rename or delete this file and re-run the rule. Otherwise, "
+            "just disable the `build_cutout` and `retrieve_cutout` rule in the config file."
+        )
+
+    return []
 
 
 if config["enable"].get("build_cutout", False):
-    terminate_if_cutout_exists(config)
 
     rule build_cutout:
         params:
             snapshots=config["snapshots"],
             cutouts=config["atlite"]["cutouts"],
         input:
+            check=terminate_if_cutout_exists,
             onshore_shapes="resources/" + RDIR + "shapes/country_shapes.geojson",
             offshore_shapes="resources/" + RDIR + "shapes/offshore_shapes.geojson",
         output:
@@ -554,6 +590,30 @@ if config["enable"].get("build_cutout", False):
             mem_mb=ATLITE_NPROCESSES * 1000,
         script:
             "scripts/build_cutout.py"
+
+
+if config["enable"].get("retrieve_cutout", False):
+
+    cutout_to_download = get_best_bundles_in_snakemake(
+        config, include_categories=["cutouts"]
+    )
+
+    rule retrieve_cutout:
+        params:
+            bundles_to_download=cutout_to_download,
+            hydrobasins_level=[],
+        input:
+            check=terminate_if_cutout_exists,
+            onshore_shapes="resources/" + RDIR + "shapes/country_shapes.geojson",
+            offshore_shapes="resources/" + RDIR + "shapes/offshore_shapes.geojson",
+        output:
+            "cutouts/" + CDIR + "{cutout}.nc",
+        log:
+            "logs/" + RDIR + "retrieve_cutout/{cutout}.log",
+        benchmark:
+            "benchmarks/" + RDIR + "retrieve_cutout_{cutout}"
+        script:
+            "scripts/retrieve_databundle_light.py"
 
 
 if config["enable"].get("build_natura_raster", False):
@@ -627,6 +687,30 @@ if config["enable"].get("retrieve_cost_data", True):
             mem_mb=5000,
         run:
             move(input[0], output[0])
+
+
+rule process_cost_data:
+    params:
+        costs=config["costs"],
+        max_hours=config["electricity"]["max_hours"],
+    input:
+        network="networks/" + RDIR + "base.nc",
+        costs=branch(
+            config["enable"].get("retrieve_cost_data", True),
+            "resources/" + RDIR + "costs_{year}.csv",
+            "data/costs.csv",
+        ),
+    output:
+        "resources/" + RDIR + "costs_{year}_{scope}.csv",
+    log:
+        "logs/" + RDIR + "build_cost_data_{year}_{scope}.log",
+    benchmark:
+        "benchmarks/" + RDIR + "build_cost_data_{year}_{scope}"
+    threads: 1
+    resources:
+        mem_mb=4000,
+    script:
+        "scripts/process_cost_data.py"
 
 
 rule build_demand_profiles:
@@ -738,12 +822,14 @@ rule build_powerplants:
 rule add_electricity:
     params:
         countries=config["countries"],
-        costs=config["costs"],
+        output_currency=config["costs"]["output_currency"],
+        fill_values=config["costs"]["fill_values"],
         conventional=config.get("conventional", {}),
         electricity=config["electricity"],
         alternative_clustering=config["cluster_options"]["alternative_clustering"],
         renewable=config["renewable"],
         length_factor=config["lines"]["length_factor"],
+        existing_capacities=config["existing_capacities"],
     input:
         **{
             f"profile_{tech}": "resources/"
@@ -759,7 +845,7 @@ rule add_electricity:
             if str(fn).startswith("data/")
         },
         base_network="networks/" + RDIR + "base.nc",
-        tech_costs=COSTS,
+        tech_costs="resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv",
         powerplants="resources/" + RDIR + "powerplants.csv",
         #gadm_shapes="resources/" + RDIR + "shapes/MAR2.geojson",
         #using this line instead of the following will test updated gadm shapes for MA.
@@ -768,6 +854,7 @@ rule add_electricity:
         gadm_shapes="resources/" + RDIR + "shapes/gadm_shapes.geojson",
         hydro_capacities="data/hydro_capacities.csv",
         demand_profiles="resources/" + RDIR + "demand_profiles.csv",
+        nuclear_p_max_pu="data/nuclear_p_max_pu.csv",
     output:
         "networks/" + RDIR + "elec.nc",
     log:
@@ -791,18 +878,16 @@ rule simplify_network:
         countries=config["countries"],
         build_shape_options=config["build_shape_options"],
         electricity=config["electricity"],
-        costs=config["costs"],
+        output_currency=config["costs"]["output_currency"],
         config_lines=config["lines"],
         config_links=config["links"],
         focus_weights=config.get("focus_weights", None),
-        subregion=config["subregion"],
     input:
+        **retrieve_subregion("simplify_network"),
         network="networks/" + RDIR + "elec.nc",
-        tech_costs=COSTS,
+        tech_costs="resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv",
         regions_onshore="resources/" + RDIR + "bus_regions/regions_onshore.geojson",
         regions_offshore="resources/" + RDIR + "bus_regions/regions_offshore.geojson",
-        country_shapes="resources/" + RDIR + "shapes/country_shapes.geojson",
-        subregion_shapes="resources/" + RDIR + "shapes/subregion_shapes.geojson",
     output:
         network="networks/" + RDIR + "elec_s{simpl}.nc",
         regions_onshore="resources/"
@@ -831,7 +916,6 @@ rule cluster_network:
         aggregation_strategies=config["cluster_options"]["aggregation_strategies"],
         build_shape_options=config["build_shape_options"],
         electricity=config["electricity"],
-        costs=config["costs"],
         length_factor=config["lines"]["length_factor"],
         renewable=config["renewable"],
         crs=config["crs"],
@@ -839,8 +923,8 @@ rule cluster_network:
         cluster_options=config["cluster_options"],
         focus_weights=config.get("focus_weights", None),
         custom_busmap=config["enable"].get("custom_busmap", False),
-        subregion=config["subregion"],
     input:
+        **retrieve_subregion("cluster_network"),
         network="networks/" + RDIR + "elec_s{simpl}.nc",
         country_shapes="resources/" + RDIR + "shapes/country_shapes.geojson",
         regions_onshore="resources/"
@@ -860,8 +944,7 @@ rule cluster_network:
             if config["enable"].get("custom_busmap", False)
             else []
         ),
-        tech_costs=COSTS,
-        subregion_shapes="resources/" + RDIR + "shapes/subregion_shapes.geojson",
+        tech_costs="resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv",
     output:
         network=branch(
             config["augmented_line_connection"].get("add_to_snakefile", False) == True,
@@ -930,9 +1013,8 @@ if config["augmented_line_connection"].get("add_to_snakefile") == True:
             augmented_line_connection=config["augmented_line_connection"],
             hvdc_as_lines=config["electricity"]["hvdc_as_lines"],
             electricity=config["electricity"],
-            costs=config["costs"],
         input:
-            tech_costs=COSTS,
+            tech_costs="resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv",
             network="networks/" + RDIR + "elec_s{simpl}_{clusters}_pre_augmentation.nc",
             regions_onshore="resources/"
             + RDIR
@@ -958,7 +1040,7 @@ rule add_extra_components:
         transmission_efficiency=config["sector"]["transmission_efficiency"],
     input:
         network="networks/" + RDIR + "elec_s{simpl}_{clusters}.nc",
-        tech_costs=COSTS,
+        tech_costs="resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv",
     output:
         "networks/" + RDIR + "elec_s{simpl}_{clusters}_ec.nc",
     log:
@@ -978,10 +1060,10 @@ rule prepare_network:
         lines=config["lines"],
         s_max_pu=config["lines"]["s_max_pu"],
         electricity=config["electricity"],
-        costs=config["costs"],
+        emission_prices=config["costs"]["emission_prices"],
     input:
         "networks/" + RDIR + "elec_s{simpl}_{clusters}_ec.nc",
-        tech_costs=COSTS,
+        tech_costs="resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv",
         power_pool_countries="data/sapp_countries.csv",
         power_pool_links="data/sapp_links.csv",
         substations="data/zm_substations.csv",
@@ -1155,7 +1237,7 @@ def input_make_summary(w):
             ll = [l for l in ll if l[0] == w.ll[0]]
     else:
         ll = w.ll
-    return [COSTS] + expand(
+    return ["resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv"] + expand(
         "results/" + RDIR + "networks/elec_s{simpl}_{clusters}_ec_l{ll}_{opts}.nc",
         ll=ll,
         **{
@@ -1167,13 +1249,11 @@ def input_make_summary(w):
 
 rule make_summary:
     params:
-        electricity=config["electricity"],
-        costs=config["costs"],
         ll=config["scenario"]["ll"],
         scenario=config["scenario"],
     input:
         input_make_summary,
-        tech_costs=COSTS,
+        tech_costs="resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv",
     output:
         directory(
             "results/"
@@ -1195,17 +1275,6 @@ rule prepare_sector_networks:
             + "prenetworks/elec_s{simpl}_{clusters}_ec_l{ll}_{opts}_{sopts}_{planning_horizons}_{discountrate}_{demand}.nc",
             **config["scenario"],
             **config["costs"],
-        ),
-
-
-rule override_res_all_nets:
-    input:
-        expand(
-            RESDIR
-            + "prenetworks/elec_s{simpl}_{clusters}_ec_l{ll}_{opts}_{sopts}_{planning_horizons}_{discountrate}_{demand}_presec.nc",
-            **config["scenario"],
-            **config["costs"],
-            **config["export"],
         ),
 
 
@@ -1314,7 +1383,6 @@ HEAT = {
 
 rule prepare_sector_network:
     params:
-        costs=config["costs"],
         electricity=config["electricity"],
         fossil_reserves=config["fossil_reserves"],
         h2_underground=config["custom_data"]["h2_underground"],
@@ -1339,9 +1407,8 @@ rule prepare_sector_network:
                 for country in config["countries"]
             },
         ),
-        network=RESDIR
-        + "prenetworks/elec_s{simpl}_{clusters}_ec_l{ll}_{opts}_{sopts}_{planning_horizons}_{discountrate}_{demand}_presec.nc",
-        costs="resources/" + RDIR + "costs_{planning_horizons}.csv",
+        network="networks/" + RDIR + "elec_s{simpl}_{clusters}_ec_l{ll}_{opts}.nc",
+        costs="resources/" + RDIR + "costs_{planning_horizons}_sec.csv",
         h2_cavern="data/hydrogen_salt_cavern_potentials.csv",
         nodal_energy_totals=branch(
             sector_enable["rail_transport"] or sector_enable["agriculture"],
@@ -1415,10 +1482,9 @@ rule add_export:
         export_endogenous=config["export"]["endogenous"],
         endogenous_price=config["export"]["endogenous_price"],
         snapshots=config["snapshots"],
-        costs=config["costs"],
     input:
         export_ports="resources/" + SECDIR + "export_ports.csv",
-        costs="resources/" + RDIR + "costs_{planning_horizons}.csv",
+        costs="resources/" + RDIR + "costs_{planning_horizons}_sec.csv",
         ship_profile="resources/" + SECDIR + "ship_profile_{h2export}TWh.csv",
         network=RESDIR
         + "prenetworks/elec_s{simpl}_{clusters}_ec_l{ll}_{opts}_{sopts}_{planning_horizons}_{discountrate}_{demand}.nc",
@@ -1430,39 +1496,6 @@ rule add_export:
         + "prenetworks/elec_s{simpl}_{clusters}_ec_l{ll}_{opts}_{sopts}_{planning_horizons}_{discountrate}_{demand}_{h2export}export.nc",
     script:
         "scripts/add_export.py"
-
-
-rule override_respot:
-    params:
-        run=run["name"],
-        custom_data=config["custom_data"],
-        countries=config["countries"],
-    input:
-        **{
-            f"custom_res_pot_{tech}_{planning_horizons}_{discountrate}": "resources/"
-            + SECDIR
-            + f"custom_renewables/{tech}_{planning_horizons}_{discountrate}_potential.csv"
-            for tech in config["custom_data"]["renewables"]
-            for discountrate in config["costs"]["discountrate"]
-            for planning_horizons in config["scenario"]["planning_horizons"]
-        },
-        **{
-            f"custom_res_ins_{tech}_{planning_horizons}_{discountrate}": "resources/"
-            + SECDIR
-            + f"custom_renewables/{tech}_{planning_horizons}_{discountrate}_installable.csv"
-            for tech in config["custom_data"]["renewables"]
-            for discountrate in config["costs"]["discountrate"]
-            for planning_horizons in config["scenario"]["planning_horizons"]
-        },
-        network="networks/" + RDIR + "elec_s{simpl}_{clusters}_ec_l{ll}_{opts}.nc",
-        energy_totals="resources/"
-        + SECDIR
-        + "energy_totals_{demand}_{planning_horizons}.csv",
-    output:
-        RESDIR
-        + "prenetworks/elec_s{simpl}_{clusters}_ec_l{ll}_{opts}_{sopts}_{planning_horizons}_{discountrate}_{demand}_presec.nc",
-    script:
-        "scripts/override_respot.py"
 
 
 rule prepare_transport_data:
@@ -1884,7 +1917,7 @@ if config["foresight"] == "overnight":
             # + "prenetworks/elec_s{simpl}_{clusters}_ec_l{ll}_{opts}_{sopts}_{planning_horizons}_{discountrate}.nc",
             network=RESDIR
             + "prenetworks/elec_s{simpl}_{clusters}_ec_l{ll}_{opts}_{sopts}_{planning_horizons}_{discountrate}_{demand}_{h2export}export.nc",
-            costs="resources/" + RDIR + "costs_{planning_horizons}.csv",
+            costs="resources/" + RDIR + "costs_{planning_horizons}_sec.csv",
             configs=SDIR + "configs/config.yaml",  # included to trigger copy_config rule
             agg_p_nom_minmax=config["electricity"]["agg_p_nom_limits"]["file"],  # ensure the CSV with capacity constraints is copied into the shadow directory (needed on Windows, since shadowed scripts can’t access files outside `input`)
         output:
@@ -1932,7 +1965,7 @@ rule make_sector_summary:
             **config["costs"],
             **config["export"],
         ),
-        costs="resources/" + RDIR + "costs_{planning_horizons}.csv",
+        costs="resources/" + RDIR + "costs_{planning_horizons}_sec.csv",
         plots=expand(
             RESDIR
             + "maps/elec_s{simpl}_{clusters}_ec_l{ll}_{opts}_{sopts}-costs-all_{planning_horizons}_{discountrate}_{demand}_{h2export}export.pdf",
@@ -1985,14 +2018,13 @@ rule plot_summary:
 rule plot_network:
     params:
         electricity=config["electricity"],
-        costs=config["costs"],
         plotting=config["plotting"],
     input:
         network="results/"
         + RDIR
         + "networks/elec_s{simpl}_{clusters}_ec_l{ll}_{opts}.nc",
         africa_shape="resources/" + RDIR + "shapes/africa_shape.geojson",
-        tech_costs=COSTS,
+        tech_costs="resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv",
     output:
         only_map="results/"
         + RDIR
@@ -2169,7 +2201,7 @@ rule build_industry_demand:  #default data
         + SECDIR
         + "demand/base_industry_totals_{planning_horizons}_{demand}.csv",
         industrial_database="data/industrial_database.csv",
-        costs="resources/" + RDIR + "costs_{planning_horizons}.csv",
+        costs="resources/" + RDIR + "costs_{planning_horizons}_sec.csv",
         industry_growth_cagr="data/demand/industry_growth_cagr.csv",
     output:
         industrial_energy_demand_per_node="resources/"
@@ -2254,7 +2286,7 @@ if config["foresight"] == "myopic":
             # clustered_pop_layout="resources/"
             # + SECDIR
             # + "population_shares/pop_layout_elec_s{simpl}_{clusters}_{planning_horizons}.csv",
-            costs="resources/" + RDIR + "costs_{planning_horizons}.csv",
+            costs="resources/" + RDIR + "costs_{planning_horizons}_sec.csv",
         output:
             RESDIR
             + "prenetworks-brownfield/elec_s{simpl}_{clusters}_l{ll}_{opts}_{sopts}_{planning_horizons}_{discountrate}_{demand}_{h2export}export.nc",
@@ -2315,7 +2347,7 @@ if config["foresight"] == "myopic":
             network=RESDIR
             + "prenetworks/elec_s{simpl}_{clusters}_ec_l{ll}_{opts}_{sopts}_{planning_horizons}_{discountrate}_{demand}_{h2export}export.nc",
             network_p=solved_previous_horizon,  #solved network at previous time step
-            costs="resources/" + RDIR + "costs_{planning_horizons}.csv",
+            costs="resources/" + RDIR + "costs_{planning_horizons}_sec.csv",
             cop_soil_total="resources/"
             + SECDIR
             + "cops/cop_soil_total_elec_s{simpl}_{clusters}_{planning_horizons}.nc",
@@ -2354,7 +2386,7 @@ if config["foresight"] == "myopic":
         input:
             network=RESDIR
             + "prenetworks-brownfield/elec_s{simpl}_{clusters}_l{ll}_{opts}_{sopts}_{planning_horizons}_{discountrate}_{demand}_{h2export}export.nc",
-            costs="resources/" + RDIR + "costs_{planning_horizons}.csv",
+            costs="resources/" + RDIR + "costs_{planning_horizons}_sec.csv",
             configs=SDIR + "configs/config.yaml",  # included to trigger copy_config rule
             agg_p_nom_minmax=config["electricity"]["agg_p_nom_limits"]["file"],  # ensure the CSV with capacity constraints is copied into the shadow directory (needed on Windows, since shadowed scripts can’t access files outside `input`)
         output:
@@ -2398,7 +2430,7 @@ if config["foresight"] == "myopic":
 
 rule run_scenario:
     input:
-        diff_config="configs/scenarios/config.{scenario_name}.yaml",
+        diff_config="configs/scenarios_zambia/config.{scenario_name}.yaml",
     output:
         touchfile=touch("results/{scenario_name}/scenario.done"),
         copyconfig="results/{scenario_name}/config.yaml",
@@ -2413,9 +2445,10 @@ rule run_scenario:
         # get base configuration file from diff config
         with open(input.diff_config) as f:
             base_config_path = (
-                yaml.full_load(f)
-                .get("run", {})
-                .get("base_config", "config.default.yaml")
+                yaml.full_load(f).get("run", {})
+                # TODO Improve naming to make it clear that `model_run_config.yaml`
+                # is a merge of config.default and validation_dispatch_zambia config
+                .get("base_config", "model_run_config.yaml")
             )
 
             # Ensure the scenario name matches the name of the configuration
@@ -2446,6 +2479,6 @@ rule run_all_scenarios:
             "results/{scenario_name}/scenario.done",
             scenario_name=[
                 c.stem.replace("config.", "")
-                for c in Path("configs/scenarios").glob("config.*.yaml")
+                for c in Path("configs/scenarios_zambia").glob("config.*.yaml")
             ],
         ),
