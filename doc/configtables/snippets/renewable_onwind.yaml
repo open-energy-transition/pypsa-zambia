@@ -1,6 +1,5 @@
   onwind:
     cutout: auto
-    source: era5 # use "era5" for a regular cutout workflow and "custom" for custom renewable profiles
     resource:
       method: wind
       turbine: Vestas_V112_3MW
