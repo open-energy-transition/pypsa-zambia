@@ -1,6 +1,6 @@
   csp:
+    cutout: auto
     source: era5 # use "era5" for a regular cutout workflow and "custom" for custom renewable profiles
-    cutout: cutout-2013-era5
     resource:
       method: csp
       installation: SAM_solar_tower
