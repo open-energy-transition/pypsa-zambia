@@ -832,7 +832,8 @@ rule add_electricity:
     input:
         **{
             f"profile_{tech}": (
-                config["renewable"][tech]["path"]
+                # config["renewable"][tech]["path"]
+                f"data/hydro_profiles/glofas_profile.nc"
                 if config["renewable"][tech].get("source", "era5") == "custom"
                 else f"resources/{RDIR}renewable_profiles/profile_{tech}.nc"
             )
