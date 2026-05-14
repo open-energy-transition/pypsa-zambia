@@ -63,25 +63,29 @@ def extract_inflow_df(
         dims="plant",
         coords={"plant": ppl_hydro_df.index},
     )
+
     # TODO Average by a few cells instead taking only the nearest one
-    ppl_hydro_inflow_xr = glofas_copy_xr["dis24"].sel(
-        latitude=ppl_hydro_lat,
-        longitude=ppl_hydro_lon,
-        method="nearest",
+    ppl_hydro_inflow_xr = (
+        glofas_copy_xr["dis24"]
+        .sel(
+            latitude=ppl_hydro_lat,
+            longitude=ppl_hydro_lon,
+            method="nearest",
+        )
+        .to_pandas()
     )
 
-    ppl_hydro_daily_inflow_df = ppl_hydro_inflow_xr.to_pandas()
-    ppl_hydro_daily_inflow_df.index.name = "time"
-    ppl_hydro_daily_inflow_df.columns.name = "plant"
+    ppl_hydro_inflow_xr.index.name = "time"
+    ppl_hydro_inflow_xr.columns.name = "plant"
 
-    ppl_hydro_daily_inflow_df.index = pd.to_datetime(ppl_hydro_daily_inflow_df.index)
+    ppl_hydro_inflow_xr.index = pd.to_datetime(ppl_hydro_inflow_xr.index)
 
     start = snapshots["start"]
     end = snapshots["end"]
+    snapshots_daily = pd.date_range(start, end, freq="1d")
 
-    snapshots = pd.date_range(start, end, freq="1d")
-    ppl_hydro_daily_cut_inflow_df = ppl_hydro_daily_inflow_df.loc[
-        ppl_hydro_daily_inflow_df.index.isin(snapshots)
+    ppl_hydro_daily_cut_inflow_df = ppl_hydro_inflow_xr.loc[
+        ppl_hydro_inflow_xr.index.isin(snapshots_daily)
     ]
 
     ppl_hydro_inflow_df = ppl_hydro_daily_cut_inflow_df.resample("1h").interpolate(
