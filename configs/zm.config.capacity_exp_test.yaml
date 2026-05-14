@@ -1,0 +1,14 @@
+# SPDX-FileCopyrightText: Contributors to PyPSA-Earth
+# SPDX-FileCopyrightText: Open Energy Transition gGmbH
+#
+# SPDX-License-Identifier: CC0-1.0
+
+run:
+  name: "capacity_expansion_test"
+
+electricity:
+  extendable_carriers:
+    Generator: ["solar"]
+    StorageUnit: []
+    Store: []
+    Link: []  
