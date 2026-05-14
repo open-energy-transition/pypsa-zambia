@@ -176,7 +176,11 @@ if (HYDRO_PROFILE_DATASET := dataset_version("hydro_profile", config))["source"]
         message:
             "Retrieving hydro profile dataset for {region} and {source}"
         input:
-            hydro_profile_nc=HTTP.remote(HYDRO_PROFILE_DATASET["url"], keep_local=True),
+            hydro_profile_nc=HTTP.remote(
+                HYDRO_PROFILE_DATASET["url"],
+                keep_local=True,
+                additional_request_string="?download=1",
+            ),
         output:
             f"data/hydro_profiles/glofas_profile.nc",
         run:
@@ -195,7 +199,11 @@ if (NATURA_EARTH_DATASET := dataset_version("natura_earth", config))["source"] i
         message:
             "Retrieving Natura Earth dataset for {source}"
         input:
-            natura_zip=HTTP.remote(NATURA_EARTH_DATASET["url"], keep_local=True),
+            natura_zip=HTTP.remote(
+                NATURA_EARTH_DATASET["url"],
+                keep_local=True,
+                additional_request_string="?download=1",
+            ),
         output:
             unzip=directory(f"data/natura_earth/{source}"),
             tiff=f"data/natura_earth/{source}" + "/natura.tiff",
