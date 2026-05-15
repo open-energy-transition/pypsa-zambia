@@ -162,3 +162,29 @@ if (LANDCOVER_DATASET := dataset_version("landcover", config))["source"] in ["pr
                 + f"/WDPA_{version}_Public_shp-points.shp",
                 index=[0, 1, 2],
             ),
+
+
+if config["enable"].get("retrieve_cutout_zambia", False):
+
+    _ZM_CUTOUT_URLS = {
+        "cutout-2023-era5": "sandbox.zenodo.org/records/499379/files/cutout-2023-era5.nc?download=1",
+        "cutout-2024-era5": "sandbox.zenodo.org/records/499392/files/cutout-2024-era5.nc?download=1",
+        "cutout-2025-era5": "sandbox.zenodo.org/records/488187/files/cutout-2025-era5.nc?download=1",
+    }
+
+    _cutout_name = list(config["atlite"]["cutouts"].keys())[0]
+    _cutout_url = _ZM_CUTOUT_URLS[_cutout_name]
+
+    rule retrieve_cutout_zambia:
+        message:
+            f"Retrieving Zambia ERA5 cutout: {_cutout_name}"
+        input:
+            cutout_nc=HTTP.remote(_cutout_url, keep_local=True),
+        output:
+            f"cutouts/{CDIR}{_cutout_name}.nc",
+        log:
+            f"logs/{RDIR}retrieve_cutout/{_cutout_name}.log",
+        benchmark:
+            f"benchmarks/{RDIR}retrieve_cutout_{_cutout_name}"
+        run:
+            move(str(input.cutout_nc), output[0])

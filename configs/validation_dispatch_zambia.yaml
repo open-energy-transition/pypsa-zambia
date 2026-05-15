@@ -13,6 +13,8 @@ enable:
   download_global_buildings: false # If 'true', GlobalMLBuildingFootprints data will be downloaded for the above given countries
   build_natura_raster: false # If 'true', then an exclusion raster will be build. Otherwise use pregenerated raster.
   build_cutout: false
+  retrieve_cutout: false
+  retrieve_cutout_zambia: true # requires atlite.cutouts key to be one of: cutout-2023-era5, cutout-2024-era5, cutout-2025-era5
 scenario:
   simpl: [""]
   ll: ["v1.0"]
