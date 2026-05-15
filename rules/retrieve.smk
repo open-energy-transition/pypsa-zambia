@@ -188,8 +188,8 @@ if config["enable"].get("retrieve_cutout_zambia", False):
             f"benchmarks/{RDIR}retrieve_cutout_{_cutout_name}"
         run:
             move(str(input.cutout_nc), output[0])
-            
-            
+
+
 if (HYDRO_PROFILE_DATASET := dataset_version("hydro_profile", config))["source"] in [
     "primary",
     "tutorial",
