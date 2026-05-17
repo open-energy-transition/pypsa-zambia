@@ -1742,3 +1742,62 @@ def sanitize_locations(n):
             n.buses.country.ne("") & n.buses.country.notnull(),
             n.buses.location.map(n.buses.country),
         )
+
+
+def write_config(
+    config,
+    fl_name,
+    output_dir,
+    config_exclude=None,
+):
+    """
+    Outputs config dictionary into a file
+
+    Parameters
+    ----------
+    config : dict
+        Dictionary formed from Snakemake `config` global variable
+
+    config_exclude : dict
+        Dictionary formed from Snakemake `config` global variable
+        used to subtract from `config`. Needed to get rid of technical
+        configuration parameters not relevant for modeling runs
+
+    fl_name : str
+        File name to store the useful config
+
+    Returns
+    -------
+    tuple or str or dict
+        If a single key is provided, returns the corresponding value from the
+        regions config file. If multiple keys are provided, returns a tuple
+        containing values corresponding to the provided keys.
+
+
+    """
+
+    # Avoid confusing REUSE as in https://reuse.software/faq/#exclude-lines
+    # REUSE-IgnoreStart
+    license_str_list = [
+        "# SPDX-FileCopyrightText:  PyPSA-Earth and PyPSA-Eur Authors",
+        "# SPDX-License-Identifier: AGPL-3.0-or-later",
+        "#",
+        "\n\r",
+    ]
+    # REUSE-IgnoreEnd
+    license_str = "\n\r".join(license_str_list)
+
+    if config_exclude:
+        keys_exclude = set(config.keys()) - set(config_exclude.keys())
+        config_clean = dict()
+        for key in keys_exclude:
+            config_clean[key] = config.get(key)
+    else:
+        config_clean = config
+
+    p = Path(output_dir)
+    p.mkdir(parents=True, exist_ok=True)
+    fl_p = Path(output_dir, fl_name)
+    with fl_p.open("w") as outfile:
+        outfile.write(license_str)
+        yaml.dump(config_clean, outfile, default_flow_style=False)

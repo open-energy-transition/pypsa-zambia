@@ -20,6 +20,7 @@ from _helpers import (
     copy_default_files,
     update_cutout_config,
     BASE_DIR,
+    write_config,
     branch,  # Remove if Snakemake >= 8.3.0
 )
 from build_demand_profiles import get_load_paths_gegis
@@ -38,9 +39,14 @@ HTTP = HTTPRemoteProvider()
 copy_default_files()
 
 
-configfile: "config.default.yaml"
 configfile: "configs/bundle_config.yaml"
 configfile: "configs/powerplantmatching_config.yaml"
+
+
+config_technical = config.copy()
+
+
+configfile: "config.default.yaml"
 configfile: "configs/validation_dispatch_zambia.yaml"
 
 
@@ -65,6 +71,23 @@ CDIR = RDIR if not run.get("shared_cutouts") else ""
 SECDIR = run["sector_name"] + "/" if run.get("sector_name") else ""
 SDIR = config["summary_dir"].strip("/") + f"/{SECDIR}"
 RESDIR = config["results_dir"].strip("/") + f"/{SECDIR}"
+
+if config.get("update_consol_config", False):
+
+    write_config(
+        config,
+        fl_name="config.zm.model_config_var.yaml",
+        output_dir="configs",
+        config_exclude=config_technical,
+    )
+
+    # provide the full list of config dictionary used by Snakemake
+    write_config(
+        config,
+        fl_name="config.zm.tech_config_var.yaml",
+        output_dir="configs",
+        config_exclude=None,
+    )
 
 load_data_paths = get_load_paths_gegis("data", config)
 ATLITE_NPROCESSES = config["atlite"].get("nprocesses", 4)

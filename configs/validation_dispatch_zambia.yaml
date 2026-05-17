@@ -6,6 +6,7 @@
 run:
   name: "validation_dispatch_zambia_2024"
   shared_cutouts: true
+  update_consol_config: false
 enable:
   retrieve_databundle: false #  Recommended 'true', for the first run. Otherwise data might be missing.
   retrieve_databundle_sector: false
