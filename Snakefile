@@ -262,6 +262,23 @@ if config["validation"]["mining_data"].get("download_data", False):
             copyfile(str(input["mining_polygons"]), output["mining_polygons"])
 
 
+if config["validation"].get("biomass", {}).get("download_data", False):
+
+    rule download_biomass_data:
+        input:
+            url=HTTP.remote(
+                "https://sandbox.zenodo.org/records/501547/files/biomass_data.csv",
+                keep_local=True,
+                additional_request_string="?download=1",
+            ),
+        output:
+            "data/biomass_data.csv",
+        log:
+            "logs/download_biomass_data.log",
+        run:
+            copyfile(str(input["url"]), output[0])
+
+
 if config["enable"].get("download_global_buildings", True):
 
     rule download_global_buildings:
@@ -857,6 +874,7 @@ rule add_electricity:
         hydro_capacities="data/hydro_capacities.csv",
         demand_profiles="resources/" + RDIR + "demand_profiles.csv",
         nuclear_p_max_pu="data/nuclear_p_max_pu.csv",
+        biomass_csv="data/biomass_data.csv",
     output:
         "networks/" + RDIR + "elec.nc",
     log:

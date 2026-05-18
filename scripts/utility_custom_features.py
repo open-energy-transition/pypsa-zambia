@@ -20,6 +20,34 @@ from shapely import wkt
 logger = logging.getLogger(__name__)
 
 
+def add_biomass_potential(n, fao_df, provinces_gdf, costs, province_col="NAME_1"):
+    """Add extendable biomass generators capped by FAO provincial potential."""
+    zm_buses = n.buses[n.buses.country == "ZM"]
+    zm_gdf = gpd.GeoDataFrame(
+        zm_buses,
+        geometry=gpd.points_from_xy(zm_buses.x, zm_buses.y),
+        crs="EPSG:4326",
+    )
+    bus_province = zm_gdf.sjoin(provinces_gdf[[province_col, "geometry"]], how="left")[
+        province_col
+    ].dropna()
+    p_nom_max = bus_province.map(fao_df["biomass_mw"]) / bus_province.map(
+        bus_province.value_counts()
+    )
+    n.madd(
+        "Generator",
+        p_nom_max.index,
+        suffix=" biomass",
+        bus=p_nom_max.index,
+        carrier="biomass",
+        p_nom=0.0,
+        p_nom_extendable=True,
+        p_nom_max=p_nom_max,
+        capital_cost=costs.at["biomass", "capital_cost"],
+        marginal_cost=costs.at["biomass", "marginal_cost"],
+    )
+
+
 def annual_gwh_to_average_mw(energy_gwh, hours_per_year=8760):
     """Convert annual energy in GWh to average power in MW."""
     return energy_gwh * 1000 / hours_per_year
