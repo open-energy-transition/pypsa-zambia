@@ -56,6 +56,25 @@ $ git merge upstream_main  # Merges the branch tracking upstream/main into new_u
 # Resolve conflicts....
 $ git push origin -u new_upstream_merge  # Push the branch to PyPSA-Zambia remote and open PR
 ```
+2. Version 2
+Soft-fork guide
+
+```
+### fetch latest changes
+$ git fetch upstream --filter=blob:none
+$ 
+$ git checkout upstream/main
+$ git checkout -b upstream_local_branch
+```
+
+Check first where the origin repo is located
+`git remote show origin`
+
+The original line (`git push --set-upstream origin upstream`) looks a bit risky as it can lead to pushing into upstream and could be modified into
+
+```
+git push --set-upstream origin upstream_local_branch 
+```
 
 A detailed general methodology is available in [this document](https://docs.google.com/document/d/1q5Ro2yVpK5lBG2JTIuVAWm5UjnC1-6Tb_SOEVAyruVI/edit?usp=sharing)
 
