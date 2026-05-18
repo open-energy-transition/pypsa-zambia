@@ -64,6 +64,8 @@ Soft-fork guide
 $ git fetch upstream --filter=blob:none
 $ 
 $ git checkout upstream/main
+# remove an old branch if needed
+$ git branch -d upstream_local_branch
 $ git checkout -b upstream_local_branch
 ```
 
