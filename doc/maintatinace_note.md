@@ -24,6 +24,7 @@ PyPSA-Zambia project is maintained as a soft-fork which means that it's kept in 
 - Upstream is always merged using a merge commit. This is necessary to preserve the blame information from upstream.
 - Merge upstream often to simplify the merges.
 - Keep your project code separate from upstream code if possible (new files or functions). It helps with merging upstream.
+- When resolving merge conflicts, it's worth to add a comment to facilitate reviews 
 
 
 Our successful [experience]((https://github.com/open-energy-transition/pypsa-zambia/pull/109)):
