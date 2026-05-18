@@ -26,14 +26,26 @@ PyPSA-Zambia project is maintained as a soft-fork which means that it's kept in 
 - Keep your project code separate from upstream code if possible (new files or functions). It helps with merging upstream.
 - When resolving merge conflicts, it's worth to add a comment to facilitate reviews 
 
+#### Git hand-ons
 
-Our successful [experience]((https://github.com/open-energy-transition/pypsa-zambia/pull/109)):
+```
+### setup remotes
+$ git remote add upstream https://github.com/pypsa-meets-earth/$ pypsa-earth.git
+$ git remote add origin https://github.com/open-energy-transition/pypsa-zambia.git
+```
+
 ```
 $ git remote -v
 origin  git@github.com:open-energy-transition/pypsa-zambia.git (fetch)
 origin  git@github.com:open-energy-transition/pypsa-zambia.git (push)
 upstream        git@github.com:pypsa-meets-earth/pypsa-earth.git (fetch)
 upstream        git@github.com:pypsa-meets-earth/pypsa-earth.git (push)
+
+```
+
+1. Version 1
+Our successful [experience]((https://github.com/open-energy-transition/pypsa-zambia/pull/109)):
+```
 $ git checkout upstream/main  # DETACHED HEAD STATE
 $ git switch -c upstream_main  # Create a new local branch following upstream main
 $ git pull upstream main  # Pull down the latest commits from the upstream main branch
