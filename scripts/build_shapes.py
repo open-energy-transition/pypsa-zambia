@@ -279,6 +279,8 @@ def get_GADM_layer(
         # create a subindex column that is useful
         # in the GADM processing of sub-national zones
         geodf_temp["GADM_ID"] = geodf_temp[f"GID_{cur_layer_id}"]
+        if f"NAME_{cur_layer_id}" in geodf_temp.columns:
+            geodf_temp["NAME_1"] = geodf_temp[f"NAME_{cur_layer_id}"]
 
         # append geodataframes
         geodf_list.append(geodf_temp)
@@ -1645,7 +1647,7 @@ def gadm(
 
     # drop useless columns
     df_gadm.drop(
-        df_gadm.columns.difference(["country", "GADM_ID", "geometry"]),
+        df_gadm.columns.difference(["country", "GADM_ID", "NAME_1", "geometry"]),
         axis=1,
         inplace=True,
         errors="ignore",

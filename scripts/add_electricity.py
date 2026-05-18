@@ -79,6 +79,7 @@ It further adds extendable ``generators`` with **zero** capacity for
 - additional open- and combined-cycle gas turbines (if ``OCGT`` and/or ``CCGT`` is listed in the config setting ``electricity: extendable_carriers``)
 """
 
+import geopandas as gpd
 import numpy as np
 import pandas as pd
 import powerplantmatching as pm
@@ -93,7 +94,7 @@ from _helpers import (
     update_p_nom_max,
 )
 from powerplantmatching.export import map_country_bus
-from utility_custom_features import disaggregate_plants
+from utility_custom_features import add_biomass_potential, disaggregate_plants
 
 idx = pd.IndexSlice
 
@@ -1402,6 +1403,13 @@ if __name__ == "__main__":
         disaggregate_flag=disaggregate_flag,
     )
     attach_existing_batteries(n, costs, ppl)
+
+    if snakemake.params.electricity.get("biomass_potential"):
+        _add_missing_carriers_from_costs(n, costs, ["biomass"])
+        fao_df = pd.read_csv(snakemake.input.biomass_csv, index_col="province")
+        provinces_gdf = gpd.read_file(snakemake.input.gadm_shapes)
+        add_biomass_potential(n, fao_df, provinces_gdf, costs)
+
     apply_nuclear_p_max_pu(
         n,
         pd.read_csv(snakemake.input.nuclear_p_max_pu),
