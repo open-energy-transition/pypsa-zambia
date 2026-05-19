@@ -13,8 +13,7 @@ enable:
   download_global_buildings: false # If 'true', GlobalMLBuildingFootprints data will be downloaded for the above given countries
   build_natura_raster: false # If 'true', then an exclusion raster will be build. Otherwise use pregenerated raster.
   build_cutout: false
-  retrieve_cutout: false
-  retrieve_cutout_zambia: false # requires atlite.cutouts key to be one of: cutout-2023-era5, cutout-2024-era5, cutout-2025-era5
+  retrieve_cutout: true # set to true to download the Zambia ERA5 cutout from zenodo; requires a matching entry under data: below
 scenario:
   simpl: [""]
   ll: ["v1.0"]
@@ -27,31 +26,38 @@ snapshots:
   inclusive: "left" # end is not inclusive
 countries: ["ZM"]
 
+# To download a pre-built ERA5 cutout from zenodo, add the cutout name as a data entry
+# and set enable.retrieve_cutout: true. The cutout name must match the one in atlite.cutouts.
+data:
+  cutout-2024-era5:
+    source: primary
+    version: v1.0
+
 atlite:
   nprocesses: 4
   cutouts:
-    cutout-2013-era5:
+    cutout-2024-era5:
       module: era5
       dx: 0.3
       dy: 0.3
-      time: ["2013-01-01", "2014-01-01"]
+      time: ["2024-01-01", "2025-01-01"]
       x: [21.5, 33.7]
       y: [-18.8, -7.8]
 
 
 renewable:
   onwind:
-    cutout: cutout-2013-era5
+    cutout: cutout-2024-era5
     correction_factor: 0.93
     extendable: false
   offwind-ac:
-    cutout: cutout-2013-era5
+    cutout: cutout-2024-era5
     extendable: false
   offwind-dc:
-    cutout: cutout-2013-era5
+    cutout: cutout-2024-era5
     extendable: false
   solar:
-    cutout: cutout-2013-era5
+    cutout: cutout-2024-era5
     correction_factor: 0.854337
     extendable: false
   hydro:
@@ -62,7 +68,7 @@ renewable:
       year: 2013
     multiplier: 0.65
   csp:
-    cutout: cutout-2013-era5
+    cutout: cutout-2024-era5
     extendable: false
 
 
