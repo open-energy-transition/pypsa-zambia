@@ -27,6 +27,7 @@ from retrieve_databundle_light import (
     datafiles_retrivedatabundle,
     get_best_bundles_in_snakemake,
 )
+from scripts._common import dataset_version
 
 from scripts.utility_custom_features import load_mining_data, build_mining_raster
 
@@ -573,9 +574,45 @@ if config["enable"].get("build_cutout", False):
 
 if config["enable"].get("retrieve_cutout", False):
 
+    _cutout_name = list(config["atlite"]["cutouts"].keys())[0]
+    _injected_bundle_key = f"bundle_cutout_{_cutout_name}"
+
+    # Dynamically register a cutout bundle from versions.csv if the cutout name is
+    # listed under data: in the config. This avoids hardcoding URLs in bundle_config.yaml.
+    if _cutout_name in config.get("data", {}):
+        _cutout_dataset = dataset_version(_cutout_name, config)
+        if _cutout_dataset["source"] == "primary":
+            config["databundles"][_injected_bundle_key] = {
+                "countries": config["countries"],
+                "tutorial": config["tutorial"],
+                "category": "cutouts",
+                "destination": "cutouts",
+                "urls": {"direct": f"https://{_cutout_dataset['url']}"},
+                "unzip": False,
+                "output": [f"cutouts/{_cutout_name}.nc"],
+                "disable_by_opt": {"build_cutout": ["all"]},
+            }
+
+    # Country-based bundle selection
     cutout_to_download = get_best_bundles_in_snakemake(
         config, include_categories=["cutouts"]
     )
+
+    # Multiple static bundles may cover the same country with different cutout years.
+    # Keep only the bundle whose output matches the configured cutout name.
+    # If none match (e.g. only a 2013 bundle exists but 2024 is requested),
+    # fall back to the dynamically injected bundle from versions.csv.
+    if _cutout_name in config.get("data", {}):
+        cutout_to_download = [
+            b
+            for b in cutout_to_download
+            if any(
+                _cutout_name in out
+                for out in config["databundles"][b].get("output", [])
+            )
+        ]
+        if not cutout_to_download and _injected_bundle_key in config["databundles"]:
+            cutout_to_download = [_injected_bundle_key]
 
     rule retrieve_cutout:
         params:
