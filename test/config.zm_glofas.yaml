@@ -65,6 +65,14 @@ cluster_options:
   simplify_network:
     exclude_carriers: []
 
+atlite:
+  nprocesses: 4
+  cutouts:
+    # use 'base' to determine geographical bounds and time span from config
+    # base:
+    # module: era5
+    zm-2013-era5-tutorial: {}    
+
 # Exclude Copernicus and GEBCO rasters
 # as there are no regional datasets for them yet
 renewable:
