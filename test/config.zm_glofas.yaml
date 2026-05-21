@@ -71,7 +71,7 @@ atlite:
     # use 'base' to determine geographical bounds and time span from config
     # base:
     # module: era5
-    zm-2013-era5-tutorial: {}
+    zm-2013-tutorial-era5: {}
 
 # Exclude Copernicus and GEBCO rasters
 # as there are no regional datasets for them yet
