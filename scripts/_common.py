@@ -80,6 +80,10 @@ def dataset_version(
         & (data_versions["latest"] if "latest" == dataset_config["version"] else True)
     ]
 
+    # Filter by year if specified in config and year column exists
+    if "year" in dataset_config and "year" in data_versions.columns:
+        dataset = dataset.loc[dataset["year"] == str(dataset_config["year"])]
+
     if dataset.empty:
         raise ValueError(
             f"Dataset '{name}' with source '{dataset_config['source']}' for '{dataset_config['version']}' not found in data/versions.csv."
