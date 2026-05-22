@@ -20,7 +20,7 @@ from shapely import wkt
 logger = logging.getLogger(__name__)
 
 
-def add_biomass_potential(n, fao_df, provinces_gdf, costs, province_col="NAME_1"):
+def add_biomass_potential(n, fao_df, provinces_gdf, costs, geo_crs, province_col="NAME_1"):
     """Add extendable biomass generators capped by FAO provincial potential."""
     zm_buses = n.buses[n.buses.country == "ZM"]
     zm_gdf = gpd.GeoDataFrame(
