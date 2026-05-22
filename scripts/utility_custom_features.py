@@ -26,7 +26,7 @@ def add_biomass_potential(n, fao_df, provinces_gdf, costs, geo_crs, province_col
     zm_gdf = gpd.GeoDataFrame(
         zm_buses,
         geometry=gpd.points_from_xy(zm_buses.x, zm_buses.y),
-        crs="EPSG:4326",
+        crs=geo_crs,
     )
     bus_province = zm_gdf.sjoin(provinces_gdf[[province_col, "geometry"]], how="left")[
         province_col
