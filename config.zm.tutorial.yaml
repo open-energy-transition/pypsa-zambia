@@ -56,7 +56,7 @@ atlite:
     # module: era5
     zm-2013-tutorial-era5: {}
 
-# commented-out for time needed to test stability 
+# commented-out for time needed to test stability
 # of a configuration with a default cutout
 # to be removed once stability has been proved
 renewable:
