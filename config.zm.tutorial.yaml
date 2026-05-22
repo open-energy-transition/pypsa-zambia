@@ -56,24 +56,23 @@ atlite:
     # module: era5
     zm-2013-tutorial-era5: {}
 
-# commented-out for time needed to test stability
-# of a configuration with a default cutout
-# to be removed once stability has been proved
+# Cutout definitions are needed to re-write those defined
+# in config.tuturial.yaml (needs fixing in the upstream)
 renewable:
-  # onwind:
-  #   cutout: zm-2013-tutorial-era5
-  # offwind-ac:
-  #   cutout: zm-2013-tutorial-era5
-  # offwind-dc:
-  #   cutout: zm-2013-tutorial-era5
-  # solar:
-  #   cutout: zm-2013-tutorial-era5
+  onwind:
+    cutout: zm-2013-tutorial-era5
+  offwind-ac:
+    cutout: zm-2013-tutorial-era5
+  offwind-dc:
+    cutout: zm-2013-tutorial-era5
+  solar:
+    cutout: zm-2013-tutorial-era5
   hydro:
-    # cutout: zm-2013-tutorial-era5
+    cutout: zm-2013-tutorial-era5
     hydrobasins_level: 4
     hydro_max_hours: "energy_capacity_totals_by_country"
-  # csp:
-  #   cutout: zm-2013-tutorial-era5
+  csp:
+    cutout: zm-2013-tutorial-era5
 
 
 solving:
