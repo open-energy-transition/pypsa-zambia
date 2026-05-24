@@ -30,28 +30,28 @@ countries: ["ZM"]
 atlite:
   nprocesses: 4
   cutouts:
-    cutout-2024-era5:
+    cutout-2013-era5:
       module: era5
       dx: 0.3
       dy: 0.3
-      time: ["2024-01-01", "2025-01-01"]
+      time: ["2013-01-01", "2014-01-01"]
       x: [21.5, 33.7]
       y: [-18.8, -7.8]
 
 
 renewable:
   onwind:
-    cutout: cutout-2024-era5
+    cutout: cutout-2013-era5
     correction_factor: 0.93
     extendable: false
   offwind-ac:
-    cutout: cutout-2024-era5
+    cutout: cutout-2013-era5
     extendable: false
   offwind-dc:
-    cutout: cutout-2024-era5
+    cutout: cutout-2013-era5
     extendable: false
   solar:
-    cutout: cutout-2024-era5
+    cutout: cutout-2013-era5
     correction_factor: 0.854337
     extendable: false
   hydro:
@@ -62,7 +62,7 @@ renewable:
       year: 2013
     multiplier: 0.65
   csp:
-    cutout: cutout-2024-era5
+    cutout: cutout-2013-era5
     extendable: false
 
 
