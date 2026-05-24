@@ -8,7 +8,7 @@ hydro_profile,v1.0,tutorial,latest supported,zm,,2024-06-01,Global hydro profile
 natura_earth,v1.0,tutorial,latest supported,earth,,2024-06-01,Natura Earth tutorial dataset,sandbox.zenodo.org/records/323567/files/natura_wpda_CC0.zip
 natura_earth,v1.0,archive,latest supported,earth,,2024-06-01,Natura Earth tutorial dataset,drive.google.com/file/d/1H-Y7p8UgnbEzJgo9qPc54BpDXS8loX7Y
 natura_earth,v1.0,primary,latest supported,earth,,2024-06-01,Natura Earth dataset,sandbox.zenodo.org/records/323567/files/natura_wpda_CC0.zip
-cutout-era5,V1.0,primary,latest supported,zm,2013,2026-05-24,Zambia Cutout,sandbox.zenodo.org/records/501170/files/cutout-2013-era5.nc
-cutout-era5,V1.0,primary,latest supported,zm,2023,2026-05-24,Zambia Cutout,sandbox.zenodo.org/records/499379/files/cutout-2023-era5.nc
-cutout-era5,V1.0,primary,latest supported,zm,2024,2026-05-24,Zambia Cutout,sandbox.zenodo.org/records/499392/files/cutout-2024-era5.nc
-cutout-era5,V1.0,primary,latest supported,zm,2025,2026-05-24,Zambia Cutout,sandbox.zenodo.org/records/488187/files/cutout-2025-era5.nc
+cutout-era5,v1.0,primary,latest supported,zm,2013,2026-05-24,Zambia Cutout,sandbox.zenodo.org/records/501170/files/cutout-2013-era5.nc
+cutout-era5,v1.0,primary,latest supported,zm,2023,2026-05-24,Zambia Cutout,sandbox.zenodo.org/records/499379/files/cutout-2023-era5.nc
+cutout-era5,v1.0,primary,latest supported,zm,2024,2026-05-24,Zambia Cutout,sandbox.zenodo.org/records/499392/files/cutout-2024-era5.nc
+cutout-era5,v1.0,primary,latest supported,zm,2025,2026-05-24,Zambia Cutout,sandbox.zenodo.org/records/488187/files/cutout-2025-era5.nc
