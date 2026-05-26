@@ -33,18 +33,10 @@ electricity:
 renewable:
   hydro:
     multiplier: 0.65
-lines:
-  s_nom_extendable: true
 
 solving:
   options:
     load_shedding: true
-
-validation:
-  interconnectors:
-    enable: false
-  custom_powerplants:
-    download_data: false
 
 load_options:
   demand_weights:
