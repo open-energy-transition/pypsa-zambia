@@ -90,6 +90,7 @@ if config.get("update_consol_config", False):
     )
 
 load_data_paths = get_load_paths_gegis("data", config)
+
 ATLITE_NPROCESSES = config["atlite"].get("nprocesses", 4)
 
 
@@ -170,8 +171,9 @@ rule plot_all_summaries:
 
 if config["enable"].get("retrieve_databundle", True):
 
+    # Exclude categories which are implemented in retrieve rules (retrieve.smk)
     bundles_to_download = get_best_bundles_in_snakemake(
-        config, exclude_categories=["cutouts"]
+        config, exclude_categories=["natura", "hydrobasins", "cutouts", "irena"]
     )
 
     rule retrieve_databundle_light:
@@ -183,104 +185,14 @@ if config["enable"].get("retrieve_databundle", True):
             expand(
                 "{file}", file=datafiles_retrivedatabundle(config, bundles_to_download)
             ),
-            directory("data/landcover"),
+            # TODO Get back once we'll have regional tutorial data for landcover
+            # directory("data/landcover"),
         log:
             "logs/" + RDIR + "retrieve_databundle.log",
         benchmark:
             "benchmarks/" + RDIR + "retrieve_databundle_light"
         script:
             "scripts/retrieve_databundle_light.py"
-
-
-if config["validation"]["custom_powerplants"].get("download_data", False):
-
-    rule download_custom_powerplants:
-        input:
-            url=HTTP.remote(
-                "https://sandbox.zenodo.org/records/491391/files/custom_powerplants.csv",
-                keep_local=True,
-                additional_request_string="?download=1",
-            ),
-        output:
-            "data/custom_powerplants.csv",
-        log:
-            "logs/download_custom_powerplants.log",
-        run:
-            copyfile(str(input["url"]), output[0])
-
-
-if config["validation"]["interconnectors"].get("download_data", False):
-
-    rule download_interconnection_data:
-        input:
-            substations=HTTP.remote(
-                "https://sandbox.zenodo.org/records/471583/files/zm_substations.csv",
-                keep_local=True,
-                additional_request_string="?download=1",
-            ),
-            links=HTTP.remote(
-                "https://sandbox.zenodo.org/records/471583/files/sapp_links.csv",
-                keep_local=True,
-                additional_request_string="?download=1",
-            ),
-            countries=HTTP.remote(
-                "https://sandbox.zenodo.org/records/471583/files/sapp_countries.csv",
-                keep_local=True,
-                additional_request_string="?download=1",
-            ),
-        output:
-            substations="data/zm_substations.csv",
-            links="data/sapp_links.csv",
-            countries="data/sapp_countries.csv",
-        log:
-            "logs/download_interconnection_data.log",
-        run:
-            copyfile(str(input["substations"]), output["substations"])
-            copyfile(str(input["links"]), output["links"])
-            copyfile(str(input["countries"]), output["countries"])
-
-
-if config["validation"]["line_types"].get("download_data", False):
-
-    rule download_line_types:
-        input:
-            url=HTTP.remote(
-                "https://sandbox.zenodo.org/records/473405/files/pypsa_line_types%20%281%29.csv",
-                keep_local=True,
-            ),
-        output:
-            "data/line_types.csv",
-        log:
-            "logs/download_line_types.log",
-        run:
-            copyfile(str(input["url"]), output[0])
-
-
-if config["validation"]["mining_data"].get("download_data", False):
-
-    rule retrieve_mining_data:
-        input:
-            provincial_demand=HTTP.remote(
-                "https://sandbox.zenodo.org/records/495635/files/zambia_provincial_mining_demand.csv",
-                keep_local=True,
-                additional_request_string="?download=1",
-            ),
-            mining_polygons=HTTP.remote(
-                "https://sandbox.zenodo.org/records/495635/files/zambia_pangaea_mining_polygons.csv",
-                keep_local=True,
-                additional_request_string="?download=1",
-            ),
-        output:
-            provincial_demand="data/mining/zambia_provincial_mining_demand.csv",
-            mining_polygons="data/mining/zambia_pangaea_mining_polygons.csv",
-        log:
-            "logs/retrieve_mining_data.log",
-        run:
-            import os
-
-            os.makedirs("data/mining", exist_ok=True)
-            copyfile(str(input["provincial_demand"]), output["provincial_demand"])
-            copyfile(str(input["mining_polygons"]), output["mining_polygons"])
 
 
 if config["enable"].get("download_global_buildings", True):
@@ -668,27 +580,6 @@ else:
     cost_directory = ""
 
 
-if config["enable"].get("retrieve_cost_data", True):
-
-    rule retrieve_cost_data:
-        params:
-            version=config["costs"]["technology_data_version"],
-        input:
-            HTTP.remote(
-                f"raw.githubusercontent.com/PyPSA/technology-data/{config['costs']['technology_data_version']}/outputs/{cost_directory}"
-                + "costs_{year}.csv",
-                keep_local=True,
-            ),
-        output:
-            "resources/" + RDIR + "costs_{year}.csv",
-        log:
-            "logs/" + RDIR + "retrieve_cost_data_{year}.log",
-        resources:
-            mem_mb=5000,
-        run:
-            move(input[0], output[0])
-
-
 rule process_cost_data:
     params:
         costs=config["costs"],
@@ -721,7 +612,11 @@ rule build_demand_profiles:
     input:
         base_network="networks/" + RDIR + "base.nc",
         regions="resources/" + RDIR + "bus_regions/regions_onshore.geojson",
-        load=load_data_paths,
+        load=branch(
+            config["load_options"].get("source", "gegis") in ["gegis", "ssp"],
+            get_load_paths_gegis("data", config),
+            "data/demand/forecasts_on_historical_period.parquet",
+        ),
         #gadm_shapes="resources/" + RDIR + "shapes/MAR2.geojson",
         #using this line instead of the following will test updated gadm shapes for MA.
         #To use: downlaod file from the google drive and place it in resources/" + RDIR + "shapes/
@@ -751,6 +646,26 @@ HYDRO_PROFILES = {
 
 def inputs_hydro(w):
     return HYDRO_PROFILES if w.technology == "hydro" else {}
+
+
+rule build_glofas_profile:
+    params:
+        snapshots=config["snapshots"],
+    # TODO replace hardcoding
+    input:
+        powerplants="resources/" + RDIR + "powerplants.csv",
+        glofas="cutouts/" + CDIR + "zm-2013-glofas.nc",
+    output:
+        profile="cutouts/" + CDIR + "profile_hydro_glofas.nc",
+    log:
+        "logs/" + RDIR + "build_glofas_profile.log",
+    benchmark:
+        "benchmarks/" + RDIR + "build_glofas_profile"
+    threads: ATLITE_NPROCESSES
+    resources:
+        mem_mb=ATLITE_NPROCESSES * 5000,
+    script:
+        "scripts/build_glofas_profile.py"
 
 
 rule build_renewable_profiles:
@@ -832,9 +747,12 @@ rule add_electricity:
         existing_capacities=config["existing_capacities"],
     input:
         **{
-            f"profile_{tech}": "resources/"
-            + RDIR
-            + f"renewable_profiles/profile_{tech}.nc"
+            f"profile_{tech}": (
+                # config["renewable"][tech]["path"]
+                f"data/hydro_profiles/glofas_profile.nc"
+                if config["renewable"][tech].get("source", "era5") == "custom"
+                else f"resources/{RDIR}renewable_profiles/profile_{tech}.nc"
+            )
             for tech in config["renewable"]
             if tech in config["electricity"]["renewable_carriers"]
         },
