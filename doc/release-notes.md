@@ -12,6 +12,13 @@ This part of documentation collects descriptive release notes to capture the mai
 
 ## New Features and Major Changes
 
+### Minor Changes and bug-fixing
+
+
+# PyPSA-Zambia v0.3
+
+## New Features and Major Changes
+
 * Power Plant disaggregation allowing power plants to retain individual identities [PR #153](https://github.com/open-energy-transition/pypsa-zambia/pull/153)
 
 * Ability to use custom hydro inflow data in the workflow [PR #178](https://github.com/open-energy-transition/pypsa-zambia/pull/178)
@@ -20,8 +27,11 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Enable capacity expansion runs by adding a dedicated configuration file [PR #219](https://github.com/open-energy-transition/pypsa-zambia/pull/219)
 
+* Merge upstream changes [PR #221](https://github.com/open-energy-transition/pypsa-zambia/pull/221)
+
 ### Minor Changes and bug-fixing
 
+* Add test to standard CI to ensure no workflow breaking changes are integrated when introducing custom configuration [PR #201](https://github.com/open-energy-transition/pypsa-zambia/pull/201)
 
 ## Upcoming changes from upstream
 
