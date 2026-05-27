@@ -10,7 +10,7 @@ SPDX-License-Identifier: CC-BY-4.0
 
 This part of documentation collects descriptive release notes to capture the main improvements introduced by developing the model before the next release.
 
-## New Features and Major Changes
+### New Features and Major Changes
 
 ### Minor Changes and bug-fixing
 
