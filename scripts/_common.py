@@ -80,9 +80,15 @@ def dataset_version(
         & (data_versions["latest"] if "latest" == dataset_config["version"] else True)
     ]
 
-    # Filter by year if specified in config and year column exists
+    # Filter by year if specified in config and year column exists.
+    # The year column is read as float64 when other rows have NaN (e.g. 2013.0);
+    # normalise to whole-number string before comparing.
     if "year" in dataset_config and "year" in data_versions.columns:
-        dataset = dataset.loc[dataset["year"] == str(dataset_config["year"])]
+        requested_year = str(int(dataset_config["year"]))
+        dataset = dataset.loc[
+            dataset["year"].apply(lambda x: str(int(x)) if pd.notna(x) else "")
+            == requested_year
+        ]
 
     if dataset.empty:
         if "year" in dataset_config:

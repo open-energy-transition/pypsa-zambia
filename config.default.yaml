@@ -38,7 +38,7 @@ data:
   cutout-era5:
     source: primary
     version: v1.0
-    year: 2023
+    year: 2013
   hydrobasins:
     source: build
     version: latest

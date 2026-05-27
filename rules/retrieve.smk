@@ -335,7 +335,7 @@ if (ERA5_CUTOUT := dataset_version("cutout-era5", config))["source"] in [
     "primary",
     "tutorial",
 ]:
-    year = ERA5_CUTOUT["year"]
+    year = int(float(ERA5_CUTOUT["year"]))
     region = ERA5_CUTOUT["region"]
 
     rule retrieve_era5_cutout:
