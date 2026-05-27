@@ -85,6 +85,10 @@ def dataset_version(
         dataset = dataset.loc[dataset["year"] == str(dataset_config["year"])]
 
     if dataset.empty:
+        if "year" in dataset_config:
+            raise ValueError(
+                f"Dataset '{name}' with source '{dataset_config['source']}' for '{dataset_config['version']}' and year '{dataset_config['year']}' not found in data/versions.csv."
+            )
         raise ValueError(
             f"Dataset '{name}' with source '{dataset_config['source']}' for '{dataset_config['version']}' not found in data/versions.csv."
         )
