@@ -22,13 +22,13 @@ from shapely.ops import transform as shapely_transform
 logger = logging.getLogger(__name__)
 
 
-def add_biomass_potential(n, fao_df, provinces_gdf, costs, province_col="NAME_1"):
+def add_biomass_potential(n, fao_df, provinces_gdf, costs, geo_crs, province_col="NAME_1"):
     """Add extendable biomass generators capped by FAO provincial potential."""
     zm_buses = n.buses[n.buses.country == "ZM"]
     zm_gdf = gpd.GeoDataFrame(
         zm_buses,
         geometry=gpd.points_from_xy(zm_buses.x, zm_buses.y),
-        crs="EPSG:4326",
+        crs=geo_crs,
     )
     bus_province = zm_gdf.sjoin(provinces_gdf[[province_col, "geometry"]], how="left")[
         province_col
