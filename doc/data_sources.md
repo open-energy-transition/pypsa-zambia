@@ -105,6 +105,6 @@ Maintainers of the repository will create the corresponding `archive`
 entry after reviewing your contribution.
 
 
-# Data inventory
+## Data inventory
 
 {{ read_csv('data_inventory.csv') }}
