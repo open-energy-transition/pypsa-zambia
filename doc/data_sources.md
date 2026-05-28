@@ -42,6 +42,8 @@ dataset with the following columns:
  from other data) or `tutorial` (shortened versions of original datasets intended to be used for testing).
 - `tags`: Space-separated tags like `latest`, `supported` or
     `deprecated`.
+- `region`: An optional comma-separated list of ISO two-letter code, or non-standard name for the regions represented in the dataset
+- `year`: An optional integer e.g. `2023` for the year of data represented in the dataset
 - `added`: The date when this entry was added to the registry.
 - `note`: Optional notes about the dataset or version.
 - `url`: The download URL for the data.
@@ -59,7 +61,7 @@ this case, the corresponding `archive` entries do not mirror the same
 version but represent snapshots taken at specific points in time from
 that primary source.
 
-### Adding a new version of a dataset
+### Adding a new *version* of a dataset
 
 If you notice that a data source has been updated and want to add the
 new version to PyPSA-Zambia:
