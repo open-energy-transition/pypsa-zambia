@@ -356,10 +356,11 @@ if (ERA5_CUTOUT := dataset_version("cutout-era5", config))["source"] in [
         run:
             copy2(str(input[0]), output[0])
 
+
 if (ZM_BIOMASS := dataset_version("zm-biomass", config))["source"] in [
     "primary",
     "tutorial",
-]:    
+]:
 
     rule download_biomass_data:
         input:
@@ -374,5 +375,3 @@ if (ZM_BIOMASS := dataset_version("zm-biomass", config))["source"] in [
             "logs/download_biomass_data.log",
         run:
             copyfile(str(input["url"]), output[0])
-
-
