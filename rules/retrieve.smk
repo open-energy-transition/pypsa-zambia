@@ -11,6 +11,20 @@ from zipfile import ZipFile
 from scripts._common import dataset_version
 
 
+country_data = config["costs"].get("country_specific_data", "")
+countries = config.get("countries", [])
+
+if country_data and countries == [country_data]:
+    cost_directory = f"{country_data}/"
+elif country_data:
+    cost_directory = f"{country_data}/"
+    warnings.warn(
+        f"'country_specific_data' is set to '{country_data}', but 'countries' is {countries}. Make sure the '{country_data}' directory exists and that this is intentional."
+    )
+else:
+    cost_directory = ""
+
+
 if (HYDROBASINS_DATASET := dataset_version("hydrobasins", config))["source"] in [
     "build",
     "tutorial",
@@ -164,6 +178,110 @@ if (LANDCOVER_DATASET := dataset_version("landcover", config))["source"] in ["pr
             ),
 
 
+rule download_custom_powerplants:
+    input:
+        url=HTTP.remote(
+            "https://sandbox.zenodo.org/records/491391/files/custom_powerplants.csv",
+            keep_local=True,
+            additional_request_string="?download=1",
+        ),
+    output:
+        "data/custom_powerplants.csv",
+    log:
+        "logs/download_custom_powerplants.log",
+    run:
+        copyfile(str(input["url"]), output[0])
+
+
+rule download_interconnection_data:
+    input:
+        substations=HTTP.remote(
+            "https://sandbox.zenodo.org/records/471583/files/zm_substations.csv",
+            keep_local=True,
+            additional_request_string="?download=1",
+        ),
+        links=HTTP.remote(
+            "https://sandbox.zenodo.org/records/471583/files/sapp_links.csv",
+            keep_local=True,
+            additional_request_string="?download=1",
+        ),
+        countries=HTTP.remote(
+            "https://sandbox.zenodo.org/records/471583/files/sapp_countries.csv",
+            keep_local=True,
+            additional_request_string="?download=1",
+        ),
+    output:
+        substations="data/zm_substations.csv",
+        links="data/sapp_links.csv",
+        countries="data/sapp_countries.csv",
+    log:
+        "logs/download_interconnection_data.log",
+    run:
+        copyfile(str(input["substations"]), output["substations"])
+        copyfile(str(input["links"]), output["links"])
+        copyfile(str(input["countries"]), output["countries"])
+
+
+rule download_line_types:
+    input:
+        url=HTTP.remote(
+            "https://sandbox.zenodo.org/records/473405/files/pypsa_line_types%20%281%29.csv",
+            keep_local=True,
+        ),
+    output:
+        "data/line_types.csv",
+    log:
+        "logs/download_line_types.log",
+    run:
+        copyfile(str(input["url"]), output[0])
+
+
+rule retrieve_mining_data:
+    input:
+        provincial_demand=HTTP.remote(
+            "https://sandbox.zenodo.org/records/495635/files/zambia_provincial_mining_demand.csv",
+            keep_local=True,
+            additional_request_string="?download=1",
+        ),
+        mining_polygons=HTTP.remote(
+            "https://sandbox.zenodo.org/records/495635/files/zambia_pangaea_mining_polygons.csv",
+            keep_local=True,
+            additional_request_string="?download=1",
+        ),
+    output:
+        provincial_demand="data/mining/zambia_provincial_mining_demand.csv",
+        mining_polygons="data/mining/zambia_pangaea_mining_polygons.csv",
+    log:
+        "logs/retrieve_mining_data.log",
+    run:
+        import os
+
+        os.makedirs("data/mining", exist_ok=True)
+        copyfile(str(input["provincial_demand"]), output["provincial_demand"])
+        copyfile(str(input["mining_polygons"]), output["mining_polygons"])
+
+
+if config["enable"].get("retrieve_cost_data", True):
+
+    rule retrieve_cost_data:
+        params:
+            version=config["costs"]["technology_data_version"],
+        input:
+            HTTP.remote(
+                f"raw.githubusercontent.com/PyPSA/technology-data/{config['costs']['technology_data_version']}/outputs/{cost_directory}"
+                + "costs_{year}.csv",
+                keep_local=True,
+            ),
+        output:
+            "resources/" + RDIR + "costs_{year}.csv",
+        log:
+            "logs/" + RDIR + "retrieve_cost_data_{year}.log",
+        resources:
+            mem_mb=5000,
+        run:
+            move(input[0], output[0])
+
+
 if (HYDRO_PROFILE_DATASET := dataset_version("hydro_profile", config))["source"] in [
     "primary",
     "tutorial",
@@ -211,3 +329,29 @@ if (NATURA_EARTH_DATASET := dataset_version("natura_earth", config))["source"] i
         run:
             unpack_archive(str(input["natura_zip"]), output["unzip"])
             copy2(os.path.join(output["tiff"]), output["shp"])
+
+
+if (ERA5_CUTOUT := dataset_version("cutout-era5", config))["source"] in [
+    "primary",
+    "tutorial",
+]:
+    year = int(float(ERA5_CUTOUT["year"]))
+    region = ERA5_CUTOUT["region"]
+
+    rule retrieve_era5_cutout:
+        message:
+            f"Retrieving ERA5 cutout for region {region} ({year})"
+        input:
+            cutout=HTTP.remote(
+                ERA5_CUTOUT["url"],
+                keep_local=True,
+                additional_request_string="?download=1",
+            ),
+        output:
+            f"cutouts/{CDIR}cutout-{year}-era5.nc",
+        log:
+            f"logs/{RDIR}retrieve_era5_cutout.log",
+        benchmark:
+            f"benchmarks/{RDIR}retrieve_era5_cutout"
+        run:
+            copy2(str(input[0]), output[0])

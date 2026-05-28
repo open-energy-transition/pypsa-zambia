@@ -10,14 +10,30 @@ SPDX-License-Identifier: CC-BY-4.0
 
 This part of documentation collects descriptive release notes to capture the main improvements introduced by developing the model before the next release.
 
+### New Features and Major Changes
+
+### Minor Changes and bug-fixing
+
+* Added link to data versioning in docs, and tidied up the links and licenses in the data inventory [PR #233](https://github.com/open-energy-transition/pypsa-zambia/pull/233)
+
+
+# PyPSA-Zambia v0.3
+
 ## New Features and Major Changes
 
 * Power Plant disaggregation allowing power plants to retain individual identities [PR #153](https://github.com/open-energy-transition/pypsa-zambia/pull/153)
 
 * Ability to use custom hydro inflow data in the workflow [PR #178](https://github.com/open-energy-transition/pypsa-zambia/pull/178)
 
+* Ability to specify cutout retrieval by year for specified years via config file [PR #218](https://github.com/open-energy-transition/pypsa-zambia/pull/218)
+
+* Merge upstream changes [PR #221](https://github.com/open-energy-transition/pypsa-zambia/pull/221)
+
+* Enable capacity expansion runs by adding a dedicated configuration file [PR #219](https://github.com/open-energy-transition/pypsa-zambia/pull/219)
+
 ### Minor Changes and bug-fixing
 
+* Add test to standard CI to ensure no workflow breaking changes are integrated when introducing custom configuration [PR #201](https://github.com/open-energy-transition/pypsa-zambia/pull/201)
 
 ## Upcoming changes from upstream
 
@@ -90,7 +106,7 @@ This part of documentation collects descriptive release notes to capture the mai
 
 ## New Features and Major Changes from upstream
 
-* Attach wind and solar generators using real positions from `powerplants.csv` instead of using redistribution according to the population `PR #1622 <https://github.com/pypsa-meets-earth/pypsa-earth/pull/1622>`__
+* Attach wind and solar generators using real positions from `powerplants.csv` instead of using redistribution according to the population [PR #1622](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1622)
 
 * Revise implementation of myopic optimization [PR #1722](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1722)
 
@@ -110,7 +126,11 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Remove unused override_respot [PR #1805](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1805)
 
+* Integrate DemandCast dataset for electricity demand [PR #1725](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1725)
+
 **Minor Changes and bug-fixing**
+
+* Avoid crash in `build_osm_network` when merging substations with the same `station_id` if `tag_substation` or `symbol` contains missing OSM metadata [PR #1818](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1818)
 
 * Add CI to update reference objective values [PR #1811](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1811)
 

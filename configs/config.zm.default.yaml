@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: CC0-1.0
 
 run:
-  name: "validation_dispatch_zambia_2024"
+  name: "zambia_default"
   shared_cutouts: true
 enable:
   retrieve_cutout: false
@@ -25,7 +25,6 @@ snapshots:
   end: "2014-01-01"
   inclusive: "left" # end is not inclusive
 countries: ["ZM"]
-
 
 atlite:
   nprocesses: 4
@@ -165,6 +164,4 @@ validation:
   line_types:
     download_data: true
   mining_data:
-    download_data: true
-  biomass:
     download_data: true
