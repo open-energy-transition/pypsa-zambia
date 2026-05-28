@@ -20,8 +20,7 @@ for the repository under `https://data.pypsa.org`. -->
 **Note**
 
 For users, selection and control over which data sources to use is
-managed through the configuration file. See `data_cf`{.interpreted-text
-role="ref"} for details. In most cases you just wanna stick with the
+managed through the configuration file. See [data](../user-guide/configuration/#data) for details. In most cases you just wanna stick with the
 latest archive version. Reproducibility is given even when using the
 `latest` tag via the `versions.csv`, which is version controlled.
 
