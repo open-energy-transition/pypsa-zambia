@@ -8,9 +8,6 @@ SPDX-License-Identifier: CC-BY-4.0
 
 PyPSA-Zambia is compiled from a variety of data sources.
 
-<!-- The following table provides an overview of the data sources used in PyPSA-Zambia.
-Different licenses apply to the data sources. -->
-
 ## Data Versioning {#managing_data_versions}
 
 Many of the data sources used in PyPSA-Zambia are updated regularly. To
@@ -106,5 +103,8 @@ entry after reviewing your contribution.
 
 
 ## Data inventory
+
+<!-- The following table provides an overview of the data sources used in PyPSA-Zambia.
+Different licenses apply to the data sources. -->
 
 {{ read_csv('data_inventory.csv') }}
