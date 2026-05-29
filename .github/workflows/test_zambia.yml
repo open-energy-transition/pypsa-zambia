@@ -271,3 +271,45 @@ jobs:
       with:
         name: ref_objectives-${{ matrix.os }}
         path: ref_objectives-${{ matrix.os }}.csv
+
+  run-tests-pixi:
+    name: OS (pixi)
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && contains(github.head_ref, 'pixi'))
+    runs-on: ${{ matrix.os }}-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu, macos, windows]
+
+    steps:
+    - uses: actions/checkout@v6
+
+    - uses: prefix-dev/setup-pixi@v0.8.3
+      with:
+        pixi-version: latest
+        environments: pypsa-earth-env
+        cache: true
+
+    - name: Run Zambia Dispatch (pixi)
+      if: steps.filter.outputs.src == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+      run: snakemake -j 1 solve_all_networks --configfile config.zm.tutorial.yaml test/config.zm.dispatch.yaml
+
+    - name: Run Upstream Tutorial (pixi)
+      if: steps.filter.outputs.src == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+      run: snakemake -j 1 solve_all_networks --configfile config.tutorial.yaml test/config.tutorial.test.yaml
+
+    - name: Run GloFAS Integration (pixi)
+      if: steps.filter.outputs.src == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+      run: snakemake -j 1 solve_all_networks --configfile config.zm.tutorial.yaml test/config.zm_glofas.yaml
+
+
+    - name: Upload artifacts
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: results-pixi-${{ matrix.os }}
+        path: |
+          logs
+          .snakemake/log
+          results
+        retention-days: 3
