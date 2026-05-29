@@ -1406,9 +1406,8 @@ if __name__ == "__main__":
 
     if snakemake.params.electricity.get("biomass_potential"):
         _add_missing_carriers_from_costs(n, costs, ["biomass"])
-        fao_df = pd.read_csv(snakemake.input.biomass_csv, index_col="province")
-        provinces_gdf = gpd.read_file(snakemake.input.gadm_shapes)
-        add_biomass_potential(n, fao_df, provinces_gdf, costs, geo_crs)
+        biomass_gdf = gpd.read_file(snakemake.input.biomass_geojson)
+        add_biomass_potential(n, biomass_gdf, costs, geo_crs)
 
     apply_nuclear_p_max_pu(
         n,

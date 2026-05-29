@@ -365,12 +365,12 @@ if (ZM_BIOMASS := dataset_version("zm-biomass", config))["source"] in [
     rule download_biomass_data:
         input:
             url=HTTP.remote(
-                "https://sandbox.zenodo.org/records/501547/files/biomass_data.csv",
+                "https://sandbox.zenodo.org/records/505798/files/biomass.geojson",
                 keep_local=True,
                 additional_request_string="?download=1",
             ),
         output:
-            "data/biomass_data.csv",
+            "data/biomass.geojson",
         log:
             "logs/download_biomass_data.log",
         run:
