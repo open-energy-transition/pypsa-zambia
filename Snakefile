@@ -27,6 +27,8 @@ from retrieve_databundle_light import (
     datafiles_retrivedatabundle,
     get_best_bundles_in_snakemake,
 )
+from scripts.utility_custom_features import load_mining_data, build_mining_raster
+
 from pathlib import Path
 
 
@@ -38,7 +40,7 @@ copy_default_files()
 configfile: "config.default.yaml"
 configfile: "configs/bundle_config.yaml"
 configfile: "configs/powerplantmatching_config.yaml"
-configfile: "config.yaml"
+configfile: "configs/validation_dispatch_zambia.yaml"
 
 
 check_config_version(config=config)
@@ -77,6 +79,9 @@ wildcard_constraints:
     demand=r"[-+a-zA-Z0-9\.\s]*",
     h2export=r"[0-9]+(\.[0-9]+)?",
     planning_horizons="20[2-9][0-9]|2100",
+
+
+include: "rules/retrieve.smk"
 
 
 if config["custom_rules"] is not []:
@@ -140,19 +145,22 @@ rule plot_all_summaries:
 
 if config["enable"].get("retrieve_databundle", True):
 
+    # Exclude categories which are implemented in retrieve rules (retrieve.smk)
     bundles_to_download = get_best_bundles_in_snakemake(
-        config, exclude_categories=["cutouts"]
+        config, exclude_categories=["natura", "hydrobasins", "cutouts", "irena"]
     )
 
     rule retrieve_databundle_light:
         params:
             bundles_to_download=bundles_to_download,
+            # TODO fix legacy input
             hydrobasins_level=config["renewable"]["hydro"]["hydrobasins_level"],
         output:  #expand(directory('{file}') if isdir('{file}') else '{file}', file=datafiles)
             expand(
                 "{file}", file=datafiles_retrivedatabundle(config, bundles_to_download)
             ),
-            directory("data/landcover"),
+            # TODO Get back once we'll have regional tutorial data for landcover
+            # directory("data/landcover"),
         log:
             "logs/" + RDIR + "retrieve_databundle.log",
         benchmark:
@@ -251,35 +259,86 @@ rule build_osm_network:
         "scripts/build_osm_network.py"
 
 
-rule build_shapes:
+# Ensure mining data is only used if Zambia-specific load-options are set in config
+if config["load_options"]["zambia_demand_distribution"]:
+
+    rule build_shapes:
+        params:
+            build_shape_options=config["build_shape_options"],
+            crs=config["crs"],
+            countries=config["countries"],
+            subregion=config["subregion"],
+            subregion_offshore="resources/" + RDIR + "shapes/subregion_offshore.geojson",
+        input:
+            eez="data/eez/eez_v11.gpkg",
+            mining_raster="resources/" + RDIR + "mining/mining_raster.tif",
+        output:
+            country_shapes="resources/" + RDIR + "shapes/country_shapes.geojson",
+            offshore_shapes="resources/" + RDIR + "shapes/offshore_shapes.geojson",
+            africa_shape="resources/" + RDIR + "shapes/africa_shape.geojson",
+            gadm_shapes="resources/" + RDIR + "shapes/gadm_shapes.geojson",
+            subregion_shapes="resources/" + RDIR + "shapes/subregion_shapes.geojson",
+            subregion_offshore="resources/" + RDIR + "shapes/subregion_offshore.geojson",
+        log:
+            "logs/" + RDIR + "build_shapes.log",
+        benchmark:
+            "benchmarks/" + RDIR + "build_shapes"
+        threads: 1
+        resources:
+            mem_mb=3096,
+        script:
+            "scripts/build_shapes.py"
+
+else:
+
+    rule build_shapes:
+        params:
+            build_shape_options=config["build_shape_options"],
+            crs=config["crs"],
+            countries=config["countries"],
+            subregion=config["subregion"],
+        input:
+            eez="data/eez/eez_v11.gpkg",
+        output:
+            country_shapes="resources/" + RDIR + "shapes/country_shapes.geojson",
+            offshore_shapes="resources/" + RDIR + "shapes/offshore_shapes.geojson",
+            africa_shape="resources/" + RDIR + "shapes/africa_shape.geojson",
+            gadm_shapes="resources/" + RDIR + "shapes/gadm_shapes.geojson",
+            subregion_shapes="resources/" + RDIR + "shapes/subregion_shapes.geojson",
+            subregion_offshore="resources/" + RDIR + "shapes/subregion_offshore.geojson",
+        log:
+            "logs/" + RDIR + "build_shapes.log",
+        benchmark:
+            "benchmarks/" + RDIR + "build_shapes"
+        threads: 1
+        resources:
+            mem_mb=3096,
+        script:
+            "scripts/build_shapes.py"
+
+
+rule build_mining_raster:
     params:
-        build_shape_options=config["build_shape_options"],
-        crs=config["crs"],
-        countries=config["countries"],
-        subregion=config["subregion"],
+        area_crs=config["crs"]["area_crs"],
     input:
-        # naturalearth='data/bundle/naturalearth/ne_10m_admin_0_countries.shp',
-        # eez='data/bundle/eez/World_EEZ_v8_2014.shp',
-        # nuts3='data/bundle/NUTS_2013_60M_SH/data/NUTS_RG_60M_2013.shp',
-        # nuts3pop='data/bundle/nama_10r_3popgdp.tsv.gz',
-        # nuts3gdp='data/bundle/nama_10r_3gdp.tsv.gz',
-        eez="data/eez/eez_v11.gpkg",
+        provincial_demand="data/mining/zambia_provincial_mining_demand.csv",
+        mining_polygons="data/mining/zambia_pangaea_mining_polygons.csv",
     output:
-        country_shapes="resources/" + RDIR + "shapes/country_shapes.geojson",
-        offshore_shapes="resources/" + RDIR + "shapes/offshore_shapes.geojson",
-        africa_shape="resources/" + RDIR + "shapes/africa_shape.geojson",
-        gadm_shapes="resources/" + RDIR + "shapes/gadm_shapes.geojson",
-        subregion_shapes="resources/" + RDIR + "shapes/subregion_shapes.geojson",
-        subregion_offshore="resources/" + RDIR + "shapes/subregion_offshore.geojson",
+        mining_raster="resources/" + RDIR + "mining/mining_raster.tif",
     log:
-        "logs/" + RDIR + "build_shapes.log",
+        "logs/" + RDIR + "build_mining_raster.log",
     benchmark:
-        "benchmarks/" + RDIR + "build_shapes"
-    threads: 1
-    resources:
-        mem_mb=3096,
-    script:
-        "scripts/build_shapes.py"
+        "benchmarks/" + RDIR + "build_mining_raster"
+    run:
+        provincial_demand, mining_polygons = load_mining_data(
+            input.provincial_demand, input.mining_polygons
+        )
+        build_mining_raster(
+            provincial_demand=provincial_demand,
+            mining_polygons=mining_polygons,
+            output_path=output.mining_raster,
+            area_crs=params.area_crs,
+        )
 
 
 def retrieve_subregion(script_name):
@@ -333,6 +392,7 @@ rule base_network:
         + "base_network/all_transformers_build_network.csv",
         country_shapes="resources/" + RDIR + "shapes/country_shapes.geojson",
         offshore_shapes="resources/" + RDIR + "shapes/offshore_shapes.geojson",
+        line_types="data/line_types.csv",
     output:
         "networks/" + RDIR + "base.nc",
     log:
@@ -494,27 +554,6 @@ else:
     cost_directory = ""
 
 
-if config["enable"].get("retrieve_cost_data", True):
-
-    rule retrieve_cost_data:
-        params:
-            version=config["costs"]["technology_data_version"],
-        input:
-            HTTP.remote(
-                f"raw.githubusercontent.com/PyPSA/technology-data/{config['costs']['technology_data_version']}/outputs/{cost_directory}"
-                + "costs_{year}.csv",
-                keep_local=True,
-            ),
-        output:
-            "resources/" + RDIR + "costs_{year}.csv",
-        log:
-            "logs/" + RDIR + "retrieve_cost_data_{year}.log",
-        resources:
-            mem_mb=5000,
-        run:
-            move(input[0], output[0])
-
-
 rule process_cost_data:
     params:
         costs=config["costs"],
@@ -581,6 +620,26 @@ HYDRO_PROFILES = {
 
 def inputs_hydro(w):
     return HYDRO_PROFILES if w.technology == "hydro" else {}
+
+
+rule build_glofas_profile:
+    params:
+        snapshots=config["snapshots"],
+    # TODO replace hardcoding
+    input:
+        powerplants="resources/" + RDIR + "powerplants.csv",
+        glofas="cutouts/" + CDIR + "zm-2013-glofas.nc",
+    output:
+        profile="cutouts/" + CDIR + "profile_hydro_glofas.nc",
+    log:
+        "logs/" + RDIR + "build_glofas_profile.log",
+    benchmark:
+        "benchmarks/" + RDIR + "build_glofas_profile"
+    threads: ATLITE_NPROCESSES
+    resources:
+        mem_mb=ATLITE_NPROCESSES * 5000,
+    script:
+        "scripts/build_glofas_profile.py"
 
 
 rule build_renewable_profiles:
@@ -662,9 +721,12 @@ rule add_electricity:
         existing_capacities=config["existing_capacities"],
     input:
         **{
-            f"profile_{tech}": "resources/"
-            + RDIR
-            + f"renewable_profiles/profile_{tech}.nc"
+            f"profile_{tech}": (
+                # config["renewable"][tech]["path"]
+                f"data/hydro_profiles/glofas_profile.nc"
+                if config["renewable"][tech].get("source", "era5") == "custom"
+                else f"resources/{RDIR}renewable_profiles/profile_{tech}.nc"
+            )
             for tech in config["renewable"]
             if tech in config["electricity"]["renewable_carriers"]
         },
@@ -701,6 +763,7 @@ rule add_electricity:
 rule simplify_network:
     params:
         aggregation_strategies=config["cluster_options"]["aggregation_strategies"],
+        disaggregate_flag=config["electricity"].get("disaggregate_powerplants", False),
         renewable=config["renewable"],
         crs=config["crs"],
         cluster_options=config["cluster_options"],
@@ -893,6 +956,10 @@ rule prepare_network:
     input:
         "networks/" + RDIR + "elec_s{simpl}_{clusters}_ec.nc",
         tech_costs="resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv",
+        power_pool_countries="data/sapp_countries.csv",
+        power_pool_links="data/sapp_links.csv",
+        substations="data/zm_substations.csv",
+        line_types="data/line_types.csv",
     output:
         "networks/" + RDIR + "elec_s{simpl}_{clusters}_ec_l{ll}_{opts}.nc",
     log:
@@ -2255,7 +2322,7 @@ if config["foresight"] == "myopic":
 
 rule run_scenario:
     input:
-        diff_config="configs/scenarios/config.{scenario_name}.yaml",
+        diff_config="configs/scenarios_zambia/config.{scenario_name}.yaml",
     output:
         touchfile=touch("results/{scenario_name}/scenario.done"),
         copyconfig="results/{scenario_name}/config.yaml",
@@ -2270,9 +2337,10 @@ rule run_scenario:
         # get base configuration file from diff config
         with open(input.diff_config) as f:
             base_config_path = (
-                yaml.full_load(f)
-                .get("run", {})
-                .get("base_config", "config.default.yaml")
+                yaml.full_load(f).get("run", {})
+                # TODO Improve naming to make it clear that `model_run_config.yaml`
+                # is a merge of config.default and validation_dispatch_zambia config
+                .get("base_config", "model_run_config.yaml")
             )
 
             # Ensure the scenario name matches the name of the configuration
@@ -2303,6 +2371,6 @@ rule run_all_scenarios:
             "results/{scenario_name}/scenario.done",
             scenario_name=[
                 c.stem.replace("config.", "")
-                for c in Path("configs/scenarios").glob("config.*.yaml")
+                for c in Path("configs/scenarios_zambia").glob("config.*.yaml")
             ],
         ),
