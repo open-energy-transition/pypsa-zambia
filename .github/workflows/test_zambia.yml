@@ -291,15 +291,12 @@ jobs:
         cache: true
 
     - name: Run Zambia Dispatch (pixi)
-      # if: steps.filter.outputs.src == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
       run: pixi run -e snakemake -j 1 solve_all_networks --configfile config.zm.tutorial.yaml test/config.zm.dispatch.yaml
 
     - name: Run Upstream Tutorial (pixi)
-      # if: steps.filter.outputs.src == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
       run: pixi run -e snakemake -j 1 solve_all_networks --configfile config.tutorial.yaml test/config.tutorial.test.yaml
 
     - name: Run GloFAS Integration (pixi)
-      # if: steps.filter.outputs.src == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
       run: pixi run -e snakemake -j 1 solve_all_networks --configfile config.zm.tutorial.yaml test/config.zm_glofas.yaml
 
 
