@@ -291,13 +291,13 @@ jobs:
         cache: true
 
     - name: Run Zambia Dispatch (pixi)
-      run: pixi run -e snakemake -j 1 solve_all_networks --configfile config.zm.tutorial.yaml test/config.zm.dispatch.yaml
+      run: pixi run -e pypsa-earth-env snakemake -j 1 solve_all_networks --configfile config.zm.tutorial.yaml test/config.zm.dispatch.yaml
 
     - name: Run Upstream Tutorial (pixi)
-      run: pixi run -e snakemake -j 1 solve_all_networks --configfile config.tutorial.yaml test/config.tutorial.test.yaml
+      run: pixi run -e pypsa-earth-env snakemake -j 1 solve_all_networks --configfile config.tutorial.yaml test/config.tutorial.test.yaml
 
     - name: Run GloFAS Integration (pixi)
-      run: pixi run -e snakemake -j 1 solve_all_networks --configfile config.zm.tutorial.yaml test/config.zm_glofas.yaml
+      run: pixi run -e pypsa-earth-env snakemake -j 1 solve_all_networks --configfile config.zm.tutorial.yaml test/config.zm_glofas.yaml
 
 
     - name: Upload artifacts
