@@ -67,7 +67,7 @@ renewable:
 
 
 load_options:
-  source: "demcast"
+  ssp: "ssp2-2.6"
   weather_year: 2023
   prediction_year: 2030
   scale: 0.85  # scaled the model demand by a factor of 14.4/19.34 to match the national value
