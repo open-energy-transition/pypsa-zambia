@@ -11,13 +11,58 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 import rasterio
+from pyproj import Transformer
 from pypsa.io import import_components_from_dataframe, import_series_from_dataframe
 from rasterio.features import rasterize
 from rasterio.mask import mask
 from rasterio.transform import from_bounds
 from shapely import wkt
+from shapely.ops import transform as shapely_transform
 
 logger = logging.getLogger(__name__)
+
+
+def add_biomass_potential(n, biomass_gdf, costs, geo_crs):
+    """Add extendable biomass generators to Zambian buses.
+
+    biomass_gdf comes from biomass.geojson which has province shapes
+    and biomass_mw capacity already merged into one file.
+    Each bus gets an equal share of its province's total biomass capacity.
+    If a bus already has a biomass generator (e.g. added earlier because
+    biomass is in extendable_carriers), we just update its p_nom_max
+    instead of adding a duplicate.
+    """
+    zm_buses = n.buses[n.buses.country == "ZM"]
+    zm_bus_points = gpd.GeoDataFrame(
+        zm_buses,
+        geometry=gpd.points_from_xy(zm_buses.x, zm_buses.y),
+        crs=geo_crs,
+    )
+    biomass_gdf = biomass_gdf.to_crs(geo_crs)
+    buses_with_biomass = zm_bus_points.sjoin(
+        biomass_gdf[["biomass_mw", "geometry"]], how="left"
+    ).dropna(subset=["biomass_mw"])
+    buses_per_province = buses_with_biomass["index_right"].value_counts()
+    bus_count = buses_with_biomass["index_right"].map(buses_per_province)
+    p_nom_max = buses_with_biomass["biomass_mw"] / bus_count
+    already_exists = (p_nom_max.index + " biomass").isin(n.generators.index)
+    buses_to_update = p_nom_max.index[already_exists]
+    buses_to_add = p_nom_max.index[~already_exists]
+    n.generators.loc[buses_to_update + " biomass", "p_nom_max"] = p_nom_max[
+        buses_to_update
+    ].values
+    n.madd(
+        "Generator",
+        buses_to_add,
+        suffix=" biomass",
+        bus=buses_to_add,
+        carrier="biomass",
+        p_nom=0.0,
+        p_nom_extendable=True,
+        p_nom_max=p_nom_max[buses_to_add],
+        capital_cost=costs.at["biomass", "capital_cost"],
+        marginal_cost=costs.at["biomass", "marginal_cost"],
+    )
 
 
 def annual_gwh_to_average_mw(energy_gwh, hours_per_year=8760):
@@ -317,19 +362,23 @@ def add_mining_data(df_gadm, mining_raster_path):
     """
     df_gadm["mining"] = 0.0
     with rasterio.open(mining_raster_path) as src:
-        pixel_size_deg = abs(src.transform.a)
+        raster_crs = src.crs.to_string()
+        # Transformer from shapes CRS (EPSG:4326) to raster CRS
+        transformer = Transformer.from_crs("EPSG:4326", raster_crs, always_xy=True)
+        # Pixel area in km²
+        pixel_size_m = abs(src.transform.a)
+        pixel_area_km2 = (pixel_size_m / 1000.0) ** 2
         for idx, row in df_gadm.iterrows():
             geom = row.geometry
             if geom is None or geom.is_empty:
                 continue
+            # Reproject geometry to raster CRS before masking
+            geom_proj = shapely_transform(transformer.transform, geom)
             # Clip raster to province
-            clipped, _ = mask(src, [geom], all_touched=True, nodata=0.0)
+            clipped, _ = mask(src, [geom_proj], all_touched=True, nodata=0.0)
             intensity = clipped[0]  # MWh/km²/year
             if intensity.max() == 0:
                 continue
-            # Approximate pixel area (km²)
-            lat = geom.centroid.y
-            pixel_area_km2 = (pixel_size_deg * 111.0) ** 2 * np.cos(np.radians(lat))
             # Total demand (GWh/year)
             df_gadm.loc[idx, "mining"] = (intensity * pixel_area_km2).sum() / 1000.0
     return df_gadm
