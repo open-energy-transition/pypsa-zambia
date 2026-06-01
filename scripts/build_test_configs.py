@@ -22,7 +22,7 @@ from ruamel.yaml import YAML
 
 def update(base_dictionary, diff_dictionary):
     """
-    A function to recursivelly update items in a dictionary which 
+    A function to recursively update items in a dictionary which 
     intended usage is unpdating the base config according to the diff
     config 
     """
