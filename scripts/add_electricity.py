@@ -97,7 +97,6 @@ from powerplantmatching.export import map_country_bus
 from utility_custom_features import (
     add_biomass_potential,
     disaggregate_plants,
-    filter_carriers_by_lead_time,
 )
 
 idx = pd.IndexSlice
@@ -1367,19 +1366,6 @@ if __name__ == "__main__":
 
     extendable_carriers = snakemake.params.electricity["extendable_carriers"]
 
-    lead_time_active = snakemake.config["costs"].get("apply_lead_time", False)
-    lead_times = snakemake.config["costs"].get("lead_time", {})
-    if lead_time_active and lead_times:
-        base_year = snakemake.config["scenario"].get("base_year")
-        if base_year is None:
-            raise ValueError(
-                "costs.apply_lead_time is True but scenario.base_year is not set in config."
-            )
-        planning_year = snakemake.config["costs"]["year"]
-        extendable_carriers["Generator"] = filter_carriers_by_lead_time(
-            extendable_carriers["Generator"], lead_times, base_year, planning_year
-        )
-
     if not (set(renewable_carriers) & set(extendable_carriers["Generator"])):
         logger.warning(
             "No renewables found in config entry `extendable_carriers`. "
@@ -1425,14 +1411,7 @@ if __name__ == "__main__":
     if snakemake.params.electricity.get("biomass_potential"):
         _add_missing_carriers_from_costs(n, costs, ["biomass"])
         biomass_gdf = gpd.read_file(snakemake.input.biomass_geojson)
-        if lead_time_active and lead_times:
-            window = snakemake.config["costs"]["year"] - base_year
-            biomass_extendable = lead_times.get("biomass", 0) <= window
-        else:
-            biomass_extendable = True
-        add_biomass_potential(
-            n, biomass_gdf, costs, geo_crs, extendable=biomass_extendable
-        )
+        add_biomass_potential(n, biomass_gdf, costs, geo_crs)
 
     apply_nuclear_p_max_pu(
         n,

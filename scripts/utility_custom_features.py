@@ -22,8 +22,8 @@ from shapely.ops import transform as shapely_transform
 logger = logging.getLogger(__name__)
 
 
-def add_biomass_potential(n, biomass_gdf, costs, geo_crs, extendable=True):
-    """Add biomass generators to Zambian buses.
+def add_biomass_potential(n, biomass_gdf, costs, geo_crs):
+    """Add extendable biomass generators to Zambian buses.
 
     biomass_gdf comes from biomass.geojson which has province shapes
     and biomass_mw capacity already merged into one file.
@@ -31,8 +31,6 @@ def add_biomass_potential(n, biomass_gdf, costs, geo_crs, extendable=True):
     If a bus already has a biomass generator (e.g. added earlier because
     biomass is in extendable_carriers), we just update its p_nom_max
     instead of adding a duplicate.
-    extendable controls whether the generators can be expanded by the solver.
-    Set to False when the lead time filter excludes biomass.
     """
     zm_buses = n.buses[n.buses.country == "ZM"]
     zm_bus_points = gpd.GeoDataFrame(
@@ -60,28 +58,11 @@ def add_biomass_potential(n, biomass_gdf, costs, geo_crs, extendable=True):
         bus=buses_to_add,
         carrier="biomass",
         p_nom=0.0,
-        p_nom_extendable=extendable,
+        p_nom_extendable=True,
         p_nom_max=p_nom_max[buses_to_add],
         capital_cost=costs.at["biomass", "capital_cost"],
         marginal_cost=costs.at["biomass", "marginal_cost"],
     )
-
-
-def filter_carriers_by_lead_time(carriers, lead_times, base_year, planning_year):
-    """Return only carriers that can be built within the available time window.
-
-    For example with base_year=2025 and planning_year=2030 the window is 5 years.
-    Nuclear needs 10 years so it is excluded. Solar needs 2 years so it passes.
-    """
-    window = planning_year - base_year
-    available = [c for c in carriers if lead_times.get(c, 0) <= window]
-    excluded = [c for c in carriers if c not in available]
-    if excluded:
-        logger.info(
-            f"Lead time filter ({base_year}→{planning_year}, window={window} yrs): "
-            f"excluding {excluded}."
-        )
-    return available
 
 
 def annual_gwh_to_average_mw(energy_gwh, hours_per_year=8760):

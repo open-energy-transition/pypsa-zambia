@@ -359,7 +359,6 @@ def load_costs(
     for attr in (
         "investment",
         "lifetime",
-        "lead_time",
         "FOM",
         "VOM",
         "efficiency",
