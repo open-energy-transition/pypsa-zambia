@@ -261,7 +261,7 @@ rule build_osm_network:
 
 
 # Ensure mining data is only used if Zambia-specific load-options are set in config
-if config["load_options"]["zambia_demand_distribution"]:
+if config["load_options"].get("zambia_demand_distribution", False):
 
     rule build_shapes:
         params:
@@ -709,7 +709,7 @@ rule build_powerplants:
         "scripts/build_powerplants.py"
 
 
-if config["electricity"].get("biomass_potential"):
+if config["validation"].get("biomass"):
 
     rule add_electricity:
         params:

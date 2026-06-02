@@ -1116,6 +1116,20 @@ plotting:
     ror: Run of River
 
 # Zambia-specific data --------------------------------------------------------
+validation:
+  interconnectors:
+    enable: false
+    download_data: false
+  custom_powerplants:
+    enable: false
+    download_data: false
+  line_types:
+    download_data: false
+  mining_data:
+    download_data: false
+  biomass:
+    download_data: false
+
 data:
   cutout-era5:
     source: primary
