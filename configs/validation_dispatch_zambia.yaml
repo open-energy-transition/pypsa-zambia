@@ -74,7 +74,7 @@ validation:
   mining_data:
     download_data: true
   biomass:
-    download_data: true    
+    download_data: true
 
 electricity:
   base_voltage: 330.
@@ -153,4 +153,4 @@ data:
     version: v1.0
   natura_earth:
     source: tutorial
-    version: v1.0    
+    version: v1.0
