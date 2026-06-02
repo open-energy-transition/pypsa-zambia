@@ -18,7 +18,7 @@ scenario:
   simpl: ['']
   ll: [v1.0]
   clusters: ['10']
-  opts: [Co2L-3h]  
+  opts: [Co2L-3h]
 
 snapshots:
   start: '2013-01-01'
@@ -28,7 +28,7 @@ countries: [ZM]
 
 atlite:
   nprocesses: 4
-  default: cutout-2013-era5      
+  default: cutout-2013-era5
 
 renewable:
   onwind:
@@ -72,11 +72,11 @@ validation:
   line_types:
     download_data: true
   mining_data:
-    download_data: true  
+    download_data: true
 
 electricity:
   base_voltage: 330.
-  voltages: [66., 88., 132., 220., 330.]  
+  voltages: [66., 88., 132., 220., 330.]
   extendable_carriers:
     Generator: []
     StorageUnit: []
@@ -84,8 +84,7 @@ electricity:
     Link: []
   automatic_emission: false
   automatic_emission_base_year: 1990 # 1990 is taken as default. Any year from 1970 to 2018 can be selected.
-  powerplants_filter: (DateOut >= 2024 or DateOut != DateOut) and (DateIn <= 2024
-    or DateIn != DateIn)
+  powerplants_filter: (DateOut >= 2024 or DateOut != DateOut) and (DateIn <= 2024 or DateIn != DateIn)
   custom_powerplants: replace # set to "merge" or "replace" if you have a custom_powerplants.csv for Zambia
   disaggregate_powerplants: false # to enable disaggregation also in simplify_network, a set of excluded carries must be specified
   conventional_carriers: [oil, OCGT, CCGT, coal, geothermal, biomass]
@@ -147,7 +146,7 @@ data:
     version: v1.0
   natura_earth:
     source: tutorial
-    version: v1.0    
+    version: v1.0
 
 solving:
   solver:

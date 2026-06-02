@@ -2351,7 +2351,9 @@ rule run_scenario:
             input.diff_config,
         )
         # merge the default config file with the difference
-        create_test_config(base_config_path, input.diff_config, "config_current_scenario.yaml")
+        create_test_config(
+            base_config_path, input.diff_config, "config_current_scenario.yaml"
+        )
         run(
             "snakemake -j all solve_all_networks --rerun-incomplete",
             shell=True,
