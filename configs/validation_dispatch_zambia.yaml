@@ -152,3 +152,18 @@ solving:
   solver:
     name: highs
     options: highs-default
+
+# TODO check conflict resolution
+validation:
+  interconnectors:
+    enable: true
+    download_data: true
+  custom_powerplants:
+    enable: true
+    download_data: true
+  line_types:
+    download_data: true
+  mining_data:
+    download_data: true
+  biomass:
+    download_data: true
