@@ -1131,6 +1131,9 @@ validation:
     download_data: false
 
 data:
+  zm-biomass:
+    source: primary
+    version: v1.0
   cutout-era5:
     source: primary
     version: v1.0
