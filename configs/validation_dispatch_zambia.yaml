@@ -28,7 +28,7 @@ countries: [ZM]
 
 atlite:
   nprocesses: 4
-  default: zm-2013-era5      
+  default: cutout-2013-era5      
 
 renewable:
   onwind:
