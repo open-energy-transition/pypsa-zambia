@@ -176,6 +176,8 @@ def attach_hydro(
                 )
 
     if "hydro" in carriers and not hydro.empty:
+        HYDRO_MAX_HOURS = 24 * 10
+        HYDRO_LIFETIME = 80
 
         n.madd(
             "StorageUnit",
@@ -184,7 +186,7 @@ def attach_hydro(
             bus=hydro["bus"],
             # p_nom=hydro["p_nom"],
             p_nom_extendable=True,
-            max_hours=hydro_max_hours,
+            max_hours=HYDRO_MAX_HOURS,
             capital_cost=(
                 costs.at["hydro", "capital_cost"]
                 if c.get("hydro_capital_cost")
@@ -196,7 +198,9 @@ def attach_hydro(
             efficiency_dispatch=costs.at["hydro", "efficiency"],
             efficiency_store=0.0,
             cyclic_state_of_charge=True,
-            lifetime=hydro["lifetime"],
+            inflow=inflow_t[hydro.index],
+            # build_year=hydro["build_year"],
+            lifetime=HYDRO_LIFETIME,
         )
 
         logger.info(
