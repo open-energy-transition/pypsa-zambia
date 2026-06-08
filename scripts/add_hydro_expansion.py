@@ -44,25 +44,19 @@ idx = pd.IndexSlice
 logger = create_logger(__name__)
 
 # TODO Revise according to the data format for hydro siting
-def load_powerplants(
-    ppl_fn: str,
+def load_hydro_sites(
+    hs_fn: str,
 ) -> pd.DataFrame:
     """
     Load and preprocess powerplant matching data, fill missing datein/dateout, and assign grouping years.
     Parameters
     ----------
-    ppl_fn : str
-        Path to powerplant matching csv file.
-    costs : pd.DataFrame
-        DataFrame containing technology costs.
-    fill_values : dict
-        Dictionary containing default values for lifetime.
-    grouping_years : list
-        List of years to group build years into.
+    hs_fn : str
+        Path to powerplant matching hydrosites csv file.
 
     Returns
     -------
-    ppl : pd.DataFrame
+    hs_df : pd.DataFrame
         Power plant list DataFrame.
     """
     carrier_dict = {
@@ -72,8 +66,8 @@ def load_powerplants(
         "ccgt, thermal": "CCGT",
         "hard coal": "coal",
     }
-    ppl = (
-        read_csv_nafix(ppl_fn, index_col=0, dtype={"bus": "str"})
+    hs_df = (
+        read_csv_nafix(hs_fn, index_col=0, dtype={"bus": "str"})
         .powerplant.to_pypsa_names()
         .powerplant.convert_country_to_alpha2()
         .rename(columns=str.lower)
@@ -81,7 +75,7 @@ def load_powerplants(
         .replace({"carrier": carrier_dict})
     )
 
-    return ppl
+    return hs_df
 
 # TODO Fix refuse
 # def attach_hydro(
@@ -220,14 +214,14 @@ if __name__ == "__main__":
 
     costs = pd.read_csv(snakemake.input.tech_costs, index_col=0)
 
-    ppl = load_powerplants(
+    hydro_sites = load_hydro_sites(
         snakemake.input.hydro_sites,
     )        
 
     attach_hydro(
         n,
         costs,
-        ppl,
+        hydro_sites,
         snakemake.params.renewable["hydro"]["hydro_min_inflow_pu"],
     )
 
