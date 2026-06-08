@@ -65,7 +65,7 @@ def extract_inflow_df(
     )
 
     # TODO Average by a few cells instead taking only the nearest one
-    ppl_hydro_inflow_xr = (
+    ppl_hydro_inflow_df = (
         glofas_copy_xr["dis24"]
         .sel(
             latitude=ppl_hydro_lat,
@@ -75,20 +75,20 @@ def extract_inflow_df(
         .to_pandas()
     )
 
-    ppl_hydro_inflow_xr.index.name = "time"
-    ppl_hydro_inflow_xr.columns.name = "plant"
+    ppl_hydro_inflow_df.index.name = "time"
+    ppl_hydro_inflow_df.columns.name = "plant"
 
-    ppl_hydro_inflow_xr.index = pd.to_datetime(ppl_hydro_inflow_xr.index)
+    ppl_hydro_inflow_df.index = pd.to_datetime(ppl_hydro_inflow_df.index)
 
     start = snapshots["start"]
     end = snapshots["end"]
     snapshots_daily = pd.date_range(start, end, freq="1d")
 
-    ppl_hydro_daily_cut_inflow_df = ppl_hydro_inflow_xr.loc[
-        ppl_hydro_inflow_xr.index.isin(snapshots_daily)
+    ppl_hydro_daily_cut_inflow_df = ppl_hydro_inflow_df.loc[
+        ppl_hydro_inflow_df.index.isin(snapshots_daily)
     ]
 
-    ppl_hydro_inflow_df = ppl_hydro_daily_cut_inflow_df.resample("1h").interpolate(
+    ppl_hydro_daily_cut_inflow_df = ppl_hydro_daily_cut_inflow_df.resample("1h").interpolate(
         method="linear"
     )
 
