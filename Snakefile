@@ -36,6 +36,8 @@ HTTP = HTTPRemoteProvider()
 
 copy_default_files()
 
+EXPAND_HYDRO = True
+
 
 configfile: "config.default.yaml"
 configfile: "configs/bundle_config.yaml"
@@ -628,9 +630,10 @@ rule build_glofas_profile:
     # TODO replace hardcoding
     input:
         powerplants="resources/" + RDIR + "powerplants.csv",
-        glofas="cutouts/" + CDIR + "zm-2013-glofas.nc",
+        glofas="cutouts/hydro/" + CDIR + "zm-2023-glofas.nc",
     output:
-        profile="cutouts/" + CDIR + "profile_hydro_glofas.nc",
+        # profile="resources/" + RDIR + "profile_hydro_glofas.nc",
+        profile="data/hydro_profiles/glofas_profile.nc"
     log:
         "logs/" + RDIR + "build_glofas_profile.log",
     benchmark:
@@ -640,6 +643,26 @@ rule build_glofas_profile:
         mem_mb=ATLITE_NPROCESSES * 5000,
     script:
         "scripts/build_glofas_profile.py"
+
+rule build_glofas_potential:
+    params:
+        snapshots=config["snapshots"],
+    # TODO replace hardcoding
+    input:
+        hydro_sites="resources/" + RDIR + "powerplants.csv",
+        glofas="cutouts/hydro/" + CDIR + "zm-2023-glofas.nc",
+    output:
+        # potential="resources/" + RDIR + "potential_hydro_glofas.nc",
+        potential="data/hydro_profiles/glofas_potential.nc"
+    log:
+        "logs/" + RDIR + "build_glofas_potential.log",
+    benchmark:
+        "benchmarks/" + RDIR + "build_glofas_potential"
+    threads: ATLITE_NPROCESSES
+    resources:
+        mem_mb=ATLITE_NPROCESSES * 5000,
+    script:
+        "scripts/build_glofas_potential.py"        
 
 
 rule build_renewable_profiles:
@@ -746,7 +769,11 @@ if config["electricity"].get("biomass_potential"):
             nuclear_p_max_pu="data/nuclear_p_max_pu.csv",
             biomass_geojson="data/biomass.geojson",
         output:
-            "networks/" + RDIR + "elec.nc",
+            branch(
+                EXPAND_HYDRO,
+                "networks/" + RDIR + "elec_pre_hydro_expansion.nc",
+                "networks/" + RDIR + "elec.nc",
+            ), 
         log:
             "logs/" + RDIR + "add_electricity.log",
         benchmark:
@@ -794,7 +821,11 @@ else:
             demand_profiles="resources/" + RDIR + "demand_profiles.csv",
             nuclear_p_max_pu="data/nuclear_p_max_pu.csv",
         output:
-            "networks/" + RDIR + "elec.nc",
+            branch(
+                EXPAND_HYDRO,
+                "networks/" + RDIR + "elec_pre_hydro_expansion.nc",
+                "networks/" + RDIR + "elec.nc",
+            ),            
         log:
             "logs/" + RDIR + "add_electricity.log",
         benchmark:
@@ -805,6 +836,25 @@ else:
         script:
             "scripts/add_electricity.py"
 
+rule add_hydro_expansion:
+    params:
+        renewable=config["renewable"],
+    input:
+        elec_network="networks/" + RDIR + "elec_pre_hydro_expansion.nc",
+        potential="data/hydro_profiles/glofas_potential.nc",
+        tech_costs="resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv",
+        hydro_sites="resources/" + RDIR + "powerplants.csv",
+    output:
+        "networks/" + RDIR + "elec.nc",
+    log:
+        "logs/" + RDIR + "add_electricity.log",
+    benchmark:
+        "benchmarks/" + RDIR + "add_electricity"
+    threads: 1
+    resources:
+        mem_mb=3000,
+    script:
+        "scripts/add_hydro_expansion.py"
 
 rule simplify_network:
     params:
