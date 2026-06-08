@@ -101,7 +101,16 @@ def extract_inflow_df(
         method="linear"
     )
 
-    return ppl_hydro_inflow_df
+    if ppl_hydro_daily_cut_inflow_df.empty:
+        start_year = snapshots_daily.year.min()
+        end_year = snapshots_daily.year.max()
+        raise ValueError(
+            f"The inflow dataframe is empty. A likely error is indexes mismatch"
+            f"{ppl_hydro_inflow_df.index.year.min()}-{ppl_hydro_inflow_df.index.year.max()} years avaliable"
+            f"{start_year}-{end_year} years are requested be snapshots"
+        )
+
+    return ppl_hydro_daily_cut_inflow_df
 
 
 def transform_to_xr(inflow_df: pd.DataFrame) -> pd.DataFrame:
