@@ -215,8 +215,14 @@ if __name__ == "__main__":
 
     configure_logging(snakemake)
 
-    n = pypsa.Network(snakemake.input.base_network)
+    n = pypsa.Network(snakemake.input.elec_network)
     Nyears = n.snapshot_weightings.objective.sum() / 8760.0
+
+    costs = pd.read_csv(snakemake.input.tech_costs, index_col=0)
+
+    ppl = load_powerplants(
+        snakemake.input.hydro_sites,
+    )        
 
     attach_hydro(
         n,
