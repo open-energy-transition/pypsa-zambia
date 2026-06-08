@@ -35,6 +35,8 @@ from add_electricity import load_powerplants
 
 logger = create_logger(__name__)
 
+DEFAULT_DAMHEIGHT_M = 5.0 # default reservoir water height
+HYDRO_MULTIPLIER = (1e3 * 10.0) / 1e6
 
 def extract_inflow_df(
     snapshots: list,
@@ -63,6 +65,8 @@ def extract_inflow_df(
         dims="plant",
         coords={"plant": ppl_hydro_df.index},
     )
+    # Height may be unknown expecially for smaller reservoirs
+    ppl_height_m = ppl_hydro_df["damheight_m"].replace(0, DEFAULT_DAMHEIGHT_M)
 
     # TODO Average by a few cells instead taking only the nearest one
     ppl_hydro_inflow_df = (
@@ -79,6 +83,11 @@ def extract_inflow_df(
     ppl_hydro_inflow_df.columns.name = "plant"
 
     ppl_hydro_inflow_df.index = pd.to_datetime(ppl_hydro_inflow_df.index)
+
+    # To get hydro potential inflow must be mutliplied by height, g and a scaling factor
+    # TODO Get rid of a scaling factor
+    ppl_hydro_inflow_df = ppl_hydro_inflow_df.mul(ppl_height_m, axis="columns")
+    ppl_hydro_inflow_df = ppl_hydro_inflow_df * HYDRO_MULTIPLIER
 
     start = snapshots["start"]
     end = snapshots["end"]
