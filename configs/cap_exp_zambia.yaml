@@ -19,7 +19,7 @@ scenario:
 
 electricity:
   extendable_carriers:
-    Generator: ["solar", "biomass", "geothermal", "hydro", "ror", "coal", "nuclear", "csp-tower", "oil", "onwind"]
+    Generator: ["solar", "biomass", "hydro", "ror", "oil", "onwind"]
     StorageUnit: []
     Store: []
     Link: []
