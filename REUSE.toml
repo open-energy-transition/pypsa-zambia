@@ -54,3 +54,9 @@ path = "doc/assets/scripts/**"
 precedence = "aggregate"
 SPDX-FileCopyrightText = "The PyPSA-Earth and PyPSA-Eur Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+[[annotations]]
+path = "IRP_Zambia_Antares_Model_Inputs_version2.docx"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Open Energy Transition gGmbH"
+SPDX-License-Identifier = "CC-BY-4.0"

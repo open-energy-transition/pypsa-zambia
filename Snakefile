@@ -2376,6 +2376,7 @@ rule run_scenario:
     threads: 1
     resources:
         mem_mb=5000,
+        scenario_runner=1,  # ensures only one scenario runs at a time (shared config_current_scenario.yaml)
     run:
         from build_test_configs import create_test_config
         import yaml
@@ -2400,16 +2401,18 @@ rule run_scenario:
         create_test_config(
             base_config_path, input.diff_config, "config_current_scenario.yaml"
         )
+        # --nolock: inner snakemake must not compete for the project lock with the outer process
         run(
-            "snakemake -j all solve_all_networks --rerun-incomplete",
+            "snakemake --cores all solve_all_networks --rerun-incomplete --nolock",
             shell=True,
             check=not config["run"]["allow_scenario_failure"],
         )
         run(
-            "snakemake -j1 make_statistics --force",
+            "snakemake --cores 1 make_statistics --force --nolock",
             shell=True,
             check=not config["run"]["allow_scenario_failure"],
         )
+        os.makedirs(os.path.dirname(output.copyconfig), exist_ok=True)
         copyfile("config_current_scenario.yaml", output.copyconfig)
 
 
