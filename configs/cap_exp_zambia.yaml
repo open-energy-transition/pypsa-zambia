@@ -19,6 +19,8 @@ scenario:
 
 electricity:
   extendable_carriers:
+    # TODO Biomass potential can have strong impact and must be adjusted
+    # according to the conditions it aims to represent
     Generator: ["solar", "biomass", "hydro", "ror", "oil", "onwind"]
     StorageUnit: []
     Store: []
