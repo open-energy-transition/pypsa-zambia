@@ -634,7 +634,7 @@ rule build_glofas_profile:
         glofas="cutouts/hydro/" + CDIR + "zm-2023-glofas.nc",
     output:
         # profile="resources/" + RDIR + "profile_hydro_glofas.nc",
-        profile="data/hydro_profiles/glofas_profile.nc"
+        profile="data/hydro_profiles/glofas_profile.nc",
     log:
         "logs/" + RDIR + "build_glofas_profile.log",
     benchmark:
@@ -645,6 +645,7 @@ rule build_glofas_profile:
     script:
         "scripts/build_glofas_profile.py"
 
+
 rule build_glofas_potential:
     params:
         snapshots=config["snapshots"],
@@ -654,7 +655,7 @@ rule build_glofas_potential:
         glofas="cutouts/hydro/" + CDIR + "zm-2023-glofas.nc",
     output:
         # potential="resources/" + RDIR + "potential_hydro_glofas.nc",
-        potential="data/hydro_profiles/glofas_potential.nc"
+        potential="data/hydro_profiles/glofas_potential.nc",
     log:
         "logs/" + RDIR + "build_glofas_potential.log",
     benchmark:
@@ -663,7 +664,7 @@ rule build_glofas_potential:
     resources:
         mem_mb=ATLITE_NPROCESSES * 5000,
     script:
-        "scripts/build_glofas_potential.py"        
+        "scripts/build_glofas_potential.py"
 
 
 rule build_renewable_profiles:
@@ -774,7 +775,7 @@ if config["validation"].get("biomass"):
                 EXPAND_HYDRO,
                 "networks/" + RDIR + "elec_pre_hydro_expansion.nc",
                 "networks/" + RDIR + "elec.nc",
-            ), 
+            ),
         log:
             "logs/" + RDIR + "add_electricity.log",
         benchmark:
@@ -826,7 +827,7 @@ else:
                 EXPAND_HYDRO,
                 "networks/" + RDIR + "elec_pre_hydro_expansion.nc",
                 "networks/" + RDIR + "elec.nc",
-            ),            
+            ),
         log:
             "logs/" + RDIR + "add_electricity.log",
         benchmark:
@@ -836,6 +837,7 @@ else:
             mem_mb=3000,
         script:
             "scripts/add_electricity.py"
+
 
 rule add_hydro_expansion:
     params:
@@ -856,6 +858,7 @@ rule add_hydro_expansion:
         mem_mb=3000,
     script:
         "scripts/add_hydro_expansion.py"
+
 
 rule simplify_network:
     params:

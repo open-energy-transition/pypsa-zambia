@@ -19,7 +19,7 @@ Outputs
 Description
 -----------
 
-The rule :mod:`add_hydro_expansion` adds expandable hydro reservoirs at specified locations 
+The rule :mod:`add_hydro_expansion` adds expandable hydro reservoirs at specified locations
 """
 
 import geopandas as gpd
@@ -42,6 +42,7 @@ from utility_custom_features import add_biomass_potential, disaggregate_plants
 idx = pd.IndexSlice
 
 logger = create_logger(__name__)
+
 
 # TODO Revise according to the data format for hydro siting
 def load_hydro_sites(
@@ -76,6 +77,7 @@ def load_hydro_sites(
     )
 
     return hs_df
+
 
 # TODO Fix refuse
 # def attach_hydro(
@@ -119,7 +121,7 @@ def attach_hydro(
         .assign(ppl_id=lambda df: df.index)
         .reset_index(drop=True)
         .rename(index=lambda s: str(s) + " hydro")
-    )    
+    )
 
     # Map technology to carrier before aggregation
     tech_to_carrier = {
@@ -201,11 +203,14 @@ def attach_hydro(
             f"Added {len(hydro)} hydro storage units with {hydro['p_nom'].sum() / 1e3:.2f} GW"
         )
 
+
 if __name__ == "__main__":
     if "snakemake" not in globals():
         from _helpers import mock_snakemake
 
-        snakemake = mock_snakemake("add_electricity", configfile="config_glofas_testing.yaml")
+        snakemake = mock_snakemake(
+            "add_electricity", configfile="config_glofas_testing.yaml"
+        )
 
     configure_logging(snakemake)
 
@@ -216,7 +221,7 @@ if __name__ == "__main__":
 
     hydro_sites = load_hydro_sites(
         snakemake.input.hydro_sites,
-    )        
+    )
 
     attach_hydro(
         n,
