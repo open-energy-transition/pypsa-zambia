@@ -21,3 +21,6 @@ data:
   natura_earth:
     source: tutorial
     version: v1.0
+  inflow-glofas:
+    source: primary
+    version: v1.0

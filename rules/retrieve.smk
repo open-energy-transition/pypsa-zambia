@@ -402,4 +402,4 @@ if (INFLOW_GLOFAS := dataset_version("inflow-glofas", config))["source"]
         benchmark:
             f"benchmarks/{RDIR}retrieve_inflow_glofas"
         run:
-            copy2(str(input[0]), output[0])            
+            copy2(str(input[0]), output[0])
