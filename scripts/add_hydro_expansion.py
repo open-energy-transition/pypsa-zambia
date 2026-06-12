@@ -171,36 +171,86 @@ def attach_hydro(
                     .to_pandas()
                 )
 
-    if "hydro" in carriers and not hydro.empty:
-        HYDRO_MAX_HOURS = 24 * 10
-        HYDRO_LIFETIME = 80
-
+    if (("ror" in carriers and not ror.empty) | ("hydro" in carriers and not hydro.empty)):
         n.madd(
-            "StorageUnit",
-            hydro.index,
-            carrier="",
-            bus=hydro["bus"],
-            # p_nom=hydro["p_nom"],
+            "Generator",
+            ror.index,
+            carrier="ror-ext",
+            bus=ror["bus"],
+            p_nom=ror["p_nom"],
             p_nom_extendable=True,
-            max_hours=HYDRO_MAX_HOURS,
-            capital_cost=(
-                costs.at["hydro", "capital_cost"]
-                if c.get("hydro_capital_cost")
-                else 0.0
+            efficiency=costs.at["ror", "efficiency"],
+            capital_cost=costs.at["ror", "capital_cost"],
+            # weight=ror["p_nom"],
+            p_max_pu=(
+                inflow_t[ror.index] 
+                # .divide(ror["p_nom"], axis=1)
+                # .where(lambda df: df <= 1.0, other=1.0)
             ),
-            marginal_cost=costs.at["hydro", "marginal_cost"],
-            p_max_pu=1.0,  # dispatch
-            p_min_pu=0.0,  # store
-            efficiency_dispatch=costs.at["hydro", "efficiency"],
-            efficiency_store=0.0,
-            cyclic_state_of_charge=True,
-            inflow=inflow_t[hydro.index],
-            # build_year=hydro["build_year"],
-            lifetime=HYDRO_LIFETIME,
+            # build_year=ror["build_year"],
+            # lifetime=ror["lifetime"],
+            lifetime=80,
         )
 
         logger.info(
-            f"Added {len(hydro)} hydro storage units with {hydro['p_nom'].sum() / 1e3:.2f} GW"
+            f"Added {len(ror)} expandable ror generators with {ror['p_nom'].sum() / 1e3:.2f} GW"
+        )                
+
+    # if "ror" in carriers and not ror.empty:
+    #     n.madd(
+    #         "Generator",
+    #         ror.index,
+    #         carrier="ror-ext",
+    #         bus=ror["bus"],
+    #         p_nom=ror["p_nom"],
+    #         p_nom_extendable=True,
+    #         efficiency=costs.at["ror", "efficiency"],
+    #         capital_cost=costs.at["ror", "capital_cost"],
+    #         # weight=ror["p_nom"],
+    #         p_max_pu=(
+    #             inflow_t[ror.index] 
+    #             # .divide(ror["p_nom"], axis=1)
+    #             # .where(lambda df: df <= 1.0, other=1.0)
+    #         ),
+    #         build_year=ror["build_year"],
+    #         lifetime=ror["lifetime"],
+    #     )
+
+    #     logger.info(
+    #         f"Added {len(ror)} expandable ror generators with {ror['p_nom'].sum() / 1e3:.2f} GW"
+    #     )
+    
+
+    # if "hydro" in carriers and not hydro.empty:
+    #     HYDRO_MAX_HOURS = 24 * 10
+    #     HYDRO_LIFETIME = 80
+
+    #     n.madd(
+    #         "StorageUnit",
+    #         hydro.index,
+    #         carrier="hydro-ext",
+    #         bus=hydro["bus"],
+    #         # p_nom=hydro["p_nom"],
+    #         p_nom_extendable=True,
+    #         max_hours=HYDRO_MAX_HOURS,
+    #         capital_cost=(
+    #             costs.at["hydro", "capital_cost"]
+    #             if c.get("hydro_capital_cost")
+    #             else 0.0
+    #         ),
+    #         marginal_cost=costs.at["hydro", "marginal_cost"],
+    #         p_max_pu=1.0,  # dispatch
+    #         p_min_pu=0.0,  # store
+    #         efficiency_dispatch=costs.at["hydro", "efficiency"],
+    #         efficiency_store=0.0,
+    #         cyclic_state_of_charge=True,
+    #         inflow=inflow_t[hydro.index],
+    #         # build_year=hydro["build_year"],
+    #         lifetime=HYDRO_LIFETIME,
+    #     )
+
+        logger.info(
+            f"Added {len(hydro)} expandable hydro storage units with {hydro['p_nom'].sum() / 1e3:.2f} GW"
         )
 
 
