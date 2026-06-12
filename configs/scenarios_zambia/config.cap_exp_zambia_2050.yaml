@@ -11,7 +11,7 @@ run:
 electricity:
   powerplants_filter: (DateOut >= 2050 or DateOut != DateOut) and (DateIn <= 2050 or DateIn != DateIn)
   extendable_carriers:
-    Generator: [solar, onwind, ror]
+    Generator: [solar, onwind]
 
 load_options:
   scale: 3.89  # IRP 2050 demand = 75,654 GWh / SSP2 base ~19,424 GWh
