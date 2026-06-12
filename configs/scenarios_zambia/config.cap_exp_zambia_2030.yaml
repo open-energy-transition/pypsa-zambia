@@ -11,7 +11,7 @@ run:
 electricity:
   powerplants_filter: (DateOut >= 2030 or DateOut != DateOut) and (DateIn <= 2030 or DateIn != DateIn)
   extendable_carriers:
-    Generator: [solar, onwind, ror]
+    Generator: [solar, onwind]
 
 load_options:
   scale: 2.10
