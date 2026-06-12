@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: Contributors to PyPSA-Earth
+# SPDX-FileCopyrightText: Open Energy Transition gGmbH
+# SPDX-License-Identifier: CC0-1.0
+# Scenario diff — 2040 planning horizon
+# Merges with: configs/cap_exp_zambia_base.yaml
+
+run:
+  name: cap_exp_zambia_2040
+  base_config: configs/cap_exp_zambia_base.yaml
+
+electricity:
+  powerplants_filter: (DateOut >= 2040 or DateOut != DateOut) and (DateIn <= 2040 or DateIn != DateIn)
+  extendable_carriers:
+    Generator: [solar, onwind, ror]
+
+load_options:
+  scale: 3.07  # IRP 2040 demand = 59,559 GWh / SSP2 base ~19,424 GWh
+
+costs:
+  year: 2040
+  marginal_cost:
+    coal: 79.92  # IRP Table 9 — 2040 coal fuel cost
+    oil: 4.70
