@@ -24,19 +24,13 @@ The rule :mod:`add_hydro_expansion` adds expandable hydro generators at specifie
 
 import numpy as np
 import pandas as pd
-import powerplantmatching as pm
 import pypsa
 import xarray as xr
 from _helpers import (
     configure_logging,
     create_logger,
     read_csv_nafix,
-    sanitize_carriers,
-    sanitize_locations,
-    update_p_nom_max,
 )
-
-idx = pd.IndexSlice
 
 logger = create_logger(__name__)
 
@@ -147,7 +141,7 @@ def attach_hydro(
         n.madd(
             "Generator",
             ror.index,
-            carrier="ror-ext",
+            carrier="ror",
             bus=ror["bus"],
             p_nom=ror["p_nom"],
             p_nom_extendable=True,
@@ -156,42 +150,13 @@ def attach_hydro(
             # weight=ror["p_nom"],
             p_max_pu=(
                 inflow_t[ror.index] 
-                # .divide(ror["p_nom"], axis=1)
-                # .where(lambda df: df <= 1.0, other=1.0)
             ),
-            # build_year=ror["build_year"],
-            # lifetime=ror["lifetime"],
             lifetime=80,
         )
 
         logger.info(
             f"Added {len(ror)} expandable ror generators with {ror['p_nom'].sum() / 1e3:.2f} GW"
         )                
-
-    # if "ror" in carriers and not ror.empty:
-    #     n.madd(
-    #         "Generator",
-    #         ror.index,
-    #         carrier="ror-ext",
-    #         bus=ror["bus"],
-    #         p_nom=ror["p_nom"],
-    #         p_nom_extendable=True,
-    #         efficiency=costs.at["ror", "efficiency"],
-    #         capital_cost=costs.at["ror", "capital_cost"],
-    #         # weight=ror["p_nom"],
-    #         p_max_pu=(
-    #             inflow_t[ror.index] 
-    #             # .divide(ror["p_nom"], axis=1)
-    #             # .where(lambda df: df <= 1.0, other=1.0)
-    #         ),
-    #         build_year=ror["build_year"],
-    #         lifetime=ror["lifetime"],
-    #     )
-
-    #     logger.info(
-    #         f"Added {len(ror)} expandable ror generators with {ror['p_nom'].sum() / 1e3:.2f} GW"
-    #     )
-    
 
     # if "hydro" in carriers and not hydro.empty:
     #     HYDRO_MAX_HOURS = 24 * 10
