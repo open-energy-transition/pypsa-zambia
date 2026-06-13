@@ -82,6 +82,8 @@ def attach_hydro(
 
     c = snakemake.params.renewable["hydro"]
 
+    # TODO Filter-out only the locations to be expanded
+    # A possible filter: DateIn + p_nom==NA or 0
     ppl = (
         ppl.query('carrier == "hydro"')
         .assign(ppl_id=lambda df: df.index)
