@@ -838,26 +838,26 @@ else:
         script:
             "scripts/add_electricity.py"
 
-
-rule add_hydro_expansion:
-    params:
-        renewable=config["renewable"],
-    input:
-        elec_network="networks/" + RDIR + "elec_pre_hydro_expansion.nc",
-        potential="data/hydro_profiles/glofas_potential.nc",
-        tech_costs="resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv",
-        hydro_sites="resources/" + RDIR + "powerplants.csv",
-    output:
-        "networks/" + RDIR + "elec.nc",
-    log:
-        "logs/" + RDIR + "add_electricity.log",
-    benchmark:
-        "benchmarks/" + RDIR + "add_electricity"
-    threads: 1
-    resources:
-        mem_mb=3000,
-    script:
-        "scripts/add_hydro_expansion.py"
+if EXPAND_HYDRO:
+    rule add_hydro_expansion:
+        params:
+            renewable=config["renewable"],
+        input:
+            elec_network="networks/" + RDIR + "elec_pre_hydro_expansion.nc",
+            potential="data/hydro_profiles/glofas_potential.nc",
+            tech_costs="resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv",
+            hydro_sites="resources/" + RDIR + "powerplants.csv",
+        output:
+            "networks/" + RDIR + "elec.nc",
+        log:
+            "logs/" + RDIR + "add_electricity.log",
+        benchmark:
+            "benchmarks/" + RDIR + "add_electricity"
+        threads: 1
+        resources:
+            mem_mb=3000,
+        script:
+            "scripts/add_hydro_expansion.py"
 
 
 rule simplify_network:
