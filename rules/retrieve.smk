@@ -379,8 +379,7 @@ if (ZM_BIOMASS := dataset_version("zm-biomass", config))["source"] in [
         run:
             copyfile(str(input["url"]), output[0])
 
-if (INFLOW_GLOFAS := dataset_version("inflow-glofas", config))["source"]
-    in [
+if (INFLOW_GLOFAS := dataset_version("inflow-glofas", config))["source"] in [
         "primary",
 ]:
     year = int(float(INFLOW_GLOFAS["year"]))
