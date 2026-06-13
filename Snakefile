@@ -36,7 +36,7 @@ HTTP = HTTPRemoteProvider()
 
 copy_default_files()
 
-EXPAND_HYDRO = True
+EXPAND_HYDRO = False
 
 
 configfile: "config.default.yaml"
