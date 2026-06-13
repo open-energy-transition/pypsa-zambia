@@ -19,10 +19,9 @@ Outputs
 Description
 -----------
 
-The rule :mod:`add_hydro_expansion` adds expandable hydro reservoirs at specified locations
+The rule :mod:`add_hydro_expansion` adds expandable hydro generators at specified locations
 """
 
-import geopandas as gpd
 import numpy as np
 import pandas as pd
 import powerplantmatching as pm
@@ -36,8 +35,6 @@ from _helpers import (
     sanitize_locations,
     update_p_nom_max,
 )
-from powerplantmatching.export import map_country_bus
-from utility_custom_features import add_biomass_potential, disaggregate_plants
 
 idx = pd.IndexSlice
 
@@ -77,31 +74,6 @@ def load_hydro_sites(
     )
 
     return hs_df
-
-
-# TODO Fix refuse
-# def attach_hydro(
-#     n: pypsa.Network,
-#     costs: pd.DataFrame,
-#     ppl: pd.DataFrame,
-#     hydro_min_inflow_pu: float = 1.0,
-# ) -> None:
-#     """
-#     Add expandable hydro powerplants to the network as Hydro Storage units
-
-#     Parameters
-#     ----------
-#     n : pypsa.Network
-#         The PyPSA network to modify.
-#     costs : pd.DataFrame
-#         DataFrame containing technology costs.
-#     ppl : pd.DataFrame
-#         Power plant DataFrame.
-
-#     Returns
-#     -------
-#     None
-#     """
 
 
 def attach_hydro(
