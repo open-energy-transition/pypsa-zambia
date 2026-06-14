@@ -36,7 +36,7 @@ from add_electricity import load_powerplants
 logger = create_logger(__name__)
 
 DEFAULT_DAMHEIGHT_M = 5.0  # default reservoir water height
-HYDRO_MULTIPLIER = (1e3 * 10.0) / 1e6
+HYDRO_MULTIPLIER = 10 * (1e3 * 10.0) / 1e6
 
 
 def extract_inflow_df(
