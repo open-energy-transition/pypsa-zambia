@@ -99,7 +99,7 @@ def attach_hydro(
     ppl["carrier"] = ppl["technology"].map(tech_to_carrier)
 
     # TODO PHS may be of potential interest as well
-    # phs = ppl[ppl["carrier"] == "PHS"]    
+    # phs = ppl[ppl["carrier"] == "PHS"]
 
     ror = ppl[ppl["carrier"] == "ror"]
     hydro = ppl[ppl["carrier"] == "hydro"]
