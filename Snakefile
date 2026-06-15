@@ -42,9 +42,8 @@ EXPAND_HYDRO = False
 configfile: "config.default.yaml"
 configfile: "configs/bundle_config.yaml"
 configfile: "configs/powerplantmatching_config.yaml"
-# configfile: "configs/validation_dispatch_zambia.yaml"
-# configfile: "config_current_scenario.yaml"
-configfile: "configs/build_cutout_zambia_config.yaml"
+configfile: "configs/validation_dispatch_zambia.yaml"
+configfile: "config_current_scenario.yaml"
 
 
 check_config_version(config=config)
@@ -624,28 +623,6 @@ HYDRO_PROFILES = {
 
 def inputs_hydro(w):
     return HYDRO_PROFILES if w.technology == "hydro" else {}
-
-
-# rule build_glofas_profile:
-#     params:
-#         snapshots=config["snapshots"],
-#     # TODO replace hardcoding
-#     input:
-#         powerplants="resources/" + RDIR + "powerplants.csv",
-#         # glofas="cutouts/hydro/" + CDIR + "zm-2023-glofas.nc",
-#         glofas="cutouts/hydro/" + CDIR + config["atlite"].get("hydro"),
-#     output:
-#         # profile="data/hydro_profiles/glofas_profile.nc",
-#         profile="resources/" + RDIR + "profile_hydro_glofas.nc",
-#     log:
-#         "logs/" + RDIR + "build_glofas_profile.log",
-#     benchmark:
-#         "benchmarks/" + RDIR + "build_glofas_profile"
-#     threads: ATLITE_NPROCESSES
-#     resources:
-#         mem_mb=ATLITE_NPROCESSES * 5000,
-#     script:
-#         "scripts/build_glofas_profile.py"
 
 
 rule build_glofas_potential:
