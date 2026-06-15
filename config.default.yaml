@@ -1156,3 +1156,4 @@ data:
   inflow-glofas:
     source: primary
     version: v1.0
+    year: 2013
