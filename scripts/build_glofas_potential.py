@@ -134,15 +134,11 @@ def transform_to_xr(inflow_df: pd.DataFrame) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-
     if "snakemake" not in globals():
-        snakemake = mock_snakemake(
-            "build_glofas_potential",
-        )
+        from _helpers import mock_snakemake
+        snakemake = mock_snakemake("build_glofas_potential")
 
-    snakemake = mock_snakemake("build_glofas_potential")
-    # , configfile="/Users/ekaterina/Documents/_github_/pypsa-zambia/results/hydro2.0_no_exports/config.yaml" )
-    configure_logging(snakemake)
+    configure_logging(snakemake)        
 
     ppls = load_powerplants(snakemake.input.hydro_sites)
     glofas_xr = xr.open_dataset(snakemake.input.glofas)
