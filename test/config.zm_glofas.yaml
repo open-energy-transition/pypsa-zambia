@@ -20,6 +20,11 @@ snapshots:
   inclusive: "left" # end is not inclusive
 countries: ["ZM"]
 
+atlite:
+  nprocesses: 4
+  # TODO Replace with a tutorial dataset to use in testing
+  hydro: hydro/zm-2013-glofas.nc
+
 enable:
   build_natura_raster: false # If 'true', then an exclusion raster will be build. Otherwise use pregenerated raster.
   retrieve_databundle: true
@@ -94,7 +99,6 @@ renewable:
     max_shore_distance: false
   hydro:
     source: custom # use "era5" for a regular cutout workflow and "custom" for custom renewable profiles
-    path: cutouts/hydro/glofas_profile_2013_tutorial.nc
     extendable: false
     normalization:
       method: irena
