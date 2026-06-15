@@ -29,7 +29,7 @@ countries: [ZM]
 atlite:
   nprocesses: 4
   default: cutout-2013-era5
-  hydro: hydro/zm-2023-glofas.nc
+  hydro: hydro/zm-2013-glofas.nc
 
 renewable:
   onwind:
