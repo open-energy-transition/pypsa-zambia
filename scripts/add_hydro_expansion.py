@@ -78,7 +78,8 @@ def attach_hydro(
 
     carriers = "hydro"
 
-    c = snakemake.params.renewable["hydro"]
+    # TODO Reading hydro parameters can be sensible
+    # c = snakemake.params.renewable["hydro"]
 
     # TODO Filter-out only the locations to be expanded
     # A possible filter: DateIn + p_nom==NA or 0
@@ -97,8 +98,10 @@ def attach_hydro(
     }
     ppl["carrier"] = ppl["technology"].map(tech_to_carrier)
 
+    # TODO PHS may be of potential interest as well
+    # phs = ppl[ppl["carrier"] == "PHS"]    
+
     ror = ppl[ppl["carrier"] == "ror"]
-    phs = ppl[ppl["carrier"] == "PHS"]
     hydro = ppl[ppl["carrier"] == "hydro"]
     tbd = ppl[ppl.technology.isna()]  # To be determined technologies
 
