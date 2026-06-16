@@ -13,7 +13,30 @@ run:
 
 enable:
   retrieve_databundle: false
+  retrieve_cutout: false
   build_natura_raster: false
+
+data:
+  cutout-era5:
+    source: primary
+    version: v1.0
+    year: 2023
+
+snapshots:
+  start: "2023-01-01"
+  end: "2024-01-01"
+  inclusive: "left"
+
+atlite:
+  cutouts:
+    cutout-2023-era5:
+      module: era5
+      dx: 0.3
+      dy: 0.3
+      time: ["2023-01-01", "2024-01-01"]
+      x: [21.5, 33.7]
+      y: [-18.8, -7.8]
+  default: cutout-2023-era5
 
 existing_capacities:
   grouping_years_power: [1960, 1965, 1970, 1975, 1980, 1985, 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025, 2030, 2035, 2040, 2045, 2050]
@@ -29,8 +52,8 @@ cluster_options:
     p_threshold_drop_isolated: 100  # MW — drop isolated subnetworks with load below this threshold
 
 electricity:
-  biomass_potential: false  # biomass committed via custom_powerplants.csv
-  extendable_carriers:      # default: all capacity committed; override per scenario
+  biomass_potential: false
+  extendable_carriers:
     Generator: []
     StorageUnit: []
     Store: []
@@ -42,50 +65,40 @@ electricity:
   custom_powerplants: replace
   powerplants_filter: (DateOut >= 2025 or DateOut != DateOut) and (DateIn <= 2025 or DateIn != DateIn)  # default; overridden per scenario
 
-  conventional:
-    coal:
-      p_min_pu: 0.0
-    oil:
-      p_min_pu: 0.0
-
 renewable:
   hydro:
-    multiplier: 2.19        # ERA5→IRP calibration for 2030-2050; override to 2.19 for 2025
+    cutout: cutout-2023-era5
+    normalization:
+      method: irena
+      year: 2023
+    multiplier: 2.19
   solar:
-    resource:
-      method: pv
-      panel: CdTe            # First Solar CdTe — dominant utility-scale technology in Africa; better high-irradiance & heat performance than CSi
-      orientation: latitude_optimal
-    correction_factor: 0.93  # Africa performance ratio: dust soiling + temperature derating + mismatch losses (replaces manual 1.20 ERA5 boost)
+    cutout: cutout-2023-era5
+    correction_factor: 0.93
   onwind:
-    resource:
-      method: wind
-      turbine: NREL_ReferenceTurbine_2020ATB_4MW  # 110 m hub height — modern reference turbine for African low-medium wind sites
-    correction_factor: 0.83  # Africa performance ratio: turbine availability + wake losses + curtailment (replaces manual 1.20 ERA5 boost)
+    cutout: cutout-2023-era5
+    correction_factor: 0.83
 
 solving:
   options:
-    load_shedding: 100
-
+    load_shedding: 100  # load shedding cost for unmet demand (EUR/MWh)
 
 lines:
-  s_max_pu: 1.0
-  s_nom_extendable: true
-  length_factor: 1.0  # Zambia flat plateau terrain — no route detour penalty
+  s_max_pu: 0.70
   ac_types:
-    330.: "ACSR Zebra 2-bundle 330.0"  # 1.72 kA / 840 MVA — SAPP standard 330 kV expansion conductor
+    330.: "ACSR Zebra 2-bundle 330.0"  # SAPP standard 330 kV expansion conductor
 
 load_options:
+  source: "demcast"    # DemandCast
+  weather_year: 2023
   demand_weights:
     mining: 0.76
     gdp: 0.24
   zambia_demand_distribution: true
-  scale: 1.15  # default to 2025; overridden per scenario
+  scale: 1.44  # overridden per scenario
 
 costs:
-  year: 2025  # default; overridden per scenario
-  fill_values:
-    discount rate: 0.10  # IRENA non-OECD standard; consistent with Zambia IPP financing (7.65–10.4% per IRP Annex 2)
+  year: 2025  # overridden per scenario
   investment: # EUR/MW — IRP Table 5 (Zambia 2023), converted at 0.7532 EUR/USD
     hydro: 2862160        # 3.800 mUSD/MW — Hydro Storage
     ror: 965602           # 1.282 mUSD/MW — Hydro Run-of-River
@@ -103,8 +116,8 @@ costs:
     offwind: 0.015
     hydro: 1.05
     ror: 0.
-    coal: 0   # IRP Table 9 — override per scenario if fuel price differs
-    oil: 0
+    coal: 72.92   # IRP Table 9 — override per scenario if fuel price differs
+    oil: 4.23
     geothermal: 0.87
     biomass: 4.14
     nuclear: 3.46
@@ -144,3 +157,7 @@ costs:
     nuclear: 50
     csp-tower: 25
     oil: 30
+
+validation:
+  interconnectors:
+    enable: false

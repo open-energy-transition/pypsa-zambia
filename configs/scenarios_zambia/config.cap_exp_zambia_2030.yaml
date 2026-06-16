@@ -14,10 +14,7 @@ electricity:
     Generator: [solar, onwind]
 
 load_options:
-  scale: 2.10
+  scale: 2.64  # IRP Table 3 2030 demand 41,925 GWh / DemandCast base 15,909 GWh
 
 costs:
   year: 2030
-  marginal_cost:
-    coal: 79.92
-    oil: 4.70

@@ -14,10 +14,7 @@ electricity:
     Generator: [solar, onwind]
 
 load_options:
-  scale: 3.07  # IRP 2040 demand = 59,559 GWh / SSP2 base ~19,424 GWh
+  scale: 3.75  # IRP Table 3 2040 demand 59,674 GWh / DemandCast base 15,909 GWh
 
 costs:
   year: 2040
-  marginal_cost:
-    coal: 79.92  # IRP Table 9 — 2040 coal fuel cost
-    oil: 4.70

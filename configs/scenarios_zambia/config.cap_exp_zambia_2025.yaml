@@ -18,10 +18,7 @@ renewable:
     multiplier: 2.19
 
 load_options:
-  scale: 1.15  # IRP 2025 demand ~22,916 GWh / SSP2 base ~19,924 GWh
+  scale: 1.44  # IRP Table 3 2026 demand 22,915 GWh / DemandCast base 15,909 GWh
 
 costs:
   year: 2025
-  marginal_cost:
-    coal: 72.92  # IRP Table 9
-    oil: 4.23
