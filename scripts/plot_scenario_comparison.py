@@ -28,11 +28,6 @@ from _helpers import configure_logging, create_logger
 logger = create_logger(__name__)
 
 
-# ---------------------------------------------------------------------------
-# Carrier renaming — names must match keys in config plotting.tech_colors
-# ---------------------------------------------------------------------------
-
-
 def rename_techs(label):
     if label == "hydro":
         return "hydro reservoir"
@@ -76,11 +71,6 @@ preferred_order = pd.Index(
 )
 
 
-# ---------------------------------------------------------------------------
-# Network discovery
-# ---------------------------------------------------------------------------
-
-
 def find_scenario_networks(results_dir):
     """Return {scenario_label: path} for one solved network per scenario run.
 
@@ -119,11 +109,6 @@ def clean_scenario_label(label):
         if label.startswith(pattern):
             return replacement + label[len(pattern) :]
     return label
-
-
-# ---------------------------------------------------------------------------
-# Data extraction
-# ---------------------------------------------------------------------------
 
 
 def extract_capacity(n):
@@ -255,11 +240,6 @@ def build_comparison_dfs(networks):
     return capacity_df, generation_df, investment_df, co2_df, demand_s
 
 
-# ---------------------------------------------------------------------------
-# Plotting
-# ---------------------------------------------------------------------------
-
-
 def _sort_df(df):
     in_pref = df.index.intersection(preferred_order)
     out_pref = df.index.difference(preferred_order)
@@ -338,11 +318,6 @@ def plot_demand_bar(demand_s, output_path):
     fig.savefig(output_path, dpi=150, bbox_inches="tight")
     plt.close(fig)
     logger.info("Saved %s", output_path)
-
-
-# ---------------------------------------------------------------------------
-# Spatial map
-# ---------------------------------------------------------------------------
 
 
 def _bus_generation_by_carrier(n):
@@ -478,11 +453,6 @@ def plot_spatial_map(
     fig.savefig(output_path, dpi=150, bbox_inches="tight")
     plt.close(fig)
     logger.info("Saved %s", output_path)
-
-
-# ---------------------------------------------------------------------------
-# Main orchestration
-# ---------------------------------------------------------------------------
 
 
 def run_comparison(
