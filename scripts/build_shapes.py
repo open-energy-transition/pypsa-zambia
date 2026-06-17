@@ -102,7 +102,8 @@ def download_GADM(
         Name of the gpkg file per country
     """
     GADM_filename = get_GADM_filename(country_code)
-    GADM_url = f"https://geodata.ucdavis.edu/gadm/gadm4.1/gpkg/{GADM_filename}.gpkg"
+    # GADM_url = f"https://geodata.ucdavis.edu/gadm/gadm4.1/gpkg/{GADM_filename}.gpkg"
+    GADM_url = "https://zenodo.org/records/20737414/files/gadm41_ZMB.gpkg?download=1"
 
     GADM_inputfile_gpkg = os.path.join(
         BASE_DIR,
