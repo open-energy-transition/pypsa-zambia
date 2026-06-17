@@ -2440,6 +2440,7 @@ rule compare_scenarios:
     params:
         results_dir="results/",
         base_dir=".",
+        scenario_filter=["cap_exp_zambia"],
     output:
         directory("results/comparison_plots"),
     log:

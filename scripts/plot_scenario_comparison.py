@@ -71,11 +71,17 @@ preferred_order = pd.Index(
 )
 
 
-def find_scenario_networks(results_dir):
+def find_scenario_networks(results_dir, scenario_filter=None):
     """Return {scenario_label: path} for one solved network per scenario run.
 
     Skips brownfield (_planned) networks and the root-level results/networks/
     folder which belongs to no named run.
+
+    Parameters
+    ----------
+    scenario_filter : list of str, optional
+        If provided, only scenario labels starting with one of these prefixes
+        are included. Pass None to include all discovered scenarios.
     """
     results_dir = os.path.realpath(results_dir)
     networks = {}
@@ -92,6 +98,10 @@ def find_scenario_networks(results_dir):
                 label = os.path.basename(scenario_dir)
             else:
                 label = parent
+            if scenario_filter and not any(
+                label.startswith(p) for p in scenario_filter
+            ):
+                continue
             if label not in networks:
                 networks[label] = nc_path
     return networks
@@ -459,10 +469,11 @@ def run_comparison(
     results_dir,
     output_dir,
     tech_colors,
+    scenario_filter=None,
     country_shapes_path=None,
     bus_regions_path=None,
 ):
-    networks = find_scenario_networks(results_dir)
+    networks = find_scenario_networks(results_dir, scenario_filter=scenario_filter)
     if not networks:
         logger.warning("No .nc network files found under %s", results_dir)
         return
@@ -545,6 +556,7 @@ if __name__ == "__main__":
 
     tech_colors = snakemake.config["plotting"]["tech_colors"]
     results_dir = snakemake.params.results_dir
+    scenario_filter = snakemake.params.get("scenario_filter", None)
 
     country_shapes = os.path.join("resources", "shapes", "country_shapes.geojson")
     bus_regions = os.path.join(
@@ -555,6 +567,7 @@ if __name__ == "__main__":
         results_dir=results_dir,
         output_dir=snakemake.output[0],
         tech_colors=tech_colors,
+        scenario_filter=scenario_filter,
         country_shapes_path=country_shapes,
         bus_regions_path=bus_regions,
     )
