@@ -2426,3 +2426,23 @@ rule run_all_scenarios:
                 for c in Path("configs/scenarios_zambia").glob("config.*.yaml")
             ],
         ),
+
+
+rule compare_scenarios:
+    """Cross-scenario comparison plots (capacity, generation, demand, spatial maps).
+
+    Run after solving networks:
+        snakemake compare_scenarios
+
+    Or standalone (auto-discovers all results/):
+        python scripts/plot_scenario_comparison.py
+    """
+    params:
+        results_dir="results/",
+        base_dir=".",
+    output:
+        directory("results/comparison_plots"),
+    log:
+        "logs/compare_scenarios.log",
+    script:
+        "scripts/plot_scenario_comparison.py"
