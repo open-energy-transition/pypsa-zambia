@@ -550,7 +550,7 @@ if __name__ == "__main__":
     if "snakemake" not in globals():
         from _helpers import mock_snakemake
 
-        snakemake = mock_snakemake("compare_scenarios")
+        snakemake = mock_snakemake("compare_scenarios", scenario_group="cap_exp_zambia")
 
     configure_logging(snakemake)
 
