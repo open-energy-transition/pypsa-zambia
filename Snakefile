@@ -267,6 +267,7 @@ if config["load_options"].get("zambia_demand_distribution", False):
 
     rule build_shapes:
         params:
+            custom_gadm=config.get("custom_gadm", False),
             build_shape_options=config["build_shape_options"],
             crs=config["crs"],
             countries=config["countries"],
@@ -296,6 +297,7 @@ else:
 
     rule build_shapes:
         params:
+            custom_gadm=config.get("custom_gadm", False),
             build_shape_options=config["build_shape_options"],
             crs=config["crs"],
             countries=config["countries"],
