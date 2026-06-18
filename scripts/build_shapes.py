@@ -82,7 +82,7 @@ def get_GADM_filename(country_code: str) -> str:
 
 
 def download_GADM(
-    country_code: str, update: bool = False, out_logging: bool = False
+    country_code: str, update: bool = False, out_logging: bool = False, custom_gadm: bool = False
 ) -> tuple[str, str]:
     """
     Download gpkg file from GADM for a given country code.
@@ -103,9 +103,11 @@ def download_GADM(
     """
     GADM_filename = get_GADM_filename(country_code)
     # TODO Avoid hard-coding
-    # GADM_url = f"https://geodata.ucdavis.edu/gadm/gadm4.1/gpkg/{GADM_filename}.gpkg"
-    GADM_url = "https://zenodo.org/records/20737414/files/gadm41_ZMB.gpkg?download=1"
-
+    if custom_gadm:
+        GADM_url = "https://zenodo.org/records/20737414/files/gadm41_ZMB.gpkg?download=1"
+    else:    
+        GADM_url = f"https://geodata.ucdavis.edu/gadm/gadm4.1/gpkg/{GADM_filename}.gpkg"
+    
     GADM_inputfile_gpkg = os.path.join(
         BASE_DIR,
         "data",
@@ -255,7 +257,7 @@ def get_GADM_layer(
         cur_layer_id = layer_id
 
         # download file gpkg
-        file_gpkg, name_file = download_GADM(country_code, update, outlogging)
+        file_gpkg, name_file = download_GADM(country_code, update, outlogging, custom_gadm=custom_gadm)
 
         # get layers of a geopackage
         list_layers = fiona.listlayers(file_gpkg)
@@ -2028,6 +2030,8 @@ if __name__ == "__main__":
     countries_list = snakemake.params.countries
     geo_crs = snakemake.params.crs["geo_crs"]
     distance_crs = snakemake.params.crs["distance_crs"]
+
+    custom_gadm = snakemake.params["custom_gadm"]
 
     layer_id = snakemake.params.build_shape_options["gadm_layer_id"]
     update = snakemake.params.build_shape_options["update_file"]
