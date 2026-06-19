@@ -8,3 +8,4 @@ run:
 
 load_options:
   source: "gegis"
+  weather_year: 2013
