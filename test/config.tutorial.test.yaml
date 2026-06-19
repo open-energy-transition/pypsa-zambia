@@ -7,4 +7,4 @@ run:
   sector_name: "tutorial"
 
 load_options:
-  source: "demcast"
+  source: "gegis"
