@@ -76,6 +76,10 @@ validation:
   biomass:
     download_data: true
 
+cluster_options:
+  simplify_network:
+    p_threshold_drop_isolated: 100  # MW — drop isolated subnetworks with load below this threshold
+
 electricity:
   base_voltage: 330.
   voltages: [66., 88., 132., 220., 330.]
