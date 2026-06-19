@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: CC0-1.0
 
 run:
-  name: benchmark_run
+  name: validation_dispatch_zambia_2023
   shared_cutouts: true
 enable:
   retrieve_cutout: false
@@ -21,14 +21,14 @@ scenario:
   opts: [Co2L-3h]
 
 snapshots:
-  start: '2013-01-01'
-  end: '2014-01-01'
+  start: '2023-01-01'
+  end: '2024-01-01'
   inclusive: left   # end is not inclusive
 countries: [ZM]
 
 atlite:
   nprocesses: 4
-  default: cutout-2013-era5
+  default: cutout-2023-era5
 
 renewable:
   onwind:
@@ -53,8 +53,8 @@ renewable:
     extendable: false
 
 load_options:
-  source: gegis
-  weather_year: 2013
+  source: demcast
+  weather_year: 2023
   prediction_year: 2030
   scale: 0.9 #0.85  # scaled the model demand by a factor of 14.4/19.34 to match the national value
   demand_weights:
