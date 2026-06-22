@@ -15,6 +15,7 @@ electricity:
 
 renewable:
   hydro:
+    # TODO Harmonize across different scenarios
     multiplier: 2.19
 
 load_options:
