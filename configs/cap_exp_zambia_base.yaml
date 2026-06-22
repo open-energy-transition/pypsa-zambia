@@ -60,6 +60,7 @@ electricity:
     Link: []
 
   automatic_emission: false
+  # TODO Adjust according to NDCs
   automatic_emission_base_year: 1990
 
   custom_powerplants: replace
