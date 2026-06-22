@@ -21,5 +21,6 @@ renewable:
 load_options:
   scale: 1.44  # IRP Table 3 2026 demand 22,915 GWh / DemandCast base 15,909 GWh
 
+# TODO Reconcile the learning rates with custom costs definitions
 costs:
   year: 2025
