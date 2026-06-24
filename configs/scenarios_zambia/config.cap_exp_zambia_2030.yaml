@@ -1,0 +1,20 @@
+# SPDX-FileCopyrightText: Contributors to PyPSA-Earth
+# SPDX-FileCopyrightText: Open Energy Transition gGmbH
+# SPDX-License-Identifier: CC0-1.0
+# Scenario diff — 2030 planning horizon
+# Merges with: configs/cap_exp_zambia_base.yaml
+
+run:
+  name: cap_exp_zambia_2030
+  base_config: configs/cap_exp_zambia_base.yaml
+
+electricity:
+  powerplants_filter: (DateOut >= 2030 or DateOut != DateOut) and (DateIn <= 2030 or DateIn != DateIn)
+  extendable_carriers:
+    Generator: [solar, onwind]
+
+load_options:
+  scale: 2.64  # IRP Table 3 2030 demand 41,925 GWh / DemandCast base 15,909 GWh
+
+costs:
+  year: 2030
