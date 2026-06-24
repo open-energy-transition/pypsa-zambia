@@ -21,13 +21,18 @@ electricity:
   extendable_carriers:
     # TODO Biomass potential can have strong impact and must be adjusted
     # according to the conditions it aims to represent
-    Generator: ["solar", "biomass", "hydro", "ror", "oil", "onwind"]
+    Generator: ["solar", "onwind"]
     StorageUnit: []
     Store: []
     Link: []
 
   automatic_emission: false
   automatic_emission_base_year: 1990
+
+  existing_thermal_dispatch:
+    enable: true
+    base_year: 2025
+    carriers: [coal, oil]
 
   powerplants_filter: (DateOut >= 2025 or DateOut != DateOut) and (DateIn <= 2025 or DateIn != DateIn)
   custom_powerplants: replace
@@ -47,7 +52,7 @@ load_options:
   zambia_demand_distribution: true
 costs:
   marginal_cost:
-    coal: 0.0
+    coal: 72.92
     oil: 4.23
   co2_emissions: # tCO2/MWh — IRP Table 5 (Zambia 2023)
     hydro: 0.025

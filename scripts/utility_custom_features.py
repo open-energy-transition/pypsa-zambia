@@ -482,3 +482,13 @@ def build_mining_raster(
         dst.write(raster, 1)
 
     return output_path
+
+
+def set_existing_thermal_zero_mc(n, base_year, carriers):
+    mask = (
+        n.generators.carrier.isin(carriers)
+        & ~n.generators.p_nom_extendable
+        & (n.generators.build_year <= base_year)
+    )
+    n.generators.loc[mask, "marginal_cost"] = 0.0
+    logger.info(f"Zero marginal cost applied to: {n.generators.index[mask].tolist()}")

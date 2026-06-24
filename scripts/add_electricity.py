@@ -97,6 +97,7 @@ from powerplantmatching.export import map_country_bus
 from utility_custom_features import (
     add_biomass_potential,
     disaggregate_plants,
+    set_existing_thermal_zero_mc,
 )
 
 idx = pd.IndexSlice
@@ -773,6 +774,16 @@ def attach_conventional_generators(
         build_year=ppl_grouped["build_year"],
         lifetime=ppl_grouped["lifetime"],
     )
+
+    thermal_config = snakemake.config["electricity"].get(
+        "existing_thermal_dispatch", {}
+    )
+    if thermal_config.get("enable", False):
+        set_existing_thermal_zero_mc(
+            n,
+            base_year=thermal_config["base_year"],
+            carriers=thermal_config["carriers"],
+        )
 
     # Add extendable conventional generators
     extendable_conventional = set(extendable_carriers["Generator"]) - set(
