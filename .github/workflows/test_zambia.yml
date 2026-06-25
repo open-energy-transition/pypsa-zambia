@@ -109,7 +109,7 @@ jobs:
       if: steps.filter.outputs.src == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
       run: snakemake -j 1 solve_all_networks --configfile config.tutorial.yaml test/config.tutorial.test.yaml
 
-   # TODO Uncomment once PR will be merged for GloFAS data retrieval   
+   # TODO Uncomment once PR will be merged for GloFAS data retrieval
     # - name: Run GloFAS Integration Test
     #   if: steps.filter.outputs.src == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     #   run: snakemake -j 1 solve_all_networks --configfile config.zm.tutorial.yaml test/config.zm_glofas.yaml
