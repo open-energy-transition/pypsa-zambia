@@ -106,8 +106,8 @@ def extract_inflow_df(
         start_year = snapshots_daily.year.min()
         end_year = snapshots_daily.year.max()
         raise ValueError(
-            f"The inflow dataframe is empty. A likely error is indexes mismatch"
-            f"{ppl_hydro_inflow_df.index.year.min()}-{ppl_hydro_inflow_df.index.year.max()} years available"
+            f"The inflow dataframe is empty. A likely error is indexes mismatch "
+            f"{ppl_hydro_inflow_df.index.year.min()}-{ppl_hydro_inflow_df.index.year.max()} years available "
             f"{start_year}-{end_year} years are requested be snapshots"
         )
 
