@@ -5,6 +5,8 @@
 version: 0.8.0
 tutorial: true
 
+# TODO Replace GADM fix with a more stable solution
+custom_gadm: true
 
 countries: ["ZM"]
 
