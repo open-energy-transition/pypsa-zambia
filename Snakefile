@@ -637,7 +637,7 @@ rule build_glofas_profile:
         glofas="cutouts/hydro/" + CDIR + config["atlite"].get("hydro"),
     output:
         # profile="data/hydro_profiles/glofas_profile.nc",
-        profile="resources/" + RDIR + "profile_hydro_glofas.nc",
+        profile="resources/" + RDIR + "renewable_profiles/profile_hydro_glofas.nc",
     log:
         "logs/" + RDIR + "build_glofas_profile.log",
     benchmark:
@@ -752,8 +752,7 @@ if config["validation"].get("biomass"):
         input:
             **{
                 f"profile_{tech}": (
-                    # f"data/hydro_profiles/glofas_profile.nc"
-                    f"resources/" + RDIR + "profile_hydro_glofas.nc"
+                    f"resources/{RDIR}renewable_profiles/profile_hydro_glofas.nc"
                     # TODO Account for `glofas` value for `source`
                     if config["renewable"][tech].get("source", "era5") == "custom"
                     else f"resources/{RDIR}renewable_profiles/profile_{tech}.nc"
@@ -808,7 +807,7 @@ else:
             **{
                 f"profile_{tech}": (
                     # f"data/hydro_profiles/glofas_profile.nc"
-                    f"resources/" + RDIR + "profile_hydro_glofas.nc"
+                    f"resources/{RDIR}renewable_profiles/profile_hydro_glofas.nc"
                     if config["renewable"][tech].get("source", "era5") == "custom"
                     else f"resources/{RDIR}renewable_profiles/profile_{tech}.nc"
                 )
