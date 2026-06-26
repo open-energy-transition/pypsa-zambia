@@ -121,8 +121,9 @@ def extract_capacity(n, exclude_carriers=None):
     """Installed optimised capacity by display-name carrier [GW / GWh].
 
     Covers generators, storage units, links and stores. Passive transmission
-    branches (Line) are excluded as their capacity is fixed and not comparable
-    across scenarios. Power components are in MW → GW; energy stores
+    branches (Line) are excluded as their capacity has different physical sense 
+    as compared with generation and storages, and is not comparable
+    with them. Power components are in MW → GW; energy stores
     (e_nom_opt) are in MWh → GWh.
     """
     exclude = set(exclude_carriers or [])
