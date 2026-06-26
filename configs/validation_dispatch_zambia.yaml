@@ -173,6 +173,7 @@ plotting:
       cap_exp_zambia_2040: "cap_exp 2040"
       cap_exp_zambia_2050: "cap_exp 2050"
     # Carriers to hide from all comparison plots; set to [] to show everything.
+    # (internal model carrier names are used)
     exclude_carriers:
     - "load shedding"
 
