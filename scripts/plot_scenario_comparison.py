@@ -60,7 +60,7 @@ def carrier_colors(n, tech_colors=None):
     """Dict mapping display name → color.
 
     Primary source: n.carriers.color. For entries that are missing or
-    empty, falls back to tech_colors (from config) keyed first by
+    empty, falls back to tech_colors (from config) keys first by
     display name, then by raw carrier name, then to a neutral grey.
     """
     nice = carrier_nice_names(n)
