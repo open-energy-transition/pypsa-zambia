@@ -155,6 +155,28 @@ costs:
     csp-tower: 25
     oil: 30
 
+plotting:
+  scenario_comparison:
+    # Output folder name under results/comparison_plots/ for this comparison group.
+    output_name: "cap_exp_zambia"
+    # Exact run.name values from the scenario configs to compare.
+    # Each string must match a folder name under results/ (i.e. run.name in the
+    # respective config, e.g. run.name: cap_exp_zambia_2025 in cap_exp_zambia.yaml).
+    scenario_filter:
+    - "cap_exp_zambia_2025"
+    - "cap_exp_zambia_2030"
+    - "cap_exp_zambia_2040"
+    - "cap_exp_zambia_2050"
+    label_map:
+      cap_exp_zambia_2025: "cap_exp 2025"
+      cap_exp_zambia_2030: "cap_exp 2030"
+      cap_exp_zambia_2040: "cap_exp 2040"
+      cap_exp_zambia_2050: "cap_exp 2050"
+    # Carriers to hide from all comparison plots; set to [] to show everything.
+    # (internal model carrier names are used)
+    exclude_carriers:
+    - "load shedding"
+
 solving:
   solver:
     name: highs

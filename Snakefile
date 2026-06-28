@@ -83,6 +83,7 @@ wildcard_constraints:
 
 
 include: "rules/retrieve.smk"
+include: "rules/postprocessing.smk"
 
 
 if config["custom_rules"] is not []:
