@@ -36,7 +36,7 @@ from add_electricity import load_powerplants
 logger = create_logger(__name__)
 
 DEFAULT_DAMHEIGHT_M = 5.0  # default reservoir water height
-#HYDRO_MULTIPLIER = 10 * (1e3 * 10.0) / 1e6
+# HYDRO_MULTIPLIER = 10 * (1e3 * 10.0) / 1e6
 
 
 def extract_inflow_df(
@@ -147,7 +147,10 @@ if __name__ == "__main__":
     glofas_xr = xr.open_dataset(snakemake.input.glofas)
 
     inflow_ppl_df = extract_inflow_df(
-        snapshots=snakemake.params.snapshots, ppl_df=ppls, glofas_xr=glofas_xr, inflow_scaling=inflow_scaling
+        snapshots=snakemake.params.snapshots,
+        ppl_df=ppls,
+        glofas_xr=glofas_xr,
+        inflow_scaling=inflow_scaling,
     )
 
     inflow_xr = transform_to_xr(inflow_ppl_df)
