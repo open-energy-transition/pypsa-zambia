@@ -630,6 +630,7 @@ def inputs_hydro(w):
 rule build_glofas_profile:
     params:
         snapshots=config["snapshots"],
+        multiplier=congif["renewable"]["hydro"].get("multiplier", 1),
     input:
         powerplants="resources/" + RDIR + "powerplants.csv",
         glofas="cutouts/" + config["atlite"].get("hydro"),
@@ -649,6 +650,7 @@ rule build_glofas_profile:
 rule build_glofas_potential:
     params:
         snapshots=config["snapshots"],
+        multiplier=congif["renewable"]["hydro"].get("multiplier", 1),
     input:
         hydro_sites="resources/" + RDIR + "powerplants.csv",
         glofas="cutouts/" + config["atlite"].get("hydro"),
