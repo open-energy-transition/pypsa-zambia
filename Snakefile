@@ -649,10 +649,9 @@ rule build_glofas_profile:
 rule build_glofas_potential:
     params:
         snapshots=config["snapshots"],
-    # TODO replace hardcoding
     input:
         hydro_sites="resources/" + RDIR + "powerplants.csv",
-        glofas="cutouts/hydro/" + CDIR + "zm-2023-glofas.nc",
+        glofas="cutouts/" + config["atlite"].get("hydro"),
     output:
         potential="resources/" + RDIR + "potential_hydro_glofas.nc",
         # potential="data/hydro_profiles/glofas_potential.nc",
