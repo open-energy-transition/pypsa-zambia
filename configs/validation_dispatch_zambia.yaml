@@ -48,7 +48,7 @@ renewable:
     normalization:
       method: irena
       year: 2013
-    multiplier: 0.65
+    multiplier: 10 # has different meaning for custom and era5 sources
   csp:
     extendable: false
 
