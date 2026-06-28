@@ -36,13 +36,14 @@ from add_electricity import load_powerplants
 logger = create_logger(__name__)
 
 DEFAULT_DAMHEIGHT_M = 5.0  # default reservoir water height
-HYDRO_MULTIPLIER = 10 * (1e3 * 10.0) / 1e6
+#HYDRO_MULTIPLIER = 10 * (1e3 * 10.0) / 1e6
 
 
 def extract_inflow_df(
     snapshots: list,
     ppl_df: pd.DataFrame,
     glofas_xr: xr.Dataset,
+    inflow_scaling: float,
 ) -> pd.DataFrame:
     """
     Extract inflow for locations of hydropowerplants
@@ -86,7 +87,7 @@ def extract_inflow_df(
     # To get hydro potential inflow must be multiplied by height, g and a scaling factor
     # TODO Get rid of a scaling factor
     ppl_hydro_inflow_df = ppl_hydro_inflow_df.mul(ppl_height_m, axis="columns")
-    ppl_hydro_inflow_df = ppl_hydro_inflow_df * HYDRO_MULTIPLIER
+    ppl_hydro_inflow_df = ppl_hydro_inflow_df * inflow_scaling
 
     start = snapshots["start"]
     end = snapshots["end"]
@@ -139,11 +140,14 @@ if __name__ == "__main__":
     snakemake = mock_snakemake("build_glofas_profile")
     configure_logging(snakemake)
 
+    # Inflow to energy units: pho_water * g & W -> MW
+    inflow_scaling = (1e3 * 10.0) / 1e6 * snakemake.params.multiplier
+
     ppls = load_powerplants(snakemake.input.powerplants)
     glofas_xr = xr.open_dataset(snakemake.input.glofas)
 
     inflow_ppl_df = extract_inflow_df(
-        snapshots=snakemake.params.snapshots, ppl_df=ppls, glofas_xr=glofas_xr
+        snapshots=snakemake.params.snapshots, ppl_df=ppls, glofas_xr=glofas_xr, inflow_scaling=inflow_scaling
     )
 
     inflow_xr = transform_to_xr(inflow_ppl_df)
