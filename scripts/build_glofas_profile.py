@@ -43,8 +43,6 @@ def extract_inflow_df(
     snapshots: list,
     ppl_df: pd.DataFrame,
     glofas_xr: xr.Dataset,
-    # TODO Implement normalisation
-    k: int = 1,
 ) -> pd.DataFrame:
     """
     Extract inflow for locations of hydropowerplants
