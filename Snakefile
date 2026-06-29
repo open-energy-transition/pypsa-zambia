@@ -42,7 +42,7 @@ configfile: "configs/bundle_config.yaml"
 configfile: "configs/powerplantmatching_config.yaml"
 configfile: "configs/validation_dispatch_zambia.yaml"
 configfile: "config_current_scenario.yaml"
-configfile: "hydro_validation_zambia.yaml"
+configfile: "validation_hydro_zambia.yaml.yaml"
 
 
 check_config_version(config=config)
