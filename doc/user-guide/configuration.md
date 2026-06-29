@@ -68,6 +68,14 @@ Specifies the temporal range for the historical weather data, which is used to b
 
 {{ read_csv('configtables/snapshots.csv') }}
 
+## data
+
+Listing sources of custom regional-focused data used by the workflow.
+
+```yaml
+--8<-- "configtables/snippets/data.yaml"
+```
+
 ## crs
 
 Defines the coordinate reference systems (crs).
