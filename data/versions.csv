@@ -12,4 +12,10 @@ cutout-era5,v1.0,primary,latest supported,zm,2013,2026-05-24,Zambia Cutout,sandb
 cutout-era5,v1.0,primary,latest supported,zm,2023,2026-05-24,Zambia Cutout,sandbox.zenodo.org/records/499379/files/cutout-2023-era5.nc
 cutout-era5,v1.0,primary,latest supported,zm,2024,2026-05-24,Zambia Cutout,sandbox.zenodo.org/records/499392/files/cutout-2024-era5.nc
 cutout-era5,v1.0,primary,latest supported,zm,2025,2026-05-24,Zambia Cutout,sandbox.zenodo.org/records/488187/files/cutout-2025-era5.nc
-zm-biomass,v1.0,primary,latest supported,zm,,2026-05-28,Zambia Biomass Data,sandbox.zenodo.org/records/501547/files/biomass_data.csv"
+zm-biomass,v1.0,primary,latest supported,zm,,2026-05-28,Zambia Biomass Data,sandbox.zenodo.org/records/501547/files/biomass_data.csv
+inflow-glofas,v1.0,primary,latest supported,zm,2001,2026-06-11,Zambia Inflow,zenodo.org/records/19740377/files/zm-2001-glofas.nc
+inflow-glofas,v1.0,primary,latest supported,zm,2002,2026-06-11,Zambia Inflow,zenodo.org/records/19740377/files/zm-2002-glofas.nc
+inflow-glofas,v1.0,primary,latest supported,zm,2013,2026-06-11,Zambia Inflow,zenodo.org/records/19740377/files/zm-2013-glofas.nc
+inflow-glofas,v1.0,primary,latest supported,zm,2023,2026-06-11,Zambia Inflow,zenodo.org/records/19740377/files/zm-2023-glofas.nc
+inflow-glofas,v1.0,primary,latest supported,zm,2024,2026-06-11,Zambia Inflow,zenodo.org/records/19740377/files/zm-2024-glofas.nc
+inflow-glofas,v1.0,primary,latest supported,zm,2025,2026-06-11,Zambia Inflow,zenodo.org/records/19740377/files/zm-2025-glofas.nc
