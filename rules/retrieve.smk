@@ -378,3 +378,28 @@ if (ZM_BIOMASS := dataset_version("zm-biomass", config))["source"] in [
             "logs/download_biomass_data.log",
         run:
             copyfile(str(input["url"]), output[0])
+
+
+if (INFLOW_GLOFAS := dataset_version("inflow-glofas", config))["source"] in [
+    "primary",
+]:
+    year = int(float(INFLOW_GLOFAS["year"]))
+    region = INFLOW_GLOFAS["region"]
+
+    rule retrieve_inflow_glofas:
+        message:
+            f"Retrieving GloFAS dataset for region {region} ({year})"
+        input:
+            cutout=HTTP.remote(
+                INFLOW_GLOFAS["url"],
+                keep_local=True,
+                additional_request_string="?download=1",
+            ),
+        output:
+            f"cutouts/hydro/{region}-{year}-glofas.nc",
+        log:
+            f"logs/{RDIR}retrieve_inflow_glofas.log",
+        benchmark:
+            f"benchmarks/{RDIR}retrieve_inflow_glofas"
+        run:
+            copy2(str(input[0]), output[0])
