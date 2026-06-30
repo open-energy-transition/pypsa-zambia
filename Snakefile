@@ -280,7 +280,9 @@ if config["load_options"].get("zambia_demand_distribution", False):
         output:
             country_shapes="resources/" + RDIR + "shapes/country_shapes.geojson",
             offshore_shapes="resources/" + RDIR + "shapes/offshore_shapes.geojson",
-            africa_shape="resources/" + RDIR + "shapes/africa_shape.geojson",
+            extended_country_shape="resources/"
+            + RDIR
+            + "shapes/extended_country_shape.geojson",
             gadm_shapes="resources/" + RDIR + "shapes/gadm_shapes.geojson",
             subregion_shapes="resources/" + RDIR + "shapes/subregion_shapes.geojson",
             subregion_offshore="resources/" + RDIR + "shapes/subregion_offshore.geojson",
@@ -308,7 +310,9 @@ else:
         output:
             country_shapes="resources/" + RDIR + "shapes/country_shapes.geojson",
             offshore_shapes="resources/" + RDIR + "shapes/offshore_shapes.geojson",
-            africa_shape="resources/" + RDIR + "shapes/africa_shape.geojson",
+            extended_country_shape="resources/"
+            + RDIR
+            + "shapes/extended_country_shape.geojson",
             gadm_shapes="resources/" + RDIR + "shapes/gadm_shapes.geojson",
             subregion_shapes="resources/" + RDIR + "shapes/subregion_shapes.geojson",
             subregion_offshore="resources/" + RDIR + "shapes/subregion_offshore.geojson",
