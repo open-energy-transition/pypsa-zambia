@@ -2,7 +2,8 @@
 # SPDX-FileCopyrightText: Open Energy Transition gGmbH
 #
 # SPDX-License-Identifier: CC0-1.0
-
+# The configuration file is intended to be used to validate intra-annual 
+distribution of the inflow using available reference data for 2023
 run:
   name: validation_dispatch_zambia_2023
   shared_cutouts: true
