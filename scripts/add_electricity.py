@@ -79,6 +79,7 @@ It further adds extendable ``generators`` with **zero** capacity for
 - additional open- and combined-cycle gas turbines (if ``OCGT`` and/or ``CCGT`` is listed in the config setting ``electricity: extendable_carriers``)
 """
 
+import geopandas as gpd
 import numpy as np
 import pandas as pd
 import powerplantmatching as pm
@@ -91,6 +92,12 @@ from _helpers import (
     sanitize_carriers,
     sanitize_locations,
     update_p_nom_max,
+)
+from powerplantmatching.export import map_country_bus
+from utility_custom_features import (
+    add_biomass_potential,
+    disaggregate_plants,
+    set_existing_thermal_zero_mc,
 )
 
 idx = pd.IndexSlice
@@ -699,6 +706,7 @@ def attach_conventional_generators(
     renewable_carriers: set,
     conventional_config: list,
     conventional_inputs: dict,
+    disaggregate_flag: bool = False,
 ) -> None:
     """
     Add existing conventional generators to the network and extendable conventional generators at all buses.
@@ -731,12 +739,16 @@ def attach_conventional_generators(
     )
     _add_missing_carriers_from_costs(n, costs, carriers)
 
-    ppl = (
-        ppl.query("carrier in @carriers")
-        .join(costs, on="carrier", rsuffix="_r")
-        .rename(index=lambda s: "C" + str(s))
-    )
-    ppl["efficiency"] = ppl.efficiency.fillna(ppl.efficiency)
+    if disaggregate_flag:
+        ppl = ppl.query("carrier in @carriers").join(costs, on="carrier", rsuffix="_r")
+        disaggregate_plants(n, ppl, name_fallback="plant", geo_crs=geo_crs)
+    else:
+        ppl = (
+            ppl.query("carrier in @carriers")
+            .join(costs, on="carrier", rsuffix="_r")
+            .rename(index=lambda s: "C" + str(s))
+        )
+        ppl["efficiency"] = ppl.efficiency.fillna(ppl.efficiency)
 
     # Aggregate power plants by (bus, carrier, grouping_year)
     ppl_grouped = aggregate_ppl_by_bus_carrier_year(ppl)
@@ -762,6 +774,16 @@ def attach_conventional_generators(
         build_year=ppl_grouped["build_year"],
         lifetime=ppl_grouped["lifetime"],
     )
+
+    thermal_config = snakemake.config["electricity"].get(
+        "existing_thermal_dispatch", {}
+    )
+    if thermal_config.get("enable", False):
+        set_existing_thermal_zero_mc(
+            n,
+            base_year=thermal_config["base_year"],
+            carriers=thermal_config["carriers"],
+        )
 
     # Add extendable conventional generators
     extendable_conventional = set(extendable_carriers["Generator"]) - set(
@@ -854,27 +876,12 @@ def apply_nuclear_p_max_pu(n, nuclear_p_max_pu):
 
 
 def attach_hydro(
-    n: pypsa.Network,
-    costs: pd.DataFrame,
-    ppl: pd.DataFrame,
-    hydro_min_inflow_pu: float = 1.0,
-) -> None:
-    """
-    Add existing hydro powerplants to the network as Hydro Storage units, Run-Of-River generators, and Pumped Hydro storage units.
-
-    Parameters
-    ----------
-    n : pypsa.Network
-        The PyPSA network to modify.
-    costs : pd.DataFrame
-        DataFrame containing technology costs.
-    ppl : pd.DataFrame
-        Power plant DataFrame.
-
-    Returns
-    -------
-    None
-    """
+    n,
+    costs,
+    ppl,
+    hydro_min_inflow_pu=1,
+    disaggregate_flag=False,
+):
     if "hydro" not in snakemake.params.renewable:
         return
     c = snakemake.params.renewable["hydro"]
@@ -882,12 +889,20 @@ def attach_hydro(
 
     _add_missing_carriers_from_costs(n, costs, carriers)
 
-    ppl = (
-        ppl.query('carrier == "hydro"')
-        .assign(ppl_id=lambda df: df.index)
-        .reset_index(drop=True)
-        .rename(index=lambda s: str(s) + " hydro")
-    )
+    if disaggregate_flag:
+        ppl = (
+            ppl.query('carrier == "hydro"')
+            .assign(ppl_id=lambda df: df.index)
+            .reset_index(drop=True)
+        )
+        disaggregate_plants(n, ppl, name_fallback="hydro", geo_crs=geo_crs)
+    else:
+        ppl = (
+            ppl.query('carrier == "hydro"')
+            .assign(ppl_id=lambda df: df.index)
+            .reset_index(drop=True)
+            .rename(index=lambda s: str(s) + " hydro")
+        )
 
     # Map technology to carrier before aggregation
     tech_to_carrier = {
@@ -1217,6 +1232,10 @@ if __name__ == "__main__":
 
     # Snakemake imports:
     demand_profiles = snakemake.input["demand_profiles"]
+    disaggregate_flag = snakemake.params.electricity.get(
+        "disaggregate_powerplants", False
+    )
+    geo_crs = snakemake.config.get("crs", {}).get("geo_crs", "EPSG:4326")
 
     costs = read_csv_nafix(snakemake.input.tech_costs, index_col=0)
     ppl = load_powerplants(
@@ -1226,6 +1245,13 @@ if __name__ == "__main__":
         snakemake.params.existing_capacities["grouping_years_power"],
     )
 
+    if disaggregate_flag:
+        raw_ppl = read_csv_nafix(
+            snakemake.input.powerplants, index_col=0, dtype={"bus": "str"}
+        )
+        name_col = next((c for c in raw_ppl.columns if c.lower() == "name"), None)
+        if name_col:
+            ppl["name"] = raw_ppl[name_col]
     if "renewable_carriers" in snakemake.params.electricity:
         renewable_carriers = set(snakemake.params.electricity["renewable_carriers"])
     else:
@@ -1237,6 +1263,7 @@ if __name__ == "__main__":
         renewable_carriers = set(snakemake.params.renewable)
 
     extendable_carriers = snakemake.params.electricity["extendable_carriers"]
+
     if not (set(renewable_carriers) & set(extendable_carriers["Generator"])):
         logger.warning(
             "No renewables found in config entry `extendable_carriers`. "
@@ -1259,6 +1286,7 @@ if __name__ == "__main__":
         renewable_carriers,
         snakemake.params.conventional,
         conventional_inputs,
+        disaggregate_flag=disaggregate_flag,
     )
     attach_wind_and_solar(
         n,
@@ -1270,9 +1298,19 @@ if __name__ == "__main__":
         snakemake.params.length_factor,
     )
     attach_hydro(
-        n, costs, ppl, snakemake.params.renewable["hydro"]["hydro_min_inflow_pu"]
+        n,
+        costs,
+        ppl,
+        snakemake.params.renewable["hydro"]["hydro_min_inflow_pu"],
+        disaggregate_flag=disaggregate_flag,
     )
     attach_existing_batteries(n, costs, ppl)
+
+    if snakemake.params.electricity.get("biomass_potential"):
+        _add_missing_carriers_from_costs(n, costs, ["biomass"])
+        biomass_gdf = gpd.read_file(snakemake.input.biomass_geojson)
+        add_biomass_potential(n, biomass_gdf, costs, geo_crs)
+
     apply_nuclear_p_max_pu(
         n,
         read_csv_nafix(snakemake.input.nuclear_p_max_pu),

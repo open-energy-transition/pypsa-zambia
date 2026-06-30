@@ -68,6 +68,14 @@ Specifies the temporal range for the historical weather data, which is used to b
 
 {{ read_csv('configtables/snapshots.csv') }}
 
+## data
+
+Listing sources of custom regional-focused data used by the workflow.
+
+```yaml
+--8<-- "configtables/snippets/data.yaml"
+```
+
 ## crs
 
 Defines the coordinate reference systems (crs).
@@ -312,6 +320,27 @@ Specifies the cost assumptions of the technologies considered. Cost information 
     If not appropriately set, the model might output unrealistic results. Learn more about this in
     [Parzen et al. 2023](https://www.sciencedirect.com/science/article/pii/S2589004222020028) and in
     [Kittel et al. 2022](https://www.sciencedirect.com/science/article/pii/S2589004222002723).
+
+## data
+```yaml
+--8<-- "configtables/snippets/data.yaml"
+```
+
+{{ read_csv('configtables/data.csv') }}
+
+
+Controls which versions of input data are used for building the model.
+Versions that are available for each dataset can be found in `data/versions.csv`.
+By default, we retrieve the `latest` supported version for each dataset from an archive source.
+This means that when upgrading between PyPSA-Zambia versions, new versions of input data will automatically be downloaded and used.
+To freeze a model to a specific version of input data, you can set a specific version in the `version` field for each dataset to one specific version as listed in the `version` column of `data/versions.csv`.
+
+Some datasets support `primary` or `build` as a source option, meaning that the data can be retrieved from the original
+data source or build it from the latest available data.
+See the `data/versions.csv` file for all available datasets and their sources/versions that are supported.
+
+Note that a high-level overview of the datasets are stored in `doc/data_inventory.csv`. This provides a summary of the datasets,
+their sources, licenses and a general description.
 
 ## monte_carlo
 

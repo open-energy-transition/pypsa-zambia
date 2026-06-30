@@ -38,6 +38,7 @@ from shapely.geometry import MultiPolygon
 from shapely.ops import transform, unary_union
 from shapely.validation import make_valid
 from tqdm import tqdm
+from utility_custom_features import add_mining_data
 
 logger = create_logger(__name__)
 
@@ -81,7 +82,10 @@ def get_GADM_filename(country_code: str) -> str:
 
 
 def download_GADM(
-    country_code: str, update: bool = False, out_logging: bool = False
+    country_code: str,
+    update: bool = False,
+    out_logging: bool = False,
+    custom_gadm: bool = False,
 ) -> tuple[str, str]:
     """
     Download gpkg file from GADM for a given country code.
@@ -101,7 +105,13 @@ def download_GADM(
         Name of the gpkg file per country
     """
     GADM_filename = get_GADM_filename(country_code)
-    GADM_url = f"https://geodata.ucdavis.edu/gadm/gadm4.1/gpkg/{GADM_filename}.gpkg"
+    # TODO Avoid hard-coding
+    if custom_gadm:
+        GADM_url = (
+            "https://zenodo.org/records/20737414/files/gadm41_ZMB.gpkg?download=1"
+        )
+    else:
+        GADM_url = f"https://geodata.ucdavis.edu/gadm/gadm4.1/gpkg/{GADM_filename}.gpkg"
 
     GADM_inputfile_gpkg = os.path.join(
         BASE_DIR,
@@ -252,7 +262,9 @@ def get_GADM_layer(
         cur_layer_id = layer_id
 
         # download file gpkg
-        file_gpkg, name_file = download_GADM(country_code, update, outlogging)
+        file_gpkg, name_file = download_GADM(
+            country_code, update, outlogging, custom_gadm=custom_gadm
+        )
 
         # get layers of a geopackage
         list_layers = fiona.listlayers(file_gpkg)
@@ -1588,6 +1600,7 @@ def gadm(
     simplify_gadm: bool = True,
     tolerance: float = 0.01,
     minarea: float = 0.01,
+    mining_raster_path: str = None,
 ) -> gpd.GeoDataFrame:
     """
     Function to create a GeoDataFrame with GADM shapes and population and gdp data.
@@ -1672,6 +1685,9 @@ def gadm(
             out_logging,
             name_file_nc="GDP_PPP_1990_2015_5arcmin_v2.nc",
         )
+
+    if mining_raster_path is not None:
+        add_mining_data(df_gadm, mining_raster_path)
 
     # renaming 3 letter to 2 letter ISO code before saving GADM file
     # In the case of a contested territory in the form 'Z00.00_0', save 'AA.00_0'
@@ -2022,6 +2038,8 @@ if __name__ == "__main__":
     geo_crs = snakemake.params.crs["geo_crs"]
     distance_crs = snakemake.params.crs["distance_crs"]
 
+    custom_gadm = snakemake.params["custom_gadm"]
+
     layer_id = snakemake.params.build_shape_options["gadm_layer_id"]
     update = snakemake.params.build_shape_options["update_file"]
     out_logging = snakemake.params.build_shape_options["out_logging"]
@@ -2077,6 +2095,7 @@ if __name__ == "__main__":
         simplify_gadm=simplify_gadm,
         tolerance=tolerance,
         minarea=minarea,
+        mining_raster_path=snakemake.input.get("mining_raster", None),
     )
 
     save_to_geojson(gadm_shapes, out.gadm_shapes)

@@ -1,0 +1,78 @@
+# SPDX-FileCopyrightText: Contributors to PyPSA-Earth
+# SPDX-FileCopyrightText: Open Energy Transition gGmbH
+#
+# SPDX-License-Identifier: CC0-1.0
+
+run:
+  name: "cap_exp_zambia_2025"
+  shared_cutouts: true
+
+enable:
+  retrieve_databundle: false
+  build_natura_raster: false
+
+scenario:
+  simpl: [""]
+  ll: ["copt"]
+  clusters: ["10"]
+  opts: [3h]
+
+electricity:
+  extendable_carriers:
+    # TODO Biomass potential can have strong impact and must be adjusted
+    # according to the conditions it aims to represent
+    Generator: ["solar", "onwind"]
+    StorageUnit: []
+    Store: []
+    Link: []
+
+  automatic_emission: false
+  automatic_emission_base_year: 1990
+
+  existing_thermal_dispatch:
+    enable: true
+    base_year: 2025
+    carriers: [coal, oil]
+
+  powerplants_filter: (DateOut >= 2025 or DateOut != DateOut) and (DateIn <= 2025 or DateIn != DateIn)
+  custom_powerplants: replace
+
+renewable:
+  hydro:
+    multiplier: 0.65
+
+solving:
+  options:
+    load_shedding: true
+
+load_options:
+  demand_weights:
+    mining: 0.76
+    gdp: 0.24
+  zambia_demand_distribution: true
+costs:
+  marginal_cost:
+    coal: 72.92
+    oil: 4.23
+  co2_emissions: # tCO2/MWh — IRP Table 5 (Zambia 2023)
+    hydro: 0.025
+    ror: 0.024
+    coal: 0.830
+    geothermal: 0.038
+    biomass: 0.038
+    solar: 0.048
+    onwind: 0.011
+    nuclear: 0.012
+    csp-tower: 0.000
+    oil: 0.490
+  lifetime: # years — IRP Table 5 (Zambia 2023)
+    hydro: 50
+    ror: 35
+    coal: 40
+    geothermal: 35
+    biomass: 25
+    solar: 25
+    onwind: 30
+    nuclear: 50
+    csp-tower: 25
+    oil: 30
