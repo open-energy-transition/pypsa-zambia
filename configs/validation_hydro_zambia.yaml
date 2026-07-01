@@ -1,0 +1,52 @@
+# SPDX-FileCopyrightText: Contributors to PyPSA-Earth
+# SPDX-FileCopyrightText: Open Energy Transition gGmbH
+#
+# SPDX-License-Identifier: CC0-1.0
+# The configuration file is intended to be used to validate intra-annual
+# distribution of the inflow using available reference data for 2023
+run:
+  name: validation_dispatch_zambia_2023
+  shared_cutouts: true
+
+scenario:
+  simpl: ['']
+  ll: [v1.0]
+  clusters: ['10']
+  opts: [Co2L-3h]
+
+snapshots:
+  start: '2023-01-01'
+  end: '2024-01-01'
+  inclusive: left   # end is not inclusive
+countries: [ZM]
+
+atlite:
+  nprocesses: 4
+  default: cutout-2023-era5
+
+renewable:
+  hydro:
+    cutout: cutout-2023-era5
+    source: era5 # use "era5" for a regular cutout workflow and "custom" for custom renewable profiles
+    extendable: false
+    normalization:
+      method: irena
+      year: 2023
+    multiplier: 0.65
+
+load_options:
+  source: demcast
+  weather_year: 2023
+
+data:
+  hydrobasins:
+    source: build
+    version: latest
+  hydro_profile:
+    source: primary
+    version: v1.0
+  inflow-glofas:
+    source: primary
+    version: v1.0
+    # NB Must be adjusted according to the weather year
+    year: 2013

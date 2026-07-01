@@ -7,7 +7,8 @@ run:
   sector_name: "tutorial"
 
 load_options:
-  source: "demcast"
+  source: "gegis"
+  weather_year: 2013
 
 renewable:
   hydro:
