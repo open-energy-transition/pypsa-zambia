@@ -14,6 +14,8 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Enable expansion of biomass generators considering realistic regional values of biomass potential [PR #220](https://github.com/open-energy-transition/pypsa-zambia/pull/220)
 
+* Added cross scenario plotting functionality via new rule `plot_scenario_comparison` [PR #276](https://github.com/open-energy-transition/pypsa-zambia/pull/276)
+
 ### Minor Changes and bug-fixing
 
 * Added link to data versioning in docs, and tidied up the links and licenses in the data inventory [PR #233](https://github.com/open-energy-transition/pypsa-zambia/pull/233)
@@ -23,6 +25,8 @@ This part of documentation collects descriptive release notes to capture the mai
 * Added proposed hydro powerplants projects from IPPPO to the custom powerplants file [PR #242](https://github.com/open-energy-transition/pypsa-zambia/pull/265)
 
 * Add GloFAS inflow datasets for different years[PR #262](https://github.com/open-energy-transition/pypsa-zambia/pull/262)
+
+* Added configuration file for hydro validation [PR #231](https://github.com/open-energy-transition/pypsa-zambia/pull/231)
 
 # PyPSA-Zambia v0.3
 
