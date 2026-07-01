@@ -47,6 +47,7 @@ import logging
 import pandas as pd
 import pypsa
 from currency_converter import CurrencyConverter
+from utility_custom_features import apply_capital_cost_overrides
 
 currency_converter = CurrencyConverter(
     fallback_on_missing_rate=True,
@@ -402,6 +403,8 @@ def load_costs(
         + (1 - config["rooftop_share"]) * costs.at["solar-utility", "capital_cost"]
     )
     costs.loc["csp"] = costs.loc["csp-tower"]
+
+    costs = apply_capital_cost_overrides(costs, config)
 
     def costs_for_storage(store, link1, link2=None, max_hours=1.0):
         capital_cost = link1["capital_cost"] + max_hours * store["capital_cost"]
