@@ -86,6 +86,7 @@ There are multiple ways to get involved and learn more about our work:
 
 ### User Guide
 
+- [Design & Features](user-guide/design.md) - PyPSA-Zambia design choices and Zambia-specific features
 - [Structure](user-guide/structure.md) - Project structure and workflow
 - [Data Workflow](user-guide/data-workflow.md) - Data processing pipeline
 - [Configuration](user-guide/configuration.md) - Configure your model settings
