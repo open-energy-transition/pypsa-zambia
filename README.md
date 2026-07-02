@@ -26,6 +26,28 @@ by
 [![Google Drive](https://img.shields.io/badge/Google%20Drive-4285F4?style=flat&logo=googledrive&logoColor=white)](https://drive.google.com/drive/folders/13Z8Y9zgsh5IZaDNkkRyo1wkoMgbdUxT5?usp=sharing)
 [![DOI](https://img.shields.io/badge/DOI-10.1016%2Fj.apenergy.2023.121096-blue)](https://doi.org/10.1016/j.apenergy.2023.121096)
 
+## What is PyPSA Zambia?
+PyPSA-Zambia is an open-source power system model for Zambia, built on top of PyPSA-Earth and developed by Open Energy Transition (OET) in collaboration with ZESCO, Zambia's national electricity utility. The project is funded by the Quadrature Climate Foundation and aims to support data-driven, transparent, and climate-resilient power system planning in Zambia.
+
+Zambia's grid is dominated by large hydropower reservoirs, making it highly sensitive to rainfall variability and multi-year drought cycles. PyPSA-Zambia is designed with this context in mind, extending the general PyPSA-Earth framework with Zambia-specific data, modelling assumptions, and workflows.
+
+The model supports two main study types:
+
+* Dispatch validation — fixed installed capacity, optimises hourly plant scheduling to reproduce historical operation. Used to validate the model against observed generation data before forward-looking studies.
+* Capacity expansion — allows the solver to invest in new generation (currently solar and wind) alongside dispatching existing plants, to find least-cost pathways for planning horizons out to 2050.
+
+### Key features
+* **GloFAS hydro inflow profiles** — hydro generation profiles are built from GloFAS river discharge data measured at individual plant locations, replacing the ERA5 runoff approach used in PyPSA-Earth. This is more physically accurate for Zambia's reservoir-dominated system.
+* **Custom Zambian power plant inventory** — a curated dataset of named Zambian plants (Kafue Gorge, Kariba North Bank, Itezhi Tezhi, Victoria Falls, and others), with individual plant identities preserved through the network simplification step.
+* **SAPP cross-border interconnectors** — models Zambia's power trading links with neighbouring countries in the Southern African Power Pool (SAPP), using dedicated line and substation data.
+* **Mining sector demand disaggregation** — Zambia's large copper mining sector is spatially disaggregated from general demand using provincial mining load data, giving a more realistic spatial distribution of electricity consumption.
+* **Priority dispatch of existing thermal plants** — existing coal and oil plants are treated as already-committed (sunk-cost) assets in expansion runs, reflecting how ZESCO operates them in practice.
+* **Biomass generation potential** — province-level biomass capacity constraints derived from land-use data.
+* **Multi-year future scenarios** — pre-built configuration files for 2025, 2030, 2040, and 2050 planning horizons, runnable in batch via a scenario orchestration workflow.
+* **Cross-scenario comparison plots** — built-in tooling to compare capacity and generation across multiple scenario runs.
+* **Built on PyPSA-Earth** — inherits OSM-based network extraction, atlite-powered renewable profiles, sector-coupling capabilities, Monte Carlo uncertainty analysis, and a Snakemake-managed workflow.
+
+
 ## Installation
 
 1. Open your terminal at a location where you want to install pypsa-zambia. Type the following in your terminal to download the package from GitHub:
