@@ -492,3 +492,18 @@ def set_existing_thermal_zero_mc(n, base_year, carriers):
     )
     n.generators.loc[mask, "marginal_cost"] = 0.0
     logger.info(f"Zero marginal cost applied to: {n.generators.index[mask].tolist()}")
+
+
+def apply_capital_cost_overrides(costs, config):
+    """Set capital costs directly from config, skipping the annuity formula.
+    Use this when the costs in the config are already annualised (EUR/MW/year).
+    """
+    user_capital_costs = config.get("capital_cost")
+    if user_capital_costs is None:
+        return costs
+    user_capital_costs = pd.Series(user_capital_costs)
+    costs.loc[user_capital_costs.index, "capital_cost"] = user_capital_costs
+    logger.info(
+        f"Using pre-annualised capital costs for: {user_capital_costs.index.tolist()}"
+    )
+    return costs
