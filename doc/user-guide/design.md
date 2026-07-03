@@ -13,16 +13,16 @@ structure inherited from PyPSA-Earth, see [Introduction](../home/introduction.md
 ## Relationship to PyPSA-Earth
 
 PyPSA-Zambia is a fork of [PyPSA-Earth](https://github.com/pypsa-meets-earth/pypsa-earth).
-It inherits the full Snakemake workflow — OSM network extraction, atlite-based
-renewable profiles, demand modelling, network solving, and sector coupling — and
+It inherits the full Snakemake workflow - OSM network extraction, atlite-based
+renewable profiles, demand modelling, network solving, and sector coupling - and
 extends it with Zambia-specific data and modelling features.
 
 Zambia-specific code lives primarily in two places:
 
-- `scripts/utility_custom_features.py` — helper functions for all ZM-specific
+- `scripts/utility_custom_features.py` - helper functions for all ZM-specific
   network modifications (interconnectors, biomass potential, demand disaggregation,
   forced thermal dispatch, etc.)
-- `configs/config.zm.default.yaml` — the ZM-specific default configuration that
+- `configs/config.zm.default.yaml` - the ZM-specific default configuration that
   overrides PyPSA-Earth's `config.default.yaml` with Zambia cost data, voltage
   levels, and feature flags
 
@@ -76,8 +76,8 @@ electricity:
   custom_powerplants: replace
 ```
 
-The file contains named plants — Kafue Gorge Upper (990 MW), Kariba North Bank
-(720 MW), Itezhi Tezhi (120 MW), Victoria Falls (108 MW), and others — with
+The file contains named plants - Kafue Gorge Upper (990 MW), Kariba North Bank
+(720 MW), Itezhi Tezhi (120 MW), Victoria Falls (108 MW), and others - with
 individual lat/lon coordinates, commission and decommission years, and reservoir
 parameters. The `powerplants_filter` config key controls which plants are active
 for a given study year:
@@ -191,7 +191,7 @@ PyPSA-Zambia supports two distinct study configurations:
 
 ### Dispatch validation
 
-All `extendable_carriers` lists are empty — the installed fleet is fixed. The
+All `extendable_carriers` lists are empty - the installed fleet is fixed. The
 solver only determines how to schedule existing plants hour-by-hour to minimise
 operating cost. This mode is used to reproduce a historical year's operation and
 compare against ZESCO's reported generation data.
@@ -220,7 +220,7 @@ snakemake -j 1 run_all_scenarios
 
 In capacity expansion runs, existing coal and oil plants would normally compete
 against cheaper renewables on marginal cost, potentially being left largely idle.
-In practice ZESCO operates these plants as baseload assets — their capital costs
+In practice ZESCO operates these plants as baseload assets - their capital costs
 are sunk and they are needed to hedge against hydro shortfalls.
 
 The `existing_thermal_dispatch` feature replicates this by setting marginal cost
@@ -238,7 +238,7 @@ electricity:
 The function `set_existing_thermal_zero_mc()` in
 `scripts/utility_custom_features.py` applies a zero marginal cost to any
 non-extendable generator whose carrier is in the list and whose
-`build_year <= base_year`. This applies only to existing plants — any new
+`build_year <= base_year`. This applies only to existing plants - any new
 capacity the solver chooses to build is not affected.
 
 ## Future Scenarios

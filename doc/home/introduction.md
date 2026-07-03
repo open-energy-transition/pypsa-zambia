@@ -8,13 +8,12 @@ SPDX-License-Identifier: CC-BY-4.0
 
 PyPSA-Zambia is a power system model for Zambia built as a customisation of
 [PyPSA-Earth](https://github.com/pypsa-meets-earth/pypsa-earth). It inherits
-PyPSA-Earth's full Snakemake-managed workflow — from raw data download through
-network building, optimisation, and results visualisation — and extends it with
+PyPSA-Earth's full Snakemake-managed workflow - from raw data download through
+network building, optimisation, powerful plotting capabilities and extends it with
 Zambia-specific data, modelling assumptions, and features described below.
 
 ## PyPSA-Earth: the inherited framework
 
-PyPSA-Zambia is built on PyPSA-Earth, an open-source global energy system model.
 The following video explains the underlying workflow logic using PyPSA-Eur as an
 illustration; the same logic applies to PyPSA-Zambia:
 
@@ -61,6 +60,15 @@ The **blocks** represent the individual rules which are required to create the f
 PyPSA-Zambia has a comprehensive set of pre-compiled datasets which provides all the inputs needed to build and run an energy system model for any country of the world. A specification of modelling-ready databundles is available in `configs/bundle_config.yaml`.
 
 The datasets are available for various spatial scales, from global to national ones and can be extracted at an initial stage of running the model as described in `Installation` section. A data management system `retrieve_databundle_light` selects the databundles which matches best settings defined in the configuration file and extracts them automatically.
+
+Below is a list of these custom datasets used in the PyPSA-ZM model:
+* GloFAS hydro datasets for Zambia: Inflow files for varying years for the country Zambia extracted from GloFAS dataset, which builds GloFAS-based hydro inflow profiles at plant locations, they are built by `build_glofas_profile`
+* ERA5 Cutouts for Zambia: Cutout file for varying years for the country Zambia built using the ERA5 dataset and are available for the years 2013, 2023, 2024 and 2025
+* `data/line_types.csv`: A csv containing Zambia specific line types
+* Mining raster: A spatial raster of mining demand intensity, built from the `zambia_provincial_mining_demand.csv` that has demand data from ERB and the `zambia_pangaea_mining_polygons.csv`
+* Sapp details: `data/sapp_countries.csv`, `data/sapp_links.csv`
+* `data/biomass.geojson`: Information about Zambia's biomass potential per province and is used by `add_biomass_potential()` to set `p_nom_max` constraints on biomass generators
+* `data/custom_powerplants.csv`: Overrides powerplantmatching with curated inventory of Zambian generators.
 
 ## Folder structure
 
