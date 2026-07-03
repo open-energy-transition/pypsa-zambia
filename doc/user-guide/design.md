@@ -12,28 +12,26 @@ structure inherited from PyPSA-Earth, see [Introduction](../home/introduction.md
 
 ## Relationship to PyPSA-Earth
 
-PyPSA-Zambia is a fork of [PyPSA-Earth](https://github.com/pypsa-meets-earth/pypsa-earth).
-It inherits the full Snakemake workflow - OSM network extraction, atlite-based
-renewable profiles, demand modelling, network solving, and sector coupling - and
-extends it with Zambia-specific data and modelling features.
+PyPSA-Zambia is maintained as a soft fork of [PyPSA-Earth](https://github.com/pypsa-meets-earth/pypsa-earth).
+This means that it is developed in parallel with PyPSA Earth and remains compatible by merging upstream changes and can also contributes it's major changes back to upstream.
 
 Zambia-specific code lives primarily in two places:
 
 - `scripts/utility_custom_features.py` - helper functions for all ZM-specific
   network modifications (interconnectors, biomass potential, demand disaggregation,
   forced thermal dispatch, etc.)
-- `configs/config.zm.default.yaml` - the ZM-specific default configuration that
+- `configs/validation_dispatch_zambia.yaml` - the ZM-specific default configuration that
   overrides PyPSA-Earth's `config.default.yaml` with Zambia cost data, voltage
   levels, and feature flags
 
 ## Hydro Modelling
 
 Zambia's electricity system is dominated by large hydropower reservoirs. Accurate
-hydro inflow profiles are therefore the single most important input to the model.
+water flow data are therefore the single most important input to the model.
 
 PyPSA-Earth's default approach uses ERA5 weather reanalysis processed by
 [Atlite](https://github.com/PyPSA/atlite/) to derive runoff-based inflow
-estimates. PyPSA-Zambia provides an alternative: inflow profiles built directly
+estimates. Use of ERA5 as a data source is also inherited in PyPSA-Zambia as well. However, PyPSA-Zambia also provides an alternative: inflow profiles built directly
 from [GloFAS](https://global-flood.emergency.copernicus.eu/) river discharge
 data, which measures actual river flow at the coordinates of each hydro plant
 rather than estimating it from atmospheric variables.
@@ -80,7 +78,10 @@ The file contains named plants - Kafue Gorge Upper (990 MW), Kariba North Bank
 (720 MW), Itezhi Tezhi (120 MW), Victoria Falls (108 MW), and others - with
 individual lat/lon coordinates, commission and decommission years, and reservoir
 parameters. The `powerplants_filter` config key controls which plants are active
-for a given study year:
+for a given study year. The parameter `DateIn` specifies the year the plant was commissioned (came online/started generation) while `DateOut` gives the year of decommision of the power plant.
+
+So `DateIn <= 2024` means "only include plants that were built by 2024." while So `DateOut >= 2024` means "only include plants that haven't retired yet by 2024."
+The `!= DateOut` parts are handling nulls. In pandas, NaN != NaN is true, so `DateOut != DateOut` is a way of saying "or the retirement date is unknown/missing." It's a quirk of how pandas evaluates query strings. In plain English it means "treat a missing date as still active."
 
 ```yaml
 electricity:
