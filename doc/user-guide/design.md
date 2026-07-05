@@ -164,7 +164,7 @@ validation:
 ## Biomass Potential
 
 PyPSA-Zambia can model biomass as an extendable generation carrier with
-province-level capacity constraints derived from land-use data. The feature is
+province-level potential constraints derived from land-use data. The feature is
 enabled by:
 
 ```yaml
@@ -190,17 +190,17 @@ capacity expansion base configs and must be enabled explicitly.
 
 PyPSA-Zambia supports two distinct study configurations:
 
-### Dispatch validation
+### Dispatch Modelling
 
 All `extendable_carriers` lists are empty - the installed fleet is fixed. The
-solver only determines how to schedule existing plants hour-by-hour to minimise
+solver only determines how to schedule existing plants to minimise
 operating cost. This mode is used to reproduce a historical year's operation and
 compare against ZESCO's reported generation data.
 
-Entry point: `configs/validation_dispatch_zambia.yaml`
+The key config in carrying out this operation is the: `configs/validation_dispatch_zambia.yaml`
 
 ```bash
-snakemake -j 1 solve_all_networks
+snakemake -j 1 solve_all_networks configfile configs/validation_dispatch_zambia.yaml
 ```
 
 ### Capacity expansion
@@ -256,7 +256,7 @@ Four planning horizon configurations are provided in `configs/scenarios_zambia/`
 Demand scale factors are derived from Zambia's Integrated Resource Plan (IRP)
 projected national demand divided by the DemandCast base year value of 15,909 GWh.
 
-All four inherit shared settings from `configs/cap_exp_zambia_base.yaml` (ERA5
+All four capacity expansion configs (`config.cap_exp_zambia_{year}.yaml`) inherit shared settings from `configs/cap_exp_zambia_base.yaml` (ERA5
 2023 cutout, 22 clusters, 3-hour temporal resolution, costs from Zambia's IRP).
 Each scenario diff only overrides `powerplants_filter`, `extendable_carriers`,
 `load_options.scale`, and `costs.year`.
