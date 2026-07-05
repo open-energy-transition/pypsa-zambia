@@ -27,11 +27,11 @@ by
 [![DOI](https://img.shields.io/badge/DOI-10.1016%2Fj.apenergy.2023.121096-blue)](https://doi.org/10.1016/j.apenergy.2023.121096)
 
 ## What is PyPSA Zambia?
-PyPSA-Zambia is an open-source power system model for Zambia, built on top of PyPSA-Earth and developed by Open Energy Transition (OET) in collaboration with ZESCO, Zambia's national electricity utility. The project is funded by the Quadrature Climate Foundation and aims to support data-driven, transparent, and climate-resilient power system planning in Zambia.
+PyPSA-Zambia is an open-source power system model for Zambia, built on top of PyPSA-Earth and developed by Open Energy Transition (OET) in collaboration with ZESCO, Zambia's national electricity utility. The project aims to support data-driven, transparent, and climate-resilient power system planning in Zambia.
 
 Zambia's grid is dominated by large hydropower reservoirs, making it highly sensitive to rainfall variability and multi-year drought cycles. PyPSA-Zambia is designed with this context in mind, extending the general PyPSA-Earth framework with Zambia-specific data, modelling assumptions, and workflows.
 
-Apart from being able to be used for validation, the model also supports the following operational studies:
+The model supports the following operational studies:
 
 * Dispatch validation — fixed installed capacity, optimises hourly plant scheduling to reproduce historical operation. Used to validate the model against observed generation data before forward-looking studies.
 * Capacity expansion — allows the solver to invest in new generation (currently solar and wind) alongside dispatching existing plants, to find least-cost pathways for planning horizons out to 2050.
