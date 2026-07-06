@@ -37,15 +37,15 @@ The model supports the following operational studies:
 * Capacity expansion — allows the solver to invest in new generation (currently solar and wind) alongside dispatching existing plants, to find least-cost pathways for planning horizons out to 2050.
 
 ### Key features
-* **GloFAS hydro inflow profiles** — hydro generation profiles are built from GloFAS river discharge data measured at individual plant locations, replacing the ERA5 runoff approach used in PyPSA-Earth. This is more physically accurate for Zambia's reservoir-dominated system.
-* **Custom Zambian power plant inventory** — a curated dataset of named Zambian plants (Kafue Gorge, Kariba North Bank, Itezhi Tezhi, Victoria Falls, and others)
+* **GloFAS hydro inflow profiles** — hydro generation profiles are built from GloFAS river discharge data measured at individual plant locations, replacing the ERA5 runoff approach used in PyPSA-Earth. This is more physically accurate for Zambia's reservoir-dominated system. [PR #262](https://github.com/open-energy-transition/pypsa-zambia/pull/262)
+* **Custom Zambian power plant inventory** — a curated dataset of named Zambian plants (Kafue Gorge, Kariba North Bank, Itezhi Tezhi, Victoria Falls, and others) [PR #242](https://github.com/open-energy-transition/pypsa-zambia/pull/265)
 * **Individual plant identities** - Individual plant identities are preserved through the network simplification step making plant statistics easier to interpret in the model. [PR #153](https://github.com/open-energy-transition/pypsa-zambia/pull/153)
-* **SAPP cross-border interconnectors** — models Zambia's power trading links with neighbouring countries in the Southern African Power Pool (SAPP), using dedicated line and substation data.
+* **SAPP cross-border interconnectors** — models Zambia's power trading links with neighbouring countries in the Southern African Power Pool (SAPP), using dedicated line and substation data. [PR #88](https://github.com/open-energy-transition/pypsa-zambia/pull/88)
 * **Mining sector demand disaggregation** — Zambia's large copper mining sector is spatially disaggregated from general demand using provincial mining load data, giving a more realistic spatial distribution of electricity consumption.
-* **Priority dispatch of existing thermal plants** — existing coal and oil plants are treated as already-committed (sunk-cost) assets in expansion runs.
-* **Biomass generation potential** — province-level biomass capacity constraints derived from land-use data.
-* **Multi-year future scenarios** — pre-built configuration files for 2025, 2030, 2040, and 2050 planning horizons, runnable in batch via a scenario orchestration workflow.
-* **Cross-scenario comparison plots** — built-in tooling to compare capacity and generation across multiple scenario runs.
+* **Priority dispatch of existing thermal plants** — existing coal and oil plants are treated as already-committed (sunk-cost) assets in expansion runs. [PR #280](https://github.com/open-energy-transition/pypsa-zambia/pull/280)
+* **Biomass generation potential** — province-level biomass capacity constraints derived from land-use data. [PR #220](https://github.com/open-energy-transition/pypsa-zambia/pull/220)
+* **Multi-year future scenarios** — pre-built configuration files for 2025, 2030, 2040, and 2050 planning horizons, runnable in batch via a scenario orchestration workflow. [PR #264](https://github.com/open-energy-transition/pypsa-zambia/pull/264)
+* **Cross-scenario comparison plots** — built-in tooling to compare capacity and generation across multiple scenario runs. [PR #276](https://github.com/open-energy-transition/pypsa-zambia/pull/276)
 * **Built on PyPSA-Earth** — inherits OSM-based network extraction, atlite-powered renewable profiles, sector-coupling capabilities, Monte Carlo uncertainty analysis, and a Snakemake-managed workflow.
 
 
