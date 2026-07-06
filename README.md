@@ -38,10 +38,11 @@ The model supports the following operational studies:
 
 ### Key features
 * **GloFAS hydro inflow profiles** — hydro generation profiles are built from GloFAS river discharge data measured at individual plant locations, replacing the ERA5 runoff approach used in PyPSA-Earth. This is more physically accurate for Zambia's reservoir-dominated system.
-* **Custom Zambian power plant inventory** — a curated dataset of named Zambian plants (Kafue Gorge, Kariba North Bank, Itezhi Tezhi, Victoria Falls, and others), with individual plant identities preserved through the network simplification step.
+* **Custom Zambian power plant inventory** — a curated dataset of named Zambian plants (Kafue Gorge, Kariba North Bank, Itezhi Tezhi, Victoria Falls, and others)
+* **Individual plant identities** - Individual plant identities are preserved through the network simplification step making plant statistics easier to interpret in the model. [PR #153](https://github.com/open-energy-transition/pypsa-zambia/pull/153)
 * **SAPP cross-border interconnectors** — models Zambia's power trading links with neighbouring countries in the Southern African Power Pool (SAPP), using dedicated line and substation data.
 * **Mining sector demand disaggregation** — Zambia's large copper mining sector is spatially disaggregated from general demand using provincial mining load data, giving a more realistic spatial distribution of electricity consumption.
-* **Priority dispatch of existing thermal plants** — existing coal and oil plants are treated as already-committed (sunk-cost) assets in expansion runs, reflecting how ZESCO operates them in practice.
+* **Priority dispatch of existing thermal plants** — existing coal and oil plants are treated as already-committed (sunk-cost) assets in expansion runs.
 * **Biomass generation potential** — province-level biomass capacity constraints derived from land-use data.
 * **Multi-year future scenarios** — pre-built configuration files for 2025, 2030, 2040, and 2050 planning horizons, runnable in batch via a scenario orchestration workflow.
 * **Cross-scenario comparison plots** — built-in tooling to compare capacity and generation across multiple scenario runs.
