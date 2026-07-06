@@ -31,10 +31,34 @@ PyPSA-Zambia is an open-source power system model for Zambia, built on top of Py
 
 Zambia's grid is dominated by large hydropower reservoirs, making it highly sensitive to rainfall variability and multi-year drought cycles. PyPSA-Zambia is designed with this context in mind, extending the general PyPSA-Earth framework with Zambia-specific data, modelling assumptions, and workflows.
 
-The model supports the following operational studies:
+PyPSA-Zambia supports two distinct study configurations:
 
-* Dispatch validation — fixed installed capacity, optimises hourly plant scheduling to reproduce historical operation. Used to validate the model against observed generation data before forward-looking studies.
-* Capacity expansion — allows the solver to invest in new generation (currently solar and wind) alongside dispatching existing plants, to find least-cost pathways for planning horizons out to 2050.
+### Dispatch Modelling
+
+This mode is used to reproduce a historical year's operation. All `extendable_carriers` lists are empty - the installed fleet is fixed. The
+solver only determines how to schedule existing plants to minimise
+operating cost.
+
+The key config in carrying out this operation is the: `configs/validation_dispatch_zambia.yaml`
+
+```bash
+snakemake -j 1 solve_all_networks configfile configs/validation_dispatch_zambia.yaml
+```
+
+### Capacity expansion
+
+This mode seeks to expand the generation fleet beyond what already exists. Solar and onwind are marked as extendable, allowing the solver to optimise both
+investment and dispatch jointly. The `existing_thermal_dispatch` feature forces
+existing coal and oil plants to always dispatch, reflecting their
+sunk-cost status in forward-looking runs.
+
+The base config is: `configs/cap_exp_zambia.yaml` (base) + year-specific overrides in
+`configs/scenarios_zambia/`
+
+```bash
+snakemake -j 1 run_all_scenarios
+```
+
 
 ### Key features
 * **GloFAS hydro inflow profiles** — hydro generation profiles are built from GloFAS river discharge data measured at individual plant locations, replacing the ERA5 runoff approach used in PyPSA-Earth. This is more physically accurate for Zambia's reservoir-dominated system. [PR #262](https://github.com/open-energy-transition/pypsa-zambia/pull/262)
