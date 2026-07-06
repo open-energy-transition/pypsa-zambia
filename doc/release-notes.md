@@ -12,7 +12,20 @@ This part of documentation collects descriptive release notes to capture the mai
 
 ### New Features and Major Changes
 
+### Minor Changes and bug-fixing
+
+
+# PyPSA-Zambia v0.4
+
+### New Features and Major Changes
+
 * Enable expansion of biomass generators considering realistic regional values of biomass potential [PR #220](https://github.com/open-energy-transition/pypsa-zambia/pull/220)
+
+* Priority dispatch for existing thermal plants to reflect actual ZESCO operations [PR #280](https://github.com/open-energy-transition/pypsa-zambia/pull/280)
+
+* Add cross-scenario comparison plots functionality to allow for comparison across scenario runs [PR #276](https://github.com/open-energy-transition/pypsa-zambia/pull/276)
+
+* Fix run_all_scenarios to allow running all scenarios in a clean and robust way [PR #243](https://github.com/open-energy-transition/pypsa-zambia/pull/243)
 
 ### Minor Changes and bug-fixing
 
@@ -23,6 +36,16 @@ This part of documentation collects descriptive release notes to capture the mai
 * Added proposed hydro powerplants projects from IPPPO to the custom powerplants file [PR #242](https://github.com/open-energy-transition/pypsa-zambia/pull/265)
 
 * Add GloFAS inflow datasets for different years[PR #262](https://github.com/open-energy-transition/pypsa-zambia/pull/262)
+
+* Fix CI by replacing unresponsive remote data sources [PR #279](https://github.com/open-energy-transition/pypsa-zambia/pull/279)
+
+* Drop isolated subnetworks from the network that do not meet threshold value greater than 100mw [PR #272](https://github.com/open-energy-transition/pypsa-zambia/pull/272)
+
+* Add future scenario configs for years 2025,2030, 2040 and 2050 [PR #264](https://github.com/open-energy-transition/pypsa-zambia/pull/264)
+
+* Created hydro validation config [PR #231](https://github.com/open-energy-transition/pypsa-zambia/pull/231)
+
+* Updated CI to support weather years greater than 2013 [PR #231](https://github.com/open-energy-transition/pypsa-zambia/pull/231)
 
 # PyPSA-Zambia v0.3
 
@@ -45,16 +68,6 @@ This part of documentation collects descriptive release notes to capture the mai
 ## Upcoming changes from upstream
 
 This part of documentation collects descriptive release notes to capture the main improvements introduced by developing the model before the next release.
-
-### New Features and Major Changes
-
-### Minor Changes and bug-fixing
-
-# PyPSA-Zambia upcoming release
-
-## New Features and Major Changes
-* Add powerplants disaggregation feature [PR #153](https://github.com/open-energy-transition/pypsa-zambia/pull/153)
-## Minor Changes and bug-fixing
 
 
 # PyPSA-Zambia v0.2
