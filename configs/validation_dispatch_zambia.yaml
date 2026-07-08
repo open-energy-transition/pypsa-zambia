@@ -183,6 +183,9 @@ solving:
     options: highs-default
 
 data:
+  custom-powerplants:
+    source: primary
+    version: v4
   zm-biomass:
     source: primary
     version: v1.0
