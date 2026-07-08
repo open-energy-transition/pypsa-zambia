@@ -498,7 +498,7 @@ def apply_capital_cost_overrides(costs, config):
     """Set capital costs directly from config, skipping the annuity formula.
     Use this when the costs in the config are already annualised (EUR/MW/year).
     """
-    user_capital_costs = config.get("capital_cost")
+    user_capital_costs = config.get("investment_annualised")
     if user_capital_costs is None:
         return costs
     user_capital_costs = pd.Series(user_capital_costs)

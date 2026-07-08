@@ -18,6 +18,8 @@ This part of documentation collects descriptive release notes to capture the mai
 
 ### Minor Changes and bug-fixing
 
+* Fixed double-annualisation of IRP capital costs for wind and solar by introducing `investment_annualised` config key, which applies pre-annualised costs directly without CRF [PR #293](https://github.com/open-energy-transition/pypsa-zambia/pull/293)
+
 * Added link to data versioning in docs, and tidied up the links and licenses in the data inventory [PR #233](https://github.com/open-energy-transition/pypsa-zambia/pull/233)
 
 * Added a baseline configuration for capacity expansion runs [PR #242](https://github.com/open-energy-transition/pypsa-zambia/pull/242)

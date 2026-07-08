@@ -100,7 +100,7 @@ load_options:
 
 costs:
   year: 2025  # overridden per scenario
-  capital_cost: # EUR/MW/year — IRP Table 5 (Zambia 2023), converted at 0.7532 EUR/USD; already annualised, applied directly without CRF
+  investment_annualised: # EUR/MW/year — IRP Table 5 (Zambia 2023), converted at 0.7532 EUR/USD; already annualised, applied directly without CRF
     hydro: 2862160        # 3.800 mUSD/MW — Hydro Storage
     ror: 965602           # 1.282 mUSD/MW — Hydro Run-of-River
     coal: 807430          # 1.072 mUSD/MW — Coal Thermal
