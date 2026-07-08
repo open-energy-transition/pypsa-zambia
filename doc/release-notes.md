@@ -47,6 +47,8 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Updated CI to support weather years greater than 2013 [PR #231](https://github.com/open-energy-transition/pypsa-zambia/pull/231)
 
+* Fix affecting full reuse compliance of the project  [PR #298](https://github.com/open-energy-transition/pypsa-zambia/pull/298)
+
 # PyPSA-Zambia v0.3
 
 ## New Features and Major Changes
