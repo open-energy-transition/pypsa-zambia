@@ -19,6 +19,7 @@ enable:
 data:
   custom-powerplants:
     source: primary
+    # parameters of powerplants aligned with IRP assumptions
     version: v6
   cutout-era5:
     source: primary
