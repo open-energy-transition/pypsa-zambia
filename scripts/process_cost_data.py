@@ -47,6 +47,7 @@ import logging
 import pandas as pd
 import pypsa
 from currency_converter import CurrencyConverter
+from utility_custom_features import apply_capital_cost_overrides
 
 currency_converter = CurrencyConverter(
     fallback_on_missing_rate=True,
@@ -378,6 +379,8 @@ def load_costs(
         * costs["investment"]
         * Nyears
     )
+
+    costs = apply_capital_cost_overrides(costs, config)
 
     costs.at["OCGT", "fuel"] = costs.at["gas", "fuel"]
     costs.at["CCGT", "fuel"] = costs.at["gas", "fuel"]
