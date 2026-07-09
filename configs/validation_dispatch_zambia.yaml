@@ -185,6 +185,7 @@ solving:
 data:
   custom-powerplants:
     source: primary
+    # parameters of powerplants correspond to the real state of the national power system
     version: v4
   zm-biomass:
     source: primary
