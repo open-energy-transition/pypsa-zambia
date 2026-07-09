@@ -89,7 +89,7 @@ solving:
     load_shedding: 100  # load shedding cost for unmet demand (EUR/MWh)
 
 lines:
-  s_max_pu: 1.0
+  s_max_pu: 0.70
   ac_types:
     330.: "ACSR Zebra 2-bundle 330.0"  # SAPP standard 330 kV expansion conductor
 

@@ -178,6 +178,8 @@ if (LANDCOVER_DATASET := dataset_version("landcover", config))["source"] in ["pr
             ),
 
 
+# Fallback for configs that do not declare a custom-powerplants version:
+# record 514032 is the legacy Zambia powerplants dataset
 _custom_ppl_url = (
     dataset_version("custom-powerplants", config)["url"]
     if "custom-powerplants" in config.get("data", {})
