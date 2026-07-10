@@ -178,10 +178,19 @@ if (LANDCOVER_DATASET := dataset_version("landcover", config))["source"] in ["pr
             ),
 
 
+# Fallback for configs that do not declare a custom-powerplants version:
+# record 514032 is the legacy Zambia powerplants dataset
+_custom_ppl_url = (
+    dataset_version("custom-powerplants", config)["url"]
+    if "custom-powerplants" in config.get("data", {})
+    else "sandbox.zenodo.org/records/514032/files/custom_powerplants.csv"
+)
+
+
 rule download_custom_powerplants:
     input:
         url=HTTP.remote(
-            "https://sandbox.zenodo.org/records/514032/files/custom_powerplants.csv",
+            _custom_ppl_url,
             keep_local=True,
             additional_request_string="?download=1",
         ),
