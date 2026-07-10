@@ -87,9 +87,11 @@ For more advanced analysis (e.g. checking imports and exports), a validation not
 
 Capacity-expansion outputs are checked against Zambia's 2023 Integrated Resource Plan (IRP), using the [IRP scenarios scoping document](https://docs.google.com/document/d/13av6J_Yz-iMXanWeEhmLaMoAJUq39FRrF4-dA1Gn8Vs/edit?usp=sharing).
 
-Demand and costs in the model are already set to match IRP figures for each planning year. The validation is in what the model chooses to build and generate given those inputs, compared against the IRP's own plan for the same years: installed capacity by technology, generation mix, and emissions.
+Demand and costs in the model are already set to match IRP figures for each planning year. The validation is in what the model chooses to build and generate given those inputs, compared against the IRP's own plan for the same years: installed capacity by technology, generation mix, investment in generation and transmission, transmission capacity, and emissions.
 
 Comparison is done at four horizons - 2025, 2030, 2040, and 2050. Comparison plots are produced via `scripts/plot_scenario_comparison.py` and saved to `results/comparison_plots/cap_exp_zambia/`.
+
+**Note:** transmission isn't covered by the comparison tooling yet. `scripts/plot_scenario_comparison.py` currently excludes lines from both the installed-capacity and investment figures, so those only reflect generation and storage. The model itself does expand transmission.
 
 ## Capacity Expansion
 
@@ -100,6 +102,8 @@ Capacity expansion scenarios extend the dispatch-only run by letting the model s
 **What can be expanded.** Only solar and onshore wind can be newly built by the model. Hydro, coal, oil, biomass, and geothermal capacities are fixed in each planning-year snapshot: whatever is scheduled to be in service that year (based on commissioning/decommissioning dates in the powerplants data) is what the model has to work with, and the optimizer only decides how much solar and wind to add on top.
 
 Solar and wind siting is currently based on general land-cover suitability across the whole country, with no per-region cap and no restriction to specific sites. The IRP instead limits wind to a set of measured candidate sites and caps additions at 1,000 MW per region per planning period.
+
+Without those limits, the model can build wind capacity far beyond what's realistic, at very low realized capacity factors.
 
 **Four independent planning-year snapshots.** `configs/scenarios_zambia/config.cap_exp_zambia_{2025,2030,2040,2050}.yaml` each merge on top of the shared `cap_exp_zambia_base.yaml` and are solved as fully independent optimizations - there is no myopic/multi-horizon linkage between them. A generator built in the 2040 run has no bearing on 2050; each year re-derives its own fixed fleet, demand level, and solar/wind buildout from scratch. This means that capacity trajectories between horizons are not guaranteed to be monotonic.
 
