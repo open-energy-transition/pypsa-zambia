@@ -83,6 +83,20 @@ Once a validation run completed, the outputs are available in `pypsa-earth-statu
 
 For more advanced analysis (e.g. checking imports and exports), a validation notebook is available in [notebooks](https://github.com/open-energy-transition/pypsa-zambia/tree/main/notebooks) folder.
 
+## Capacity Expansion Validation Setup
+
+Capacity-expansion outputs are cross-checked against Zambia's 2023 Integrated Resource Plan (IRP). Unlike the dispatch validation above (which compares against independently observed data), several inputs to the capacity-expansion runs are calibrated directly to IRP figures rather than derived independently:
+
+- Demand (`load_options:scale` per scenario) is scaled to match IRP Table 3's national demand projection for each planning year.
+- Costs (investment, marginal cost, FOM, lifetime, CO2 factors) are transcribed from IRP Table 5, Table 9, and Annex 3.
+
+Because of that, matching total demand or cost levels to IRP is not itself a validation result - it's true by construction. The actual validation signal is in what the optimizer does *given* those inputs: the resulting technology mix, capacity trajectory, and generation split, none of which are anchored to IRP and instead emerge from the model's own least-cost decisions. Comparison is done at four horizons (2025, 2030, 2040, 2050) against:
+
+- IRP Table 11 - cumulative installed capacity and capacity additions by period, by technology.
+- IRP Table 12 - generation mix by technology.
+
+Comparison plots are produced via `scripts/plot_scenario_comparison.py`, reading solved networks from `results/cap_exp_zambia_{2025,2030,2040,2050}/networks/` and writing to `results/comparison_plots/cap_exp_zambia/` (installed capacity, generation mix, investments, CO2 emissions, demand - by scenario).
+
 ## Capacity Expansion
 
 Capacity expansion scenarios extend the dispatch-only run by letting the model size new generation to meet demand at future planning horizons, using cost and technology parameters calibrated to Zambia's 2023 Integrated Resource Plan (IRP).
