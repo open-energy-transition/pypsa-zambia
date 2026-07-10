@@ -29,6 +29,7 @@ countries: [ZM]
 atlite:
   nprocesses: 4
   default: cutout-2013-era5
+  hydro: hydro/zm-2013-glofas.nc
 
 renewable:
   onwind:
@@ -42,12 +43,12 @@ renewable:
     correction_factor: 0.854337
     extendable: false
   hydro:
-    source: era5 # use "era5" for a regular cutout workflow and "custom" for custom renewable profiles
+    source: custom # use "era5" for a regular cutout workflow and "custom" for custom renewable profiles
     extendable: false
     normalization:
       method: irena
       year: 2013
-    multiplier: 0.65
+    multiplier: 10 # has different meaning for custom and era5 sources
   csp:
     extendable: false
 
@@ -204,9 +205,6 @@ data:
   landcover:
     source: primary
     version: Mar2026
-  hydro_profile:
-    source: primary
-    version: v1.0
   natura_earth:
     source: tutorial
     version: v1.0

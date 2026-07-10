@@ -1155,9 +1155,6 @@ data:
   landcover:
     source: primary
     version: Mar2026
-  hydro_profile:
-    source: primary
-    version: v1.0
   natura_earth:
     source: tutorial
     version: v1.0

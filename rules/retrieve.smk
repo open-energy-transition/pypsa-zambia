@@ -291,29 +291,6 @@ if config["enable"].get("retrieve_cost_data", True):
             move(input[0], output[0])
 
 
-if (HYDRO_PROFILE_DATASET := dataset_version("hydro_profile", config))["source"] in [
-    "primary",
-    "tutorial",
-]:
-
-    region = HYDRO_PROFILE_DATASET["region"]
-    source = HYDRO_PROFILE_DATASET["source"]
-
-    rule retrieve_hydro_profile:
-        message:
-            "Retrieving hydro profile dataset for {region} and {source}"
-        input:
-            hydro_profile_nc=HTTP.remote(
-                HYDRO_PROFILE_DATASET["url"],
-                keep_local=True,
-                additional_request_string="?download=1",
-            ),
-        output:
-            f"data/hydro_profiles/glofas_profile.nc",
-        run:
-            copy2(str(input[0]), output[0])
-
-
 if (NATURA_EARTH_DATASET := dataset_version("natura_earth", config))["source"] in [
     "primary",
     "tutorial",
