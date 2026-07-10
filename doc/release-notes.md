@@ -12,6 +12,8 @@ This part of documentation collects descriptive release notes to capture the mai
 
 ### New Features and Major Changes
 
+* Use separate custom powerplants datasets for dispatch validation (ERB 2023-2025 data with KGL as reservoir) and capacity expansion (IRP and proposed plants), configured via `data.custom-powerplants` in the respective config files [PR #302](https://github.com/open-energy-transition/pypsa-zambia/pull/302)
+
 ### Minor Changes and bug-fixing
 
 
@@ -28,6 +30,8 @@ This part of documentation collects descriptive release notes to capture the mai
 * Fix run_all_scenarios to allow running all scenarios in a clean and robust way [PR #243](https://github.com/open-energy-transition/pypsa-zambia/pull/243)
 
 ### Minor Changes and bug-fixing
+
+* Fixed double-annualisation of IRP capital costs for wind and solar by introducing `investment_annualised` config key, which applies pre-annualised costs directly without CRF [PR #293](https://github.com/open-energy-transition/pypsa-zambia/pull/293)
 
 * Added link to data versioning in docs, and tidied up the links and licenses in the data inventory [PR #233](https://github.com/open-energy-transition/pypsa-zambia/pull/233)
 
@@ -50,6 +54,7 @@ This part of documentation collects descriptive release notes to capture the mai
 * Updated ReadMe and Docs [PR #295](https://github.com/open-energy-transition/pypsa-zambia/pull/295)
 
 * Updated Docs to include capacity expansion design [PR #304](https://github.com/open-energy-transition/pypsa-zambia/pull/304)
+* Fix affecting full reuse compliance of the project  [PR #298](https://github.com/open-energy-transition/pypsa-zambia/pull/298)
 
 # PyPSA-Zambia v0.3
 
