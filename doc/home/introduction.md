@@ -57,7 +57,7 @@ The **blocks** represent the individual rules which are required to create the f
 
 ## Data Management System
 
-PyPSA-Zambia has a comprehensive set of pre-compiled datasets which provides all the inputs needed to build and run an energy system model for the country, some of which are inherited from PyPSA Earth. A specification of modelling-ready databundles is available in `configs/bundle_config.yaml` while some of the more Zambia specific datasets can be found in the implemented data version approach in `retrieve.smk`. More information can be found in the [data sources](../data_sources/#managing_data_versions) section of the documentation.
+PyPSA-Zambia has a comprehensive set of pre-compiled datasets which provides all the inputs needed to build and run an energy system model for the country, some of which are inherited from PyPSA Earth. A specification of modelling-ready databundles is available in `configs/bundle_config.yaml` while some of the more Zambia specific datasets can be found in the implemented data version approach in `retrieve.smk`. More information can be found in the [data sources](../data_sources.md#managing_data_versions) section of the documentation.
 
 The datasets are available for various spatial scales, from global to national ones and can be extracted at an initial stage of running the model as described in `Installation` section. A data management system `retrieve_databundle_light` selects the databundles which matches best settings defined in the configuration file and extracts them automatically.
 
