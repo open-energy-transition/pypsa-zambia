@@ -98,7 +98,7 @@ def set_plot_style():
     plt.style.use(
         [
             "classic",
-            "seaborn-white",
+            "seaborn-v0_8-white",
             {
                 "axes.grid": False,
                 "grid.linestyle": "--",
@@ -173,8 +173,8 @@ def plot_map(n, ax=None, attribute="p_nom", opts={}):
         link_colors=link_colors_with_alpha,
         bus_sizes=0,
         # boundaries=map_boundaries,
-        color_geomap=True,
-        geomap=False,
+        color_geomap=False,
+        geomap=True,
         ax=ax,
     )
     ax.set_aspect("equal")
