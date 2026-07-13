@@ -51,6 +51,8 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Fix affecting full reuse compliance of the project  [PR #298](https://github.com/open-energy-transition/pypsa-zambia/pull/298)
 
+* Merge latest upstream changes from PyPSA-Earth [PR #286](https://github.com/open-energy-transition/pypsa-zambia/pull/286)
+
 # PyPSA-Zambia v0.3
 
 ## New Features and Major Changes
