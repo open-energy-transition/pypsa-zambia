@@ -109,9 +109,10 @@ jobs:
       if: steps.filter.outputs.src == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
       run: snakemake -j 1 solve_all_networks --configfile config.tutorial.yaml test/config.test.yaml
 
-    - name: Run GloFAS Integration Test
-      if: steps.filter.outputs.src == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-      run: snakemake -j 1 solve_all_networks --configfile config.zm.tutorial.yaml test/config.zm_glofas.yaml
+   # TODO Uncomment once PR will be merged for GloFAS data retrieval
+    # - name: Run GloFAS Integration Test
+    #   if: steps.filter.outputs.src == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    #   run: snakemake -j 1 solve_all_networks --configfile config.zm.tutorial.yaml test/config.zm_glofas.yaml
 
     # Disaggregation test could be added to the dispatch test
     # - name: Run Zambia PPDisaggregation Dispatch Test

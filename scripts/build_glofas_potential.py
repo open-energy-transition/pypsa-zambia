@@ -30,20 +30,21 @@ instead of using a usual atlite workflow based on ERA5
 
 import pandas as pd
 import xarray as xr
-from _helpers import configure_logging, create_logger
+from _helpers import configure_logging, create_logger, mock_snakemake
 from add_electricity import load_powerplants
 
 logger = create_logger(__name__)
 
 DEFAULT_DAMHEIGHT_M = 5.0  # default reservoir water height
-# HYDRO_MULTIPLIER = 10 * (1e3 * 10.0) / 1e6
+HYDRO_MULTIPLIER = (1e3 * 10.0) / 1e6
 
 
 def extract_inflow_df(
     snapshots: list,
     ppl_df: pd.DataFrame,
     glofas_xr: xr.Dataset,
-    inflow_scaling: float,
+    # TODO Implement normalisation
+    k: int = 1,
 ) -> pd.DataFrame:
     """
     Extract inflow for locations of hydropowerplants
@@ -87,7 +88,7 @@ def extract_inflow_df(
     # To get hydro potential inflow must be multiplied by height, g and a scaling factor
     # TODO Get rid of a scaling factor
     ppl_hydro_inflow_df = ppl_hydro_inflow_df.mul(ppl_height_m, axis="columns")
-    ppl_hydro_inflow_df = ppl_hydro_inflow_df * inflow_scaling
+    ppl_hydro_inflow_df = ppl_hydro_inflow_df * HYDRO_MULTIPLIER
 
     start = snapshots["start"]
     end = snapshots["end"]
@@ -105,8 +106,8 @@ def extract_inflow_df(
         start_year = snapshots_daily.year.min()
         end_year = snapshots_daily.year.max()
         raise ValueError(
-            f"The inflow dataframe is empty. A likely error is indexes mismatch "
-            f"{ppl_hydro_inflow_df.index.year.min()}-{ppl_hydro_inflow_df.index.year.max()} years available "
+            f"The inflow dataframe is empty. A likely error is indexes mismatch"
+            f"{ppl_hydro_inflow_df.index.year.min()}-{ppl_hydro_inflow_df.index.year.max()} years available"
             f"{start_year}-{end_year} years are requested be snapshots"
         )
 
@@ -133,26 +134,20 @@ def transform_to_xr(inflow_df: pd.DataFrame) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
+    if "snakemake" not in globals():
+        from _helpers import mock_snakemake
 
-    # TODO Avoid excessive import
-    from _helpers import mock_snakemake
+        snakemake = mock_snakemake("build_glofas_potential")
 
-    snakemake = mock_snakemake("build_glofas_profile")
     configure_logging(snakemake)
 
-    # Inflow to energy units: pho_water * g & W -> MW
-    inflow_scaling = (1e3 * 10.0) / 1e6 * snakemake.params.multiplier
-
-    ppls = load_powerplants(snakemake.input.powerplants)
+    ppls = load_powerplants(snakemake.input.hydro_sites)
     glofas_xr = xr.open_dataset(snakemake.input.glofas)
 
     inflow_ppl_df = extract_inflow_df(
-        snapshots=snakemake.params.snapshots,
-        ppl_df=ppls,
-        glofas_xr=glofas_xr,
-        inflow_scaling=inflow_scaling,
+        snapshots=snakemake.params.snapshots, ppl_df=ppls, glofas_xr=glofas_xr
     )
 
     inflow_xr = transform_to_xr(inflow_ppl_df)
 
-    inflow_xr.to_netcdf(snakemake.output.profile)
+    inflow_xr.to_netcdf(snakemake.output.potential)

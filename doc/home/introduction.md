@@ -6,7 +6,16 @@ SPDX-License-Identifier: CC-BY-4.0
 
 # Introduction
 
-A short video explaining the logic of PyPSA-Eur which is similar to PyPSA-Earth:
+PyPSA-Zambia is a power system model for Zambia built as a customisation of
+[PyPSA-Earth](https://github.com/pypsa-meets-earth/pypsa-earth). It inherits
+PyPSA-Earth's full Snakemake-managed workflow - from raw data download through
+network building, optimisation, powerful plotting capabilities and extends it with
+Zambia-specific data, modelling assumptions, and features described below.
+
+## PyPSA-Earth: the inherited framework
+
+The following video explains the underlying workflow logic using PyPSA-Eur as an
+illustration; the same logic applies to PyPSA-Zambia:
 
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
     <iframe style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" src="https://www.youtube.com/embed/ty47YU1_eeQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
@@ -48,7 +57,7 @@ The **blocks** represent the individual rules which are required to create the f
 
 ## Data Management System
 
-PyPSA-Earth has a comprehensive set of pre-compiled datasets which provides all the inputs needed to build and run an energy system model for any country of the world. A specification of modelling-ready databundles is available in `configs/bundle_config.yaml`.
+PyPSA-Zambia has a comprehensive set of pre-compiled datasets which provides all the inputs needed to build and run an energy system model for the country, some of which are inherited from PyPSA Earth. A specification of modelling-ready databundles is available in `configs/bundle_config.yaml` while some of the more Zambia specific datasets can be found in the implemented data version approach in `retrieve.smk`. More information can be found in the [data sources](../data_sources.md#managing_data_versions) section of the documentation.
 
 The datasets are available for various spatial scales, from global to national ones and can be extracted at an initial stage of running the model as described in `Installation` section. A data management system `retrieve_databundle_light` selects the databundles which matches best settings defined in the configuration file and extracts them automatically.
 
@@ -67,7 +76,7 @@ The content in this package is organized in folders as described below; for more
 
 ## License
 
-PyPSA-Earth work is released under multiple licenses:
+PyPSA-Zambia work is released under multiple licenses:
 
 - All original source code is licensed as free software under [AGPL-3.0 License](https://github.com/pypsa-meets-earth/pypsa-earth/blob/main/LICENSES).
 - The documentation is licensed under [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/).

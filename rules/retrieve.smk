@@ -178,10 +178,19 @@ if (LANDCOVER_DATASET := dataset_version("landcover", config))["source"] in ["pr
             ),
 
 
+# Fallback for configs that do not declare a custom-powerplants version:
+# record 514032 is the legacy Zambia powerplants dataset
+_custom_ppl_url = (
+    dataset_version("custom-powerplants", config)["url"]
+    if "custom-powerplants" in config.get("data", {})
+    else "sandbox.zenodo.org/records/514032/files/custom_powerplants.csv"
+)
+
+
 rule download_custom_powerplants:
     input:
         url=HTTP.remote(
-            "https://sandbox.zenodo.org/records/514032/files/custom_powerplants.csv",
+            _custom_ppl_url,
             keep_local=True,
             additional_request_string="?download=1",
         ),
@@ -280,29 +289,6 @@ if config["enable"].get("retrieve_cost_data", True):
             mem_mb=5000,
         run:
             move(input[0], output[0])
-
-
-if (HYDRO_PROFILE_DATASET := dataset_version("hydro_profile", config))["source"] in [
-    "primary",
-    "tutorial",
-]:
-
-    region = HYDRO_PROFILE_DATASET["region"]
-    source = HYDRO_PROFILE_DATASET["source"]
-
-    rule retrieve_hydro_profile:
-        message:
-            "Retrieving hydro profile dataset for {region} and {source}"
-        input:
-            hydro_profile_nc=HTTP.remote(
-                HYDRO_PROFILE_DATASET["url"],
-                keep_local=True,
-                additional_request_string="?download=1",
-            ),
-        output:
-            f"data/hydro_profiles/glofas_profile.nc",
-        run:
-            copy2(str(input[0]), output[0])
 
 
 if (NATURA_EARTH_DATASET := dataset_version("natura_earth", config))["source"] in [

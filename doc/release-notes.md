@@ -12,6 +12,8 @@ This part of documentation collects descriptive release notes to capture the mai
 
 ### New Features and Major Changes
 
+* Use separate custom powerplants datasets for dispatch validation (ERB 2023-2025 data with KGL as reservoir) and capacity expansion (IRP and proposed plants), configured via `data.custom-powerplants` in the respective config files [PR #302](https://github.com/open-energy-transition/pypsa-zambia/pull/302)
+
 ### Minor Changes and bug-fixing
 
 
@@ -49,6 +51,9 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Updated CI to support weather years greater than 2013 [PR #231](https://github.com/open-energy-transition/pypsa-zambia/pull/231)
 
+* Updated ReadMe and Docs [PR #295](https://github.com/open-energy-transition/pypsa-zambia/pull/295)
+
+* Updated Docs to include capacity expansion design [PR #304](https://github.com/open-energy-transition/pypsa-zambia/pull/304)
 * Fix affecting full reuse compliance of the project  [PR #298](https://github.com/open-energy-transition/pypsa-zambia/pull/298)
 
 * Merge latest upstream changes from PyPSA-Earth [PR #286](https://github.com/open-energy-transition/pypsa-zambia/pull/286)

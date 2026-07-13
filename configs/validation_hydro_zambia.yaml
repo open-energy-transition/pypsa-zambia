@@ -42,9 +42,6 @@ data:
   hydrobasins:
     source: build
     version: latest
-  hydro_profile:
-    source: primary
-    version: v1.0
   inflow-glofas:
     source: primary
     version: v1.0
