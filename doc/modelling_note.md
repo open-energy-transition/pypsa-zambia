@@ -83,6 +83,10 @@ Once a validation run completed, the outputs are available in `pypsa-earth-statu
 
 For more advanced analysis (e.g. checking imports and exports), a validation notebook is available in [notebooks](https://github.com/open-energy-transition/pypsa-zambia/tree/main/notebooks) folder.
 
+## Capacity Expansion
+
+Capacity expansion scenarios extend the dispatch-only run by letting the model size new generation to meet demand at future planning horizons, using cost and technology parameters calibrated to Zambia's 2023 Integrated Resource Plan (IRP).
+
 ## Capacity Expansion Validation Setup
 
 Capacity-expansion outputs are checked against Zambia's 2023 Integrated Resource Plan (IRP). A capacity expansion model has been setup using IRP assumptions summarised the [IRP scenarios scoping document](https://docs.google.com/document/d/13av6J_Yz-iMXanWeEhmLaMoAJUq39FRrF4-dA1Gn8Vs/edit?usp=sharing).
@@ -92,10 +96,6 @@ Demand in the model is adjusted to match IRP figures for each planning year. The
 Comparison is done for IRP scenarios corresponding to the following four horizons: 2025, 2030, 2040, and 2050. Comparison plots are produced via `scripts/plot_scenario_comparison.py` and saved to `results/comparison_plots/cap_exp_zambia/`.
 
 **Note:** transmission isn't covered by the comparison tooling yet. `scripts/plot_scenario_comparison.py` currently excludes lines from both the installed-capacity and investment figures, so those only reflect generation and storage. The model itself does expand transmission.
-
-## Capacity Expansion
-
-Capacity expansion scenarios extend the dispatch-only run by letting the model size new generation to meet demand at future planning horizons, using cost and technology parameters calibrated to Zambia's 2023 Integrated Resource Plan (IRP).
 
 ### Design
 
@@ -115,16 +115,6 @@ Hydro can be represented using either ERA5-derived runoff calculated by `atlite`
 **Demand and cost basis.** Demand is a DemandCast hourly profile for the selected 2023 weather year, scaled per planning year (`load_options:scale`) to match IRP Table 3's national demand projection for that year. Investment, marginal cost, FOM, lifetime, and CO2 emission factors are transcribed directly from the Zambia 2023 IRP (Table 5, Table 9, Annex 3), converted at a fixed 0.7532 EUR/USD rate.
 
 ### Results
-
-Generation mix by technology, model vs. IRP Table 12, in TWh:
-
-| Year | Hydro Storage | Hydro RoR | Solar | Wind | Coal & Oil | Biomass & Geo | Total |
-|---|---|---|---|---|---|---|---|
-| 2025/26 | 11.4 / 9.2 | 10.1 / 9.4 | 0.3 / 3.0 | 0.1 / 0.9 | 0.9 / — | — / — | 22.8 / 22.9 |
-| 2030 | 18.9 / 9.7 | 11.2 / 20.8 | 4.0 / 3.8 | 2.8 / 2.5 | 2.9 / 4.0 | 1.8 / 1.0 | 41.6 / 41.9 |
-| 2040 | 18.2 / 10.0 | 21.6 / 23.0 | 5.5 / 6.4 | 3.8 / 7.0 | 3.0 / 7.0 | 7.3 / 6.1 | 59.3 / 59.6 |
-| 2050 | 19.0 / 8.3 | 25.7 / 31.4 | 6.9 / 9.2 | 3.6 / 11.5 | 4.4 / 5.4 | 15.8 / 9.9 | 75.5 / 75.7 |
-
 *(model / IRP)*
 
 Total demand matches IRP closely at every horizon, as expected since it's calibrated to it directly. Wind is under-represented relative to the IRP throughout, and the gap grows with each horizon, while hydro storage carries a larger share of generation than the IRP assumes. These figures are from an earlier scenario run, using an earlier version of the wind/solar siting data; expect the mix to shift as the model is re-run with updated inputs.
