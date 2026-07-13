@@ -17,6 +17,9 @@ enable:
   progress_bar: false
 
 data:
+  custom-powerplants:
+    source: primary
+    version: v4
   hydrobasins:
     source: tutorial
     version: latest
