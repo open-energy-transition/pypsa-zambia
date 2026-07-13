@@ -95,7 +95,7 @@ Demand in the model is adjusted to match IRP figures for each planning year. The
 
 Comparison is done for IRP scenarios corresponding to the following four horizons: 2025, 2030, 2040, and 2050. Comparison plots are produced via `scripts/plot_scenario_comparison.py` and saved to `results/comparison_plots/cap_exp_zambia/`.
 
-**Note:** transmission isn't covered by the comparison tooling yet. `scripts/plot_scenario_comparison.py` currently excludes lines from both the installed-capacity and investment figures, so those only reflect generation and storage. The model itself does expand transmission.
+**Note:** transmission isn't covered by the comparison tooling yet. `scripts/plot_scenario_comparison.py` currently excludes lines from both the installed-capacity and investment figures, so those only reflect generation and storage. The model itself, however, does expand transmission.
 
 ### Design
 
@@ -116,6 +116,6 @@ Hydro can be represented using either ERA5-derived runoff calculated by `atlite`
 ### Results
 *(model / IRP)*
 
-Total demand matches IRP closely at every horizon, as expected since it's calibrated to it directly. Wind is under-represented relative to the IRP throughout, and the gap grows with each horizon, while hydro storage carries a larger share of generation than the IRP assumes. These figures are from an earlier scenario run, using an earlier version of the wind/solar siting data; expect the mix to shift as the model is re-run with updated inputs.
+Total demand matches IRP closely at every horizon, as expected since it's calibrated to it directly. Wind is under-represented relative to the IRP throughout, and the gap grows with each horizon, while hydro storage carries a larger share of generation than the IRP assumes. These results are from an earlier scenario run, using an earlier version of the wind/solar siting data; expect the mix to shift as the model is re-run with updated inputs.
 
 There's a separate mismatch worth flagging in the underlying capacity, independent of which run's generation numbers are used: the split between hydro storage and hydro run-of-river doesn't match IRP even where total hydro is close. The model's run-of-river capacity in 2025 is around 1,517 MW, well above the roughly 820 MW the IRP counts for existing run-of-river plants plus the committed Kafue Gorge Lower project. This looks like a difference in how individual plants are classified between the two datasets rather than a resource or siting issue, and hasn't been investigated further yet.
