@@ -85,11 +85,11 @@ For more advanced analysis (e.g. checking imports and exports), a validation not
 
 ## Capacity Expansion Validation Setup
 
-Capacity-expansion outputs are checked against Zambia's 2023 Integrated Resource Plan (IRP), using the [IRP scenarios scoping document](https://docs.google.com/document/d/13av6J_Yz-iMXanWeEhmLaMoAJUq39FRrF4-dA1Gn8Vs/edit?usp=sharing).
+Capacity-expansion outputs are checked against Zambia's 2023 Integrated Resource Plan (IRP). A capacity expansion model has been setup using IRP assumptions summarised the [IRP scenarios scoping document](https://docs.google.com/document/d/13av6J_Yz-iMXanWeEhmLaMoAJUq39FRrF4-dA1Gn8Vs/edit?usp=sharing).
 
-Demand and costs in the model are already set to match IRP figures for each planning year. The validation is in what the model chooses to build and generate given those inputs, compared against the IRP's own plan for the same years: installed capacity by technology, generation mix, investment in generation and transmission, transmission capacity, and emissions.
+Demand in the model is adjusted to match IRP figures for each planning year. The validation includes against the IRP's own plan for the same years for installed capacity by technology, generation mix, investment in generation and transmission, transmission capacity, and emissions.
 
-Comparison is done at four horizons - 2025, 2030, 2040, and 2050. Comparison plots are produced via `scripts/plot_scenario_comparison.py` and saved to `results/comparison_plots/cap_exp_zambia/`.
+Comparison is done for IRP scenarios corresponding to the following four horizons: 2025, 2030, 2040, and 2050. Comparison plots are produced via `scripts/plot_scenario_comparison.py` and saved to `results/comparison_plots/cap_exp_zambia/`.
 
 **Note:** transmission isn't covered by the comparison tooling yet. `scripts/plot_scenario_comparison.py` currently excludes lines from both the installed-capacity and investment figures, so those only reflect generation and storage. The model itself does expand transmission.
 
@@ -99,21 +99,20 @@ Capacity expansion scenarios extend the dispatch-only run by letting the model s
 
 ### Design
 
-**What can be expanded.** Only solar and onshore wind can be newly built by the model. Hydro, coal, oil, biomass, and geothermal capacities are fixed in each planning-year snapshot: whatever is scheduled to be in service that year (based on commissioning/decommissioning dates in the powerplants data) is what the model has to work with, and the optimizer only decides how much solar and wind to add on top.
+**What can be expanded.** Only solar and onshore wind can be newly built by the model. Hydro, coal, oil, biomass, and geothermal capacities are fixed in each planning-year snapshot: whatever is scheduled to be in service that year (based on commissioning/decommissioning dates in the powerplants data) is what the model has to work with, and the optimizer only decides how to dispatch the available capacity, and how much solar and wind to add on top.
 
 Solar and wind siting is currently based on general land-cover suitability across the whole country, with no per-region cap and no restriction to specific sites. The IRP instead limits wind to a set of measured candidate sites and caps additions at 1,000 MW per region per planning period.
 
 Without those limits, the model can build wind capacity far beyond what's realistic, at very low realized capacity factors.
 
-**Four independent planning-year snapshots.** `configs/scenarios_zambia/config.cap_exp_zambia_{2025,2030,2040,2050}.yaml` each merge on top of the shared `cap_exp_zambia_base.yaml` and are solved as fully independent optimizations - there is no myopic/multi-horizon linkage between them. A generator built in the 2040 run has no bearing on 2050; each year re-derives its own fixed fleet, demand level, and solar/wind buildout from scratch. This means that capacity trajectories between horizons are not guaranteed to be monotonic.
+**Four independent planning-year snapshots.** `configs/scenarios_zambia/config.cap_exp_zambia_{2025,2030,2040,2050}.yaml` each merge on top of the shared `cap_exp_zambia_base.yaml` and are solved as an overnight optimisation. A generator built in the 2040 run has no bearing on 2050 and each year obtains its own fixed fleet, demand level, and solar/wind buildout from scratch. This means that capacity trajectories between horizons are not meant to be monotonic.
 
-**Weather and hydro conditions.** All four planning years are solved against the same single weather year - ERA5 `cutout-{year}-era5`, hourly, within a given year e.g `2023-01-01` to `2024-01-01`.
+**Weather and hydro conditions.** All four planning years are solved against the same single weather year using ERA5-originated weather archive `cutout-{year}-era5` in hourly resolution.
 
-Hydro specifically is non-extendable in every scenario, normalized via the IRENA method against 2023 generation statistics with a uniform multiplier of 2.19, and drawn from the same `{year}` ERA5 cutout as solar/wind.
+Hydro can be represented using either ERA5-derived runoff calculated by `atlite` procedure, or a novel method based of GloFAS data. Expansion of hydro is currently accounted for by considering development plans for installed hydro generation capacity.
 
-Solar and wind use `correction_factor` 0.93 and 0.83 respectively (empirical de-rating of the raw ERA5-derived profile), and siting eligibility is computed with a `simple` land-use potential method.
 
-**Demand and cost basis.** Demand is a DemandCast hourly profile for the 2023 weather year, scaled per planning year (`load_options:scale`) to match IRP Table 3's national demand projection for that year (e.g. 2030: scale 2.64 against IRP's 41,925 GWh vs. DemandCast's unscaled 15,909 GWh base). Investment, marginal cost, FOM, lifetime, and CO2 emission factors are transcribed directly from the Zambia 2023 IRP (Table 5, Table 9, Annex 3), converted at a fixed 0.7532 EUR/USD rate, with `costs.year` set per scenario.
+**Demand and cost basis.** Demand is a DemandCast hourly profile for the selected 2023 weather year, scaled per planning year (`load_options:scale`) to match IRP Table 3's national demand projection for that year. Investment, marginal cost, FOM, lifetime, and CO2 emission factors are transcribed directly from the Zambia 2023 IRP (Table 5, Table 9, Annex 3), converted at a fixed 0.7532 EUR/USD rate.
 
 ### Results
 
