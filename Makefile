@@ -18,15 +18,14 @@ zambia_clean:
 	snakemake -c4 solve_all_networks --delete-all-output --configfile config.tutorial.yaml test/config.zm_cap_exp.yaml
 test:
 	set -e
-	# this runs the tutorial config applying a run name on top
-	snakemake solve_all_networks -call --configfile config.tutorial.yaml test/config.tutorial.test.yaml
+	# this runs test scenario in test/config.test.yaml
+	snakemake solve_all_networks -call --configfile config.tutorial.yaml test/config.test.yaml
 	# add custom config to tutorial config
-	snakemake solve_all_networks -call --configfile config.tutorial.yaml test/config.custom.yaml
-	snakemake solve_all_networks -call --configfile config.tutorial.yaml configs/scenarios/config.NG.yaml
 	snakemake solve_all_networks_monte -call --configfile config.tutorial.yaml test/config.monte_carlo.yaml
-	snakemake solve_all_networks -call --configfile config.tutorial.yaml test/config.landlock.yaml
 	snakemake -c4 solve_sector_networks --configfile config.tutorial.yaml test/config.sector.yaml
 	snakemake -c4 solve_sector_networks_myopic --configfile config.tutorial.yaml test/config.myopic.yaml
+	snakemake solve_all_networks -call --configfile config.tutorial.yaml test/config.custom.yaml
+	snakemake solve_all_networks -call --configfile config.tutorial.yaml test/config.landlock.yaml
 	echo "All tests completed successfully."
 
 setup:

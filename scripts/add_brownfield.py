@@ -190,6 +190,7 @@ def disable_grid_expansion_if_limit_hit(n: pypsa.Network) -> None:
                 n.global_constraints.drop(name, inplace=True)
 
 
+# from _helpers import read_csv_nafix
 # def adjust_renewable_profiles(n, input_profiles, params, year):
 #     """
 #     Adjusts renewable profiles according to the renewable technology specified,
@@ -197,8 +198,8 @@ def disable_grid_expansion_if_limit_hit(n: pypsa.Network) -> None:
 #     """
 
 #     # spatial clustering
-#     cluster_busmap = pd.read_csv(snakemake.input.cluster_busmap, index_col=0).squeeze()
-#     simplify_busmap = pd.read_csv(
+#     cluster_busmap = read_csv_nafix(snakemake.input.cluster_busmap, index_col=0).squeeze()
+#     simplify_busmap = read_csv_nafix(
 #         snakemake.input.simplify_busmap, index_col=0
 #     ).squeeze()
 #     clustermaps = simplify_busmap.map(cluster_busmap)

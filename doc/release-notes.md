@@ -56,6 +56,8 @@ This part of documentation collects descriptive release notes to capture the mai
 * Updated Docs to include capacity expansion design [PR #304](https://github.com/open-energy-transition/pypsa-zambia/pull/304)
 * Fix affecting full reuse compliance of the project  [PR #298](https://github.com/open-energy-transition/pypsa-zambia/pull/298)
 
+* Merge latest upstream changes from PyPSA-Earth [PR #286](https://github.com/open-energy-transition/pypsa-zambia/pull/286)
+
 # PyPSA-Zambia v0.3
 
 ## New Features and Major Changes
@@ -135,7 +137,13 @@ This part of documentation collects descriptive release notes to capture the mai
 
 ## New Features and Major Changes from upstream
 
-* Attach wind and solar generators using real positions from `powerplants.csv` instead of using redistribution according to the population [PR #1622](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1622)
+* Add pixi as an alternative package manager for environment and dependency management, alongside the existing conda-based setup. [PR #1789](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1789)
+
+* Advance CI: add docs and lint workflows, skip test CI for doc-only PRs [PR #1790](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1790)
+
+* Add ammonia industry explicitly [PR #1783](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1783)
+
+* Attach wind and solar generators using real positions from `powerplants.csv` instead of using redistribution according to the population `PR #1622 <https://github.com/pypsa-meets-earth/pypsa-earth/pull/1622>`__
 
 * Revise implementation of myopic optimization [PR #1722](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1722)
 
@@ -158,6 +166,20 @@ This part of documentation collects descriptive release notes to capture the mai
 * Integrate DemandCast dataset for electricity demand [PR #1725](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1725)
 
 **Minor Changes and bug-fixing**
+
+* Replace deprecated UNCTAD urban population download endpoint in `prepare_urban_percent.py` [PR #1881](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1881)
+
+* Remove unused `add_extendable_generators` function in `add_electricity.py` script [PR #1854](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1854)
+
+* Adjusted the code to be more robust [#1812](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1812)
+
+* Avoid crash in `add_chp_constraints` when the network has no links, supporting operational models without brownfield/expandable batteries, pumped storage, or DC links [#1750](https://github.com/pypsa-meets-earth/pypsa-earth/issues/1750)
+
+* Add error when emission_extractor fails [PR #1856](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1856)
+
+* Generalize the hard-coded legacy name `africa_shape` [PR #1848](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1848)
+
+* Reduce execution time of CI tests [PR #1819](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1819)
 
 * Avoid crash in `build_osm_network` when merging substations with the same `station_id` if `tag_substation` or `symbol` contains missing OSM metadata [PR #1818](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1818)
 
@@ -224,6 +246,12 @@ This part of documentation collects descriptive release notes to capture the mai
 * Make checking the need for exclusion rasters more explicit [PR #1755](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1755)
 
 * Dissolve geometries with duplicated GADM IDs, typical of regions with contested regions [PR #1759](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1759)
+
+* Update contribution guide [PR #1803](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1803)
+
+* Fix residual issues with the scaling of H2 demand for export [PR #1692](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1692)
+
+* Add module-level and missing function docstrings and type hints to `scripts/_helpers.py` [PR #1857](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1857)
 
 # PyPSA-Earth 0.8.0
 
@@ -535,6 +563,7 @@ This part of documentation collects descriptive release notes to capture the mai
 * Fixed problematic float parsing (`_parse_float`) in `clean_osm_data.py` to make sure all OSM lines are correctly accounted for [PR #1089](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1089)
 * Fix minor bug for advanced csp implementation [PR #1076](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1076)
 * Fix minor bug in `build_powerplants.py` where the gas technology assignment incorrectly introduced NaN values for all powerplant technologies. [PR #1102](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1102)
+* Add Ghana-specific config file supplemented by an exception in `.gitignore` [PR #1861](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1861)
 
 # PyPSA-Earth 0.4.0
 

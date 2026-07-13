@@ -61,6 +61,8 @@ playground/
 
 # Specific configuration files
 configs/scenarios/config.*.yaml
+# TODO Mind conflict resolution
+!configs/scenarios/config.GH.yaml
 !configs/scenarios/config.NG.yaml
 
 # VS Code-related files
@@ -75,6 +77,7 @@ screenlog*
 # Exclude specific file paths
 !data/demand/unsd/paths/Energy_Statistics_Database.xlsx
 site/
+!data/industry/ammonia_plants.csv
 doc/img/gen_*.svg
 Zambia_validation.ipynb
 regression_pypsa_zambia.ipynb
