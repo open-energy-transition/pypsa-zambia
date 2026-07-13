@@ -103,7 +103,6 @@ Comparison is done for IRP scenarios corresponding to the following four horizon
 
 Solar and wind siting is currently based on general land-cover suitability across the whole country, with no per-region cap and no restriction to specific sites. The IRP instead limits wind to a set of measured candidate sites and caps additions at 1,000 MW per region per planning period.
 
-Without those limits, the model can build wind capacity far beyond what's realistic, at very low realized capacity factors.
 
 **Four independent planning-year snapshots.** `configs/scenarios_zambia/config.cap_exp_zambia_{2025,2030,2040,2050}.yaml` each merge on top of the shared `cap_exp_zambia_base.yaml` and are solved as an overnight optimisation. A generator built in the 2040 run has no bearing on 2050 and each year obtains its own fixed fleet, demand level, and solar/wind buildout from scratch. This means that capacity trajectories between horizons are not meant to be monotonic.
 
