@@ -16,6 +16,8 @@ This part of documentation collects descriptive release notes to capture the mai
 
 ### Minor Changes and bug-fixing
 
+* Added link to download PyPSA APP to docs [PR #319](https://github.com/open-energy-transition/pypsa-zambia/pull/319)
+
 
 # PyPSA-Zambia v0.4
 
