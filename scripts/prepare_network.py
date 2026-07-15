@@ -464,10 +464,12 @@ if __name__ == "__main__":
     sanitize_carriers(n, snakemake.config)
     sanitize_locations(n)
     if snakemake.config["validation"]["interconnectors"]["enable"]:
+        snapshot_year = n.snapshots[0].year
         power_pool_countries, power_pool_links, substations = load_interconnector_data(
             snakemake.input.power_pool_countries,
             snakemake.input.power_pool_links,
             snakemake.input.substations,
+            year=snapshot_year,
         )
 
         n = add_interconnectors(

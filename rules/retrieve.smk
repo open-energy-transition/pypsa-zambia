@@ -215,7 +215,7 @@ rule download_interconnection_data:
             additional_request_string="?download=1",
         ),
         countries=HTTP.remote(
-            "https://sandbox.zenodo.org/records/471583/files/sapp_countries.csv",
+            "https://sandbox.zenodo.org/records/565480/files/sapp_countries.csv",
             keep_local=True,
             additional_request_string="?download=1",
         ),
@@ -234,8 +234,9 @@ rule download_interconnection_data:
 rule download_line_types:
     input:
         url=HTTP.remote(
-            "https://sandbox.zenodo.org/records/473405/files/pypsa_line_types%20%281%29.csv",
+            "https://sandbox.zenodo.org/records/565480/files/line_types.csv",
             keep_local=True,
+            additional_request_string="?download=1",
         ),
     output:
         "data/line_types.csv",

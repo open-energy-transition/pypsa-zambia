@@ -70,10 +70,30 @@ def annual_gwh_to_average_mw(energy_gwh, hours_per_year=8760):
     return energy_gwh * 1000 / hours_per_year
 
 
-def load_interconnector_data(countries_path, links_path, substations_path):
-    """Load interconnector input data from CSV files."""
+def load_interconnector_data(countries_path, links_path, substations_path, year=None):
+    """Load interconnector input data from CSV files.
+
+    If sapp_countries.csv contains a 'year' column, the row set matching
+    *year* is selected.  When *year* is None or not present in the data the
+    most recent available year is used as a fallback.
+    """
+    countries = pd.read_csv(countries_path)
+
+    if "year" in countries.columns:
+        available_years = sorted(countries["year"].unique())
+        if year is not None and year in available_years:
+            selected_year = year
+        else:
+            selected_year = available_years[-1]
+            if year is not None:
+                logger.warning(
+                    f"No trade data for year {year} in {countries_path}; "
+                    f"falling back to {selected_year}."
+                )
+        countries = countries[countries["year"] == selected_year].drop(columns=["year"])
+
     return (
-        pd.read_csv(countries_path),
+        countries,
         pd.read_csv(links_path),
         pd.read_csv(substations_path),
     )
