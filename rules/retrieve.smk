@@ -234,9 +234,8 @@ rule download_interconnection_data:
 rule download_line_types:
     input:
         url=HTTP.remote(
-            "https://sandbox.zenodo.org/records/565480/files/line_types.csv",
+            "https://sandbox.zenodo.org/records/473405/files/pypsa_line_types%20%281%29.csv",
             keep_local=True,
-            additional_request_string="?download=1",
         ),
     output:
         "data/line_types.csv",
