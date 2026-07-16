@@ -16,6 +16,8 @@ This part of documentation collects descriptive release notes to capture the mai
 
 ### Minor Changes and bug-fixing
 
+* Added link to download PyPSA APP to docs [PR #319](https://github.com/open-energy-transition/pypsa-zambia/pull/319)
+
 
 # PyPSA-Zambia v0.4
 
@@ -23,7 +25,7 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Enable expansion of biomass generators considering realistic regional values of biomass potential [PR #220](https://github.com/open-energy-transition/pypsa-zambia/pull/220)
 
-* Priority dispatch for existing thermal plants to reflect actual ZESCO operations [PR #280](https://github.com/open-energy-transition/pypsa-zambia/pull/280)
+* Priority dispatch for existing thermal plants to reflect IRP assumptions [PR #280](https://github.com/open-energy-transition/pypsa-zambia/pull/280)
 
 * Add cross-scenario comparison plots functionality to allow for comparison across scenario runs [PR #276](https://github.com/open-energy-transition/pypsa-zambia/pull/276)
 
