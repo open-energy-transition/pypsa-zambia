@@ -215,7 +215,7 @@ rule download_interconnection_data:
             additional_request_string="?download=1",
         ),
         countries=HTTP.remote(
-            "https://sandbox.zenodo.org/records/471583/files/sapp_countries.csv",
+            "https://sandbox.zenodo.org/records/565480/files/sapp_countries.csv",
             keep_local=True,
             additional_request_string="?download=1",
         ),
