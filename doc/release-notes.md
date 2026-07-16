@@ -18,6 +18,8 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Added link to download PyPSA APP to docs [PR #319](https://github.com/open-energy-transition/pypsa-zambia/pull/319)
 
+* Fixed bug whereby docs page was not included into nav tree of readthedocs [PR #328](https://github.com/open-energy-transition/pypsa-zambia/pull/328)
+
 
 # PyPSA-Zambia v0.4
 
