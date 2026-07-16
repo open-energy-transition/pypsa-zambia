@@ -80,17 +80,15 @@ def load_interconnector_data(countries_path, links_path, substations_path, year=
     countries = pd.read_csv(countries_path)
 
     if "year" in countries.columns:
-        available_years = sorted(countries["year"].unique())
-        if year is not None and year in available_years:
-            selected_year = year
-        else:
-            selected_year = available_years[-1]
+        available_years = countries["year"].unique()
+        if year is None or year not in available_years:
             if year is not None:
                 logger.warning(
                     f"No trade data for year {year} in {countries_path}; "
-                    f"falling back to {selected_year}."
+                    f"falling back to {available_years.max()}."
                 )
-        countries = countries[countries["year"] == selected_year].drop(columns=["year"])
+            year = available_years.max()
+        countries = countries[countries["year"] == year].drop(columns=["year"])
 
     return (
         countries,

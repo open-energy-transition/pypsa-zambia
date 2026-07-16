@@ -464,7 +464,13 @@ if __name__ == "__main__":
     sanitize_carriers(n, snakemake.config)
     sanitize_locations(n)
     if snakemake.config["validation"]["interconnectors"]["enable"]:
-        snapshot_year = n.snapshots[0].year
+        snapshot_years = n.snapshots.year.unique()
+        if len(snapshot_years) > 1:
+            logger.warning(
+                f"Snapshots span multiple years {sorted(snapshot_years)}; "
+                f"using {snapshot_years.min()} for trade data selection."
+            )
+        snapshot_year = int(snapshot_years.min())
         power_pool_countries, power_pool_links, substations = load_interconnector_data(
             snakemake.input.power_pool_countries,
             snakemake.input.power_pool_links,

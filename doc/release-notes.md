@@ -14,7 +14,10 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Use separate custom powerplants datasets for dispatch validation (ERB 2023-2025 data with KGL as reservoir) and capacity expansion (IRP and proposed plants), configured via `data.custom-powerplants` in the respective config files [PR #302](https://github.com/open-energy-transition/pypsa-zambia/pull/302)
 
+
 ### Minor Changes and bug-fixing
+
+* Correct SAPP cross-border trade values to match ERB Energy Sector Report data. The `sapp_countries.csv` is now filtered by snapshot year automatically[PR #320](https://github.com/open-energy-transition/pypsa-zambia/pull/320)
 
 
 # PyPSA-Zambia v0.4

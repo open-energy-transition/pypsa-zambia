@@ -19,3 +19,4 @@ inflow-glofas,v1.0,primary,latest supported,zm,2024,2026-06-11,Zambia Inflow,zen
 inflow-glofas,v1.0,primary,latest supported,zm,2025,2026-06-11,Zambia Inflow,zenodo.org/records/19740377/files/zm-2025-glofas.nc
 custom-powerplants,v4,primary,supported,zm,,2026-07-08,Zambia dispatch validation power plants (ERB 2023-2025 data; KGL as reservoir),sandbox.zenodo.org/records/499641/files/custom_powerplants.csv
 custom-powerplants,v6,primary,supported,zm,,2026-07-08,Zambia capacity expansion power plants (IRP + proposed plants),sandbox.zenodo.org/records/537704/files/custom_powerplants.csv
+sapp-countries,v1,primary,latest supported,zm,,2026-07-16,SAPP year-indexed trade data (ERB ESR 2020-2025),sandbox.zenodo.org/records/565480/files/sapp_countries.csv
