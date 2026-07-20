@@ -98,6 +98,13 @@ electricity:
   renewable_carriers: [solar, onwind, hydro]
   estimate_renewable_capacities:
     stats: false # wind and solar generation provided by the custom powerplants file
+  existing_thermal_dispatch:
+    enable: true
+    base_year: 2024
+    carriers: [coal, oil]
+    plant_factors:
+      coal: 0.6557
+      oil: 0.6187
   operational_reserve:
     activate: false
 lines:

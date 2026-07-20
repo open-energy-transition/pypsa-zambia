@@ -783,6 +783,7 @@ def attach_conventional_generators(
             n,
             base_year=thermal_config["base_year"],
             carriers=thermal_config["carriers"],
+            plant_factors=thermal_config.get("plant_factors"),
         )
 
     # Add extendable conventional generators

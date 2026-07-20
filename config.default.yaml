@@ -227,6 +227,9 @@ electricity:
     enable: false
     base_year: 2025
     carriers: [coal, oil]
+    plant_factors:
+      coal: 0.6557
+      oil: 0.6187
 
   conventional_carriers: [nuclear, oil, OCGT, CCGT, coal, lignite, geothermal, biomass]
   renewable_carriers: [solar, onwind, offwind-ac, offwind-dc, hydro]
