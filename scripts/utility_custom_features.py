@@ -484,7 +484,8 @@ def build_mining_raster(
     return output_path
 
 
-def set_existing_thermal_zero_mc(n, base_year, carriers):
+def set_existing_thermal_zero_mc(n, base_year, carriers, plant_factors=None):
+    """Force-dispatch existing thermal plants and optionally cap their output."""
     mask = (
         n.generators.carrier.isin(carriers)
         & ~n.generators.p_nom_extendable
@@ -492,6 +493,13 @@ def set_existing_thermal_zero_mc(n, base_year, carriers):
     )
     n.generators.loc[mask, "marginal_cost"] = 0.0
     logger.info(f"Zero marginal cost applied to: {n.generators.index[mask].tolist()}")
+
+    for carrier, factor in (plant_factors or {}).items():
+        carrier_mask = mask & (n.generators.carrier == carrier)
+        n.generators.loc[carrier_mask, "p_max_pu"] = factor
+        logger.info(
+            f"Plant factor {factor:.0%} applied to: {n.generators.index[carrier_mask].tolist()}"
+        )
 
 
 def apply_capital_cost_overrides(costs, config):
