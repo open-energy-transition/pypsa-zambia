@@ -412,8 +412,10 @@ if __name__ == "__main__":
 
     tech_colors = snakemake.config["plotting"]["tech_colors"]
     results_dir = snakemake.params.results_dir
-    sc_cfg = snakemake.config.get("plotting", {}).get("scenario_comparison", {})
-    # Exact run.name values to compare; defined in plotting.scenario_comparison.scenario_filter.
+    scenario_group = snakemake.wildcards.scenario_group
+    all_groups = snakemake.config.get("plotting", {}).get("scenario_comparison", {})
+    sc_cfg = all_groups.get(scenario_group, {})
+    # Exact run.name values to compare; defined in plotting.scenario_comparison.<group>.scenario_filter.
     scenario_filter = sc_cfg.get("scenario_filter", [])
     label_map = sc_cfg.get("label_map", None)
     exclude_carriers = sc_cfg.get("exclude_carriers", [])
