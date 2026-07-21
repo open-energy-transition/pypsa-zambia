@@ -123,17 +123,18 @@ def extract_capacity(n, exclude_carriers=None):
     Covers generators, storage units, links and stores. Passive transmission
     branches (Line) are excluded as their capacity has different physical sense
     as compared with generation and storages, and is not comparable
-    with them. Power components are in MW → GW; energy stores
-    (e_nom_opt) are in MWh → GWh.
+    with them. Cross-border interconnector Links (carrier "AC") are excluded
+    for the same reason — they carry transfer capacity, not generation
+    capacity, and can otherwise dwarf the rest of the stack (e.g. validation
+    runs with interconnectors enabled). Power components are in MW → GW;
+    energy stores (e_nom_opt) are in MWh → GWh.
     """
     exclude = set(exclude_carriers or [])
     nice = carrier_nice_names(n)
-    result = _by_carrier(
-        n.statistics.optimal_capacity(groupby=get_carrier, nice_names=False).drop(
-            "Line", level="component", errors="ignore"
-        ),
-        exclude,
-    )
+    stats = n.statistics.optimal_capacity(groupby=get_carrier, nice_names=False)
+    stats = stats.drop("Line", level="component", errors="ignore")
+    stats = stats.drop(("Link", "AC"), errors="ignore")
+    result = _by_carrier(stats, exclude)
     result.index = result.index.map(nice)
     return result.groupby(level=0).sum() / 1e3
 
