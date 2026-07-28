@@ -671,8 +671,7 @@ capacity expansion base configs and must be enabled explicitly.
 
 In capacity expansion runs, existing coal and oil plants would normally compete
 against cheaper renewables on marginal cost, potentially being left largely idle.
-In practice ZESCO operates these plants as baseload assets - their capital costs
-are sunk and they are needed to hedge against hydro shortfalls.
+In practice it is possible to operate these plants as baseload assets - their capital costs are sunk and they are needed to hedge against hydro shortfalls.
 
 The `existing_thermal_dispatch` feature replicates this by setting marginal cost
 to zero for qualifying thermal plants, ensuring the optimiser always dispatches
