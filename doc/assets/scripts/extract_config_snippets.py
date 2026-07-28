@@ -78,6 +78,7 @@ def main():
         "load_options": ["load_options"],
         "co2budget": ["co2_budget"],
         "electricity": ["electricity"],
+        "existing_thermal_dispatch": ["electricity", "existing_thermal_dispatch"],
         "lines": ["lines"],
         "links": ["links"],
         "transformers": ["transformers"],
