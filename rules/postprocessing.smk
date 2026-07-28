@@ -2,6 +2,37 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 
+rule build_reference_generation:
+    """Aggregates historical ZESCO/IPP generation datasets by PyPSA fuel.
+
+    Consumed by _compare_scenarios_group for groups that opt in via
+    plotting.scenario_comparison.<group>.reference_data: [generation].
+    """
+    input:
+        ipp="data/validation/ipp_generation.csv",
+        diesel="data/validation/zesco_diesel_generation.csv",
+        large_hydro="data/validation/zesco_large_hydro_generation.csv",
+        mini_hydro="data/validation/zesco_mini_hydro_generation.csv",
+        fuel_mapping="data/source_to_pypsa_fuels_mapping.csv",
+    output:
+        "resources/validation/reference_generation_by_fuel.csv",
+    log:
+        "logs/build_reference_generation.log",
+    script:
+        "../scripts/build_reference_generation.py"
+
+
+def _compare_scenarios_group_reference_inputs(wildcards):
+    """Only require the reference-generation resource for groups that opt in."""
+    groups = config.get("plotting", {}).get("scenario_comparison", {})
+    reference_data = groups.get(wildcards.scenario_group, {}).get("reference_data", [])
+    if "generation" in reference_data:
+        return {
+            "reference_generation": "resources/validation/reference_generation_by_fuel.csv"
+        }
+    return {}
+
+
 rule compare_scenarios:
     """Builds every comparison group defined under plotting.scenario_comparison.
 
@@ -25,6 +56,8 @@ rule _compare_scenarios_group:
     where <scenario_group> is a key under plotting.scenario_comparison in the run
     config. Scenarios to compare are defined by that group's scenario_filter.
     """
+    input:
+        unpack(_compare_scenarios_group_reference_inputs),
     params:
         results_dir="results/",
     output:

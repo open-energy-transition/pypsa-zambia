@@ -181,6 +181,12 @@ plotting:
       - "validation_dispatch_zambia_2024"
       exclude_carriers:
       - "load shedding"
+      # Historical reference datasets to overlay next to each scenario's bar.
+      # Each entry here must be handled by plot_scenario_comparison.py; the
+      # calendar year is taken from the trailing _YYYY in each scenario_filter
+      # entry above. Currently only "generation" is supported.
+      reference_data:
+      - generation
 
 solving:
   solver:

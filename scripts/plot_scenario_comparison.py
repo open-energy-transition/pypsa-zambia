@@ -11,6 +11,7 @@ Outputs go to the directory defined by snakemake.output[0].
 """
 
 import os
+import re
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -19,6 +20,19 @@ from _helpers import configure_logging, create_logger
 from pypsa.statistics import get_carrier
 
 logger = create_logger(__name__)
+
+# Maps data/source_to_pypsa_fuels_mapping.csv "pypsa" fuel labels (as produced
+# by build_reference_generation.py) to the same display names used for model
+# carriers (n.carriers.nice_name), so reference bars share stacking/colors
+# with the model bars they sit next to.
+REFERENCE_FUEL_NICE_NAMES = {
+    "reservoir and dam": "Reservoir & Dam",
+    "run of river": "Run of River",
+    "solar": "Solar",
+    "coal": "Coal",
+    "oil": "Oil",
+    "biomass": "Biomass",
+}
 
 # Preferred stack order uses n.carriers.nice_name values.
 # Carriers not listed here are appended at the end.
@@ -110,6 +124,28 @@ def clean_scenario_label(label, label_map=None):
     The raw folder name is returned unchanged when no entry exists.
     """
     return (label_map or {}).get(label, label)
+
+
+def resolve_reference_year(run_name):
+    """Extract a calendar year from a trailing _YYYY in a run.name, if any."""
+    match = re.search(r"_(\d{4})$", run_name)
+    return int(match.group(1)) if match else None
+
+
+def load_reference_generation(path, year):
+    """Annual generation by display-name carrier [TWh] for one calendar year.
+
+    Reads the long-format output of build_reference_generation.py
+    (columns: year, fuel, generation_gwh) and converts GWh to TWh to match
+    extract_generation's units.
+    """
+    ref = pd.read_csv(path)
+    ref = ref[ref["year"] == year]
+    if ref.empty:
+        return pd.Series(dtype=float)
+    s = ref.set_index("fuel")["generation_gwh"] / 1e3
+    s.index = s.index.map(lambda f: REFERENCE_FUEL_NICE_NAMES.get(f, f))
+    return s.groupby(level=0).sum()
 
 
 def _by_carrier(s, exclude):
@@ -327,6 +363,8 @@ def run_comparison(
     scenario_filter,
     label_map=None,
     exclude_carriers=None,
+    reference_data=None,
+    reference_generation_path=None,
 ):
     networks = find_scenario_networks(results_dir, scenario_filter)
     if not networks:
@@ -345,18 +383,48 @@ def run_comparison(
         )
     )
 
-    if label_map:
-        # label_map insertion order defines the x-axis scenario order; define
-        # the mapping once and get ordering without a separate param.
-        preferred = list(label_map.values())
-        cols = [c for c in preferred if c in capacity_df.columns] + [
-            c for c in capacity_df.columns if c not in preferred
-        ]
-        capacity_df = capacity_df[cols]
-        generation_df = generation_df[cols]
-        investment_df = investment_df[cols]
-        co2_df = co2_df[cols]
-        demand_s = demand_s.reindex(cols)
+    # scenario_filter order defines the x-axis order for every chart.
+    labels = [
+        clean_scenario_label(name, label_map=label_map) for name in scenario_filter
+    ]
+    cols = [c for c in labels if c in capacity_df.columns]
+    capacity_df = capacity_df[cols]
+    generation_df = generation_df[cols]
+    investment_df = investment_df[cols]
+    co2_df = co2_df[cols]
+    demand_s = demand_s.reindex(cols)
+
+    if "generation" in (reference_data or []) and reference_generation_path:
+        gen_order = []
+        reference_cols = {}
+        for raw_name, short in zip(scenario_filter, labels):
+            if short not in generation_df.columns:
+                continue
+            gen_order.append(short)
+            year = resolve_reference_year(raw_name)
+            if year is None:
+                logger.warning(
+                    "Could not resolve a reference year from run.name %r; "
+                    "skipping reference overlay for this scenario.",
+                    raw_name,
+                )
+                continue
+            ref_series = load_reference_generation(reference_generation_path, year)
+            if ref_series.empty:
+                logger.warning(
+                    "No reference generation data for year %d (scenario %s)",
+                    year,
+                    raw_name,
+                )
+                continue
+            ref_label = f"Actual {year}"
+            reference_cols[ref_label] = ref_series
+            gen_order.append(ref_label)
+
+        if reference_cols:
+            ref_df = pd.DataFrame(reference_cols)
+            generation_df = pd.concat([generation_df, ref_df], axis=1).fillna(0)
+            generation_df = generation_df[gen_order]
 
     if not capacity_df.empty:
         plot_stacked_bar(
@@ -420,6 +488,8 @@ if __name__ == "__main__":
     scenario_filter = sc_cfg.get("scenario_filter", [])
     label_map = sc_cfg.get("label_map", None)
     exclude_carriers = sc_cfg.get("exclude_carriers", [])
+    reference_data = sc_cfg.get("reference_data", [])
+    reference_generation_path = getattr(snakemake.input, "reference_generation", None)
 
     run_comparison(
         results_dir=results_dir,
@@ -428,4 +498,6 @@ if __name__ == "__main__":
         scenario_filter=scenario_filter,
         label_map=label_map,
         exclude_carriers=exclude_carriers,
+        reference_data=reference_data,
+        reference_generation_path=reference_generation_path,
     )
