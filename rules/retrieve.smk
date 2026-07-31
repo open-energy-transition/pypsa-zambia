@@ -26,8 +26,7 @@ else:
 
 
 if (HYDROBASINS_DATASET := dataset_version("hydrobasins", config))["source"] in [
-    "build",
-    "tutorial",
+    "build"
 ]:
 
     """
@@ -368,6 +367,7 @@ if (ZM_BIOMASS := dataset_version("zm-biomass", config))["source"] in [
 
 if (INFLOW_GLOFAS := dataset_version("inflow-glofas", config))["source"] in [
     "primary",
+    "tutorial",
 ]:
     year = int(float(INFLOW_GLOFAS["year"]))
     region = INFLOW_GLOFAS["region"]

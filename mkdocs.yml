@@ -42,6 +42,7 @@ nav:
   - Structure: user-guide/structure.md
   - Data Workflow: user-guide/data-workflow.md
   - Configuration: user-guide/configuration.md
+  - Modelling Notes: modelling_note.md
   - Wildcards: user-guide/wildcards.md
   - Costs: user-guide/costs.md
   - Custom Data Integration: user-guide/custom-data.md

@@ -77,7 +77,7 @@ validation:
   biomass:
     download_data: true
 
-cluster_options:
+clustering:
   simplify_network:
     p_threshold_drop_isolated: 100  # MW — drop isolated subnetworks with load below this threshold
 
@@ -89,8 +89,6 @@ electricity:
     StorageUnit: []
     Store: []
     Link: []
-  automatic_emission: false
-  automatic_emission_base_year: 1990 # 1990 is taken as default. Any year from 1970 to 2018 can be selected.
   powerplants_filter: (DateOut >= 2024 or DateOut != DateOut) and (DateIn <= 2024 or DateIn != DateIn)
   custom_powerplants: replace # set to "merge" or "replace" if you have a custom_powerplants.csv for Zambia
   disaggregate_powerplants: false # to enable disaggregation also in simplify_network, a set of excluded carries must be specified
@@ -155,6 +153,14 @@ costs:
     nuclear: 50
     csp-tower: 25
     oil: 30
+
+co2:
+  limit: 7.75e+7     # annual cap [tCO2/year]; European default — adjust for your region; active via Co2L wildcard
+  base: 1.487e+9     # baseline emissions used for relative reduction targets; European default
+  emission_price: 0. # [currency/tCO2]; active via Ep wildcard
+  automatic_emission: # derive co2.limit from historical emission data instead of the value above
+    enable: false
+    base_year: 1990  # any year from 1970 to 2018
 
 plotting:
   scenario_comparison:
