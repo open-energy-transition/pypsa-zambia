@@ -44,9 +44,6 @@ electricity:
     Store: []
     Link: []
 
-  automatic_emission: false
-  automatic_emission_base_year: 1990 # 1990 is taken as default. Any year from 1970 to 2018 can be selected.
-
   powerplants_filter: (DateOut >= 2023 or DateOut != DateOut) and (DateIn <= 2023 or DateIn != DateIn)
   custom_powerplants: replace # set to "merge" or "replace" if you have a custom_powerplants.csv for Zambia
   disaggregate_powerplants: false
@@ -68,7 +65,7 @@ lines:
 costs:
   year: 2025
 
-cluster_options:
+clustering:
   simplify_network:
     exclude_carriers: []
 
@@ -118,6 +115,10 @@ renewable:
     max_depth: false
     min_shore_distance: false
     max_shore_distance: false
+
+co2:
+  automatic_emission: # derive co2.limit from historical emission data instead of the value above
+    enable: false
 
 sector:
   enable:

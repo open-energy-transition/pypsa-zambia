@@ -37,19 +37,19 @@ snapshots:
   end: "2013-03-7"
 
 
-clean_osm_data_options:
-  threshold_voltage: 35000
+osm:
+  clean_osm_data:
+    threshold_voltage: 35000
 
 base_network:
   min_voltage_substation_offshore: 35000
   min_voltage_rebase_voltage: 35000
 
-
-electricity:
-  co2limit: 1.487e+9
-  co2base: 1.487e+9
+co2:
+  limit: 1.487e+9     # annual cap [tCO2/year]; European default — adjust for your region; active via Co2L wildcard
+  base: 1.487e+9     # baseline emissions used for relative reduction targets; European default
+  emission_price: 0. # [currency/tCO2]; active via Ep wildcard
   automatic_emission: true
-
 
 atlite:
   nprocesses: 4
@@ -74,6 +74,9 @@ renewable:
     cutout: zm-2013-tutorial-era5
     hydrobasins_level: 4
     hydro_max_hours: "energy_capacity_totals_by_country"
+    resource:
+      method: hydro
+      hydrobasins: data/hydrobasins_hydroshare/africa-geoglows-atlite.shp
   csp:
     cutout: zm-2013-tutorial-era5
 
