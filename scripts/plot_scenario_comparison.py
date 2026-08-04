@@ -138,13 +138,15 @@ def load_reference_generation(path, year, nice_names=None):
     e.g. "hydro"/"ror"/"coal") to its display name via resolve_nice_name so
     reference bars share stacking/colors with the model bars they sit next to.
     """
-    ref = pd.read_csv(path)
-    ref = ref[ref["year"] == year]
-    if ref.empty:
+    reference_generation = pd.read_csv(path)
+    reference_generation = reference_generation[reference_generation["year"] == year]
+    if reference_generation.empty:
         return pd.Series(dtype=float)
-    s = ref.set_index("fuel")["generation_gwh"] / 1e3
-    s.index = s.index.map(lambda f: resolve_nice_name(f, nice_names))
-    return s.groupby(level=0).sum()
+    generation_by_fuel = reference_generation.set_index("fuel")["generation_gwh"] / 1e3
+    generation_by_fuel.index = generation_by_fuel.index.map(
+        lambda f: resolve_nice_name(f, nice_names)
+    )
+    return generation_by_fuel.groupby(level=0).sum()
 
 
 def _by_carrier(s, exclude):

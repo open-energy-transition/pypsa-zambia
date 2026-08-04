@@ -4,7 +4,7 @@
 
 """Aggregate historical Zambian generation reference data by PyPSA fuel.
 
-Reads the four wide-format ZESCO / IPP generation datasets (one row per year,
+Reads the four wide-format ERB / IPP generation datasets (one row per year,
 one column per power plant, values in GWh), maps each plant to a reference
 fuel, and sums generation by (year, fuel). Output is long-format so it can be
 filtered to a single calendar year when overlaid on a scenario comparison
