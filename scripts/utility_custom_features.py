@@ -494,11 +494,13 @@ def set_existing_thermal_zero_mc(n, base_year, carriers, plant_factors=None):
     n.generators.loc[mask, "marginal_cost"] = 0.0
     logger.info(f"Zero marginal cost applied to: {n.generators.index[mask].tolist()}")
 
-    for carrier, factor in (plant_factors or {}).items():
-        carrier_mask = mask & (n.generators.carrier == carrier)
-        n.generators.loc[carrier_mask, "p_max_pu"] = factor
+    for pu_constrained_carrier, pu_factor in (plant_factors or {}).items():
+        pu_constrained_carrier_mask = mask & (
+            n.generators.carrier == pu_constrained_carrier
+        )
+        n.generators.loc[pu_constrained_carrier_mask, "p_max_pu"] = pu_factor
         logger.info(
-            f"Plant factor {factor:.0%} applied to: {n.generators.index[carrier_mask].tolist()}"
+            f"Plant factor {pu_factor:.0%} applied to: {n.generators.index[pu_constrained_carrier_mask].tolist()}"
         )
 
 

@@ -97,7 +97,7 @@ electricity:
   estimate_renewable_capacities:
     stats: false # wind and solar generation provided by the custom powerplants file
   existing_thermal_dispatch:
-    enable: true
+    enable: false
     base_year: 2024
     carriers: [coal, oil]
     plant_factors:
