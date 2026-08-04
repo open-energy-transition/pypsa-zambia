@@ -21,19 +21,6 @@ from pypsa.statistics import get_carrier
 
 logger = create_logger(__name__)
 
-# Maps data/source_to_pypsa_fuels_mapping.csv "pypsa" fuel labels (as produced
-# by build_reference_generation.py) to the same display names used for model
-# carriers (n.carriers.nice_name), so reference bars share stacking/colors
-# with the model bars they sit next to.
-REFERENCE_FUEL_NICE_NAMES = {
-    "reservoir and dam": "Reservoir & Dam",
-    "run of river": "Run of River",
-    "solar": "Solar",
-    "coal": "Coal",
-    "oil": "Oil",
-    "biomass": "Biomass",
-}
-
 # Preferred stack order uses n.carriers.nice_name values.
 # Carriers not listed here are appended at the end.
 preferred_order = pd.Index(
@@ -56,6 +43,16 @@ preferred_order = pd.Index(
         "Hydrogen Storage",
     ]
 )
+
+
+def resolve_nice_name(carrier, nice_names=None):
+    """Display name for a raw carrier code, e.g. for a reference-data fuel
+    label that has no n.carriers entry to read nice_name from.
+
+    Mirrors add_electricity.py's n.carriers.nice_name assignment: look up
+    plotting.nice_names from the run config, falling back to Title Case.
+    """
+    return (nice_names or {}).get(carrier, carrier.title())
 
 
 def carrier_nice_names(n):
@@ -132,19 +129,21 @@ def resolve_reference_year(run_name):
     return int(match.group(1)) if match else None
 
 
-def load_reference_generation(path, year):
+def load_reference_generation(path, year, nice_names=None):
     """Annual generation by display-name carrier [TWh] for one calendar year.
 
-    Reads the long-format output of build_reference_generation.py
-    (columns: year, fuel, generation_gwh) and converts GWh to TWh to match
-    extract_generation's units.
+    Reads the long-format output of build_reference_generation.py (columns:
+    year, fuel, generation_gwh), converts GWh to TWh to match
+    extract_generation's units, and renames each fuel (a raw carrier code,
+    e.g. "hydro"/"ror"/"coal") to its display name via resolve_nice_name so
+    reference bars share stacking/colors with the model bars they sit next to.
     """
     ref = pd.read_csv(path)
     ref = ref[ref["year"] == year]
     if ref.empty:
         return pd.Series(dtype=float)
     s = ref.set_index("fuel")["generation_gwh"] / 1e3
-    s.index = s.index.map(lambda f: REFERENCE_FUEL_NICE_NAMES.get(f, f))
+    s.index = s.index.map(lambda f: resolve_nice_name(f, nice_names))
     return s.groupby(level=0).sum()
 
 
@@ -365,6 +364,7 @@ def run_comparison(
     exclude_carriers=None,
     reference_data=None,
     reference_generation_path=None,
+    nice_names=None,
 ):
     networks = find_scenario_networks(results_dir, scenario_filter)
     if not networks:
@@ -409,7 +409,9 @@ def run_comparison(
                     raw_name,
                 )
                 continue
-            ref_series = load_reference_generation(reference_generation_path, year)
+            ref_series = load_reference_generation(
+                reference_generation_path, year, nice_names=nice_names
+            )
             if ref_series.empty:
                 logger.warning(
                     "No reference generation data for year %d (scenario %s)",
@@ -480,6 +482,7 @@ if __name__ == "__main__":
     configure_logging(snakemake)
 
     tech_colors = snakemake.config["plotting"]["tech_colors"]
+    nice_names = snakemake.config["plotting"]["nice_names"]
     results_dir = snakemake.params.results_dir
     scenario_group = snakemake.wildcards.scenario_group
     all_groups = snakemake.config.get("plotting", {}).get("scenario_comparison", {})
@@ -500,4 +503,5 @@ if __name__ == "__main__":
         exclude_carriers=exclude_carriers,
         reference_data=reference_data,
         reference_generation_path=reference_generation_path,
+        nice_names=nice_names,
     )

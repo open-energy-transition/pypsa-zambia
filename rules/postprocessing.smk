@@ -13,7 +13,8 @@ rule build_reference_generation:
         diesel="data/validation/zesco_diesel_generation.csv",
         large_hydro="data/validation/zesco_large_hydro_generation.csv",
         mini_hydro="data/validation/zesco_mini_hydro_generation.csv",
-        fuel_mapping="data/source_to_pypsa_fuels_mapping.csv",
+        fuel_aliases="data/reference_fuel_aliases.csv",
+        custom_powerplants="data/custom_powerplants.csv",
     output:
         "resources/validation/reference_generation_by_fuel.csv",
     log:
