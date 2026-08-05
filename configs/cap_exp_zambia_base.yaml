@@ -9,27 +9,17 @@
 
 run:
   name: "cap_exp_zambia_base"   # overridden by each scenario diff
-  shared_cutouts: true
-
-enable:
-  retrieve_databundle: false
-  retrieve_cutout: false
-  build_natura_raster: false
 
 data:
   custom-powerplants:
-    source: primary
     # parameters of powerplants aligned with IRP assumptions
     version: v6
   cutout-era5:
-    source: primary
-    version: v1.0
     year: 2023
 
 snapshots:
   start: "2023-01-01"
   end: "2024-01-01"
-  inclusive: "left"
 
 atlite:
   cutouts:
@@ -57,24 +47,17 @@ cluster_options:
 
 electricity:
   biomass_potential: false
-  extendable_carriers:
-    Generator: []
-    StorageUnit: []
-    Store: []
-    Link: []
 
   automatic_emission: false
   # TODO Adjust according to NDCs
   automatic_emission_base_year: 1990
 
-  custom_powerplants: replace
   powerplants_filter: (DateOut >= 2025 or DateOut != DateOut) and (DateIn <= 2025 or DateIn != DateIn)  # default; overridden per scenario
 
 renewable:
   hydro:
     cutout: cutout-2023-era5
     normalization:
-      method: irena
       year: 2023
     multiplier: 2.19
   solar:
@@ -89,16 +72,12 @@ solving:
     load_shedding: 100  # load shedding cost for unmet demand (EUR/MWh)
 
 lines:
-  s_max_pu: 0.70
   ac_types:
     330.: "ACSR Zebra 2-bundle 330.0"  # SAPP standard 330 kV expansion conductor
 
 load_options:
   source: "demcast"    # DemandCast
   weather_year: 2023
-  demand_weights:
-    mining: 0.76
-    gdp: 0.24
   zambia_demand_distribution: true
   scale: 1.44  # overridden per scenario
 
@@ -115,18 +94,6 @@ costs:
     nuclear: 4865672      # 6.460 mUSD/MW — Nuclear
     csp-tower: 4973380    # 6.603 mUSD/MW — Solar CSP
     oil: 506904           # 0.673 mUSD/MW — Mixed Fuel
-  marginal_cost: # EUR/MWh — IRP Table 5 (Zambia 2023), converted at 0.7532 EUR/USD
-    solar: 0
-    onwind: 0
-    offwind: 0.015
-    hydro: 1.05
-    ror: 0.
-    coal: 72.92   # IRP Table 9 — override per scenario if fuel price differs
-    oil: 4.23
-    geothermal: 0.87
-    biomass: 4.14
-    nuclear: 3.46
-    csp: 0.
   FOM: # % of investment per year — IRP Annex 3
     solar: 1.1
     solar-utility: 1.1
@@ -138,31 +105,4 @@ costs:
     geothermal: 1.6
     nuclear: 1.5
     oil: 2.0
-  co2_emissions: # tCO2/MWh — IRP Table 5 (Zambia 2023)
-    hydro: 0.025
-    ror: 0.024
-    coal: 0.830
-    geothermal: 0.038
-    biomass: 0.038
-    solar: 0.048
-    onwind: 0.011
-    nuclear: 0.012
-    csp-tower: 0.000
-    oil: 0.490
   rooftop_share: 0  # utility-scale solar only
-  lifetime: # years — IRP Table 5 (Zambia 2023)
-    hydro: 50
-    ror: 35
-    coal: 40
-    geothermal: 35
-    biomass: 25
-    solar: 25
-    solar-utility: 25
-    onwind: 30
-    nuclear: 50
-    csp-tower: 25
-    oil: 30
-
-validation:
-  interconnectors:
-    enable: false
