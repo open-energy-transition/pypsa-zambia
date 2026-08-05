@@ -26,8 +26,7 @@ else:
 
 
 if (HYDROBASINS_DATASET := dataset_version("hydrobasins", config))["source"] in [
-    "build",
-    "tutorial",
+    "build"
 ]:
 
     """
@@ -215,7 +214,7 @@ rule download_interconnection_data:
             additional_request_string="?download=1",
         ),
         countries=HTTP.remote(
-            "https://sandbox.zenodo.org/records/471583/files/sapp_countries.csv",
+            "https://sandbox.zenodo.org/records/565480/files/sapp_countries.csv",
             keep_local=True,
             additional_request_string="?download=1",
         ),
@@ -368,6 +367,7 @@ if (ZM_BIOMASS := dataset_version("zm-biomass", config))["source"] in [
 
 if (INFLOW_GLOFAS := dataset_version("inflow-glofas", config))["source"] in [
     "primary",
+    "tutorial",
 ]:
     year = int(float(INFLOW_GLOFAS["year"]))
     region = INFLOW_GLOFAS["region"]
