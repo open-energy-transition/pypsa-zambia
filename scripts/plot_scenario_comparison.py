@@ -6,8 +6,6 @@
 Reads solved networks from multiple scenario runs and produces stacked bar
 charts of installed capacity, generation mix, demand, investments and CO2
 emissions for side-by-side scenario comparison.
-
-Outputs go to the directory defined by snakemake.output[0].
 """
 
 import os
@@ -22,7 +20,6 @@ from pypsa.statistics import get_carrier
 logger = create_logger(__name__)
 
 # Preferred stack order uses n.carriers.nice_name values.
-# Carriers not listed here are appended at the end.
 preferred_order = pd.Index(
     [
         "Reservoir & Dam",
@@ -48,19 +45,12 @@ preferred_order = pd.Index(
 def resolve_nice_name(carrier, nice_names=None):
     """Display name for a raw carrier code, e.g. for a reference-data fuel
     label that has no n.carriers entry to read nice_name from.
-
-    Mirrors add_electricity.py's n.carriers.nice_name assignment: look up
-    plotting.nice_names from the run config, falling back to Title Case.
     """
     return (nice_names or {}).get(carrier, carrier.title())
 
 
 def carrier_nice_names(n):
-    """Series mapping raw carrier name → display name.
-
-    Uses n.carriers.nice_name; falls back to the carrier name itself for
-    entries that are missing or empty (e.g. custom or local carriers).
-    """
+    """Series mapping raw carrier name → display name."""
     names = n.carriers["nice_name"].copy()
     missing = names.isna() | (names.str.strip() == "")
     names[missing] = names.index[missing]
@@ -68,12 +58,7 @@ def carrier_nice_names(n):
 
 
 def carrier_colors(n, tech_colors=None):
-    """Dict mapping display name → color.
-
-    Primary source: n.carriers.color. For entries that are missing or
-    empty, falls back to tech_colors (from config) keys first by
-    display name, then by raw carrier name, then to a neutral grey.
-    """
+    """Dict mapping display name → color."""
     nice = carrier_nice_names(n)
     result = {}
     for carrier in n.carriers.index:
@@ -87,11 +72,7 @@ def carrier_colors(n, tech_colors=None):
 
 
 def find_scenario_networks(results_dir, scenario_filter):
-    """Return {scenario_label: path} for each run name in scenario_filter.
-
-    scenario_filter is a list of exact run.name values (folder names under
-    results/). Only folders whose name exactly matches an entry are included;
-    """
+    """Return {scenario_label: path} for each run name in scenario_filter."""
     results_dir = os.path.realpath(results_dir)
     networks = {}
     for dirpath, dirnames, filenames in os.walk(results_dir):
@@ -114,12 +95,7 @@ def find_scenario_networks(results_dir, scenario_filter):
 
 
 def clean_scenario_label(label, label_map=None):
-    """Return a display label for a scenario folder name.
-
-    label_map is a dict mapping raw folder names to display strings
-    (set via plotting.scenario_comparison.label_map in the run config).
-    The raw folder name is returned unchanged when no entry exists.
-    """
+    """Return a display label for a scenario folder name."""
     return (label_map or {}).get(label, label)
 
 
@@ -130,14 +106,7 @@ def resolve_reference_year(run_name):
 
 
 def load_reference_generation(path, year, nice_names=None):
-    """Annual generation by display-name carrier [TWh] for one calendar year.
-
-    Reads the long-format output of build_reference_generation.py (columns:
-    year, fuel, generation_gwh), converts GWh to TWh to match
-    extract_generation's units, and renames each fuel (a raw carrier code,
-    e.g. "hydro"/"ror"/"coal") to its display name via resolve_nice_name so
-    reference bars share stacking/colors with the model bars they sit next to.
-    """
+    """Annual generation by display-name carrier [TWh] for one calendar year."""
     reference_generation = pd.read_csv(path)
     reference_generation = reference_generation[reference_generation["year"] == year]
     if reference_generation.empty:
@@ -155,17 +124,7 @@ def _by_carrier(s, exclude):
 
 
 def extract_capacity(n, exclude_carriers=None):
-    """Installed optimised capacity by display-name carrier [GW / GWh].
-
-    Covers generators, storage units, links and stores. Passive transmission
-    branches (Line) are excluded as their capacity has different physical sense
-    as compared with generation and storages, and is not comparable
-    with them. Cross-border interconnector Links (carrier "AC") are excluded
-    for the same reason — they carry transfer capacity, not generation
-    capacity, and can otherwise dwarf the rest of the stack (e.g. validation
-    runs with interconnectors enabled). Power components are in MW → GW;
-    energy stores (e_nom_opt) are in MWh → GWh.
-    """
+    """Installed optimised capacity by display-name carrier [GW / GWh]."""
     exclude = set(exclude_carriers or [])
     nice = carrier_nice_names(n)
     stats = n.statistics.optimal_capacity(groupby=get_carrier, nice_names=False)
@@ -177,12 +136,7 @@ def extract_capacity(n, exclude_carriers=None):
 
 
 def extract_generation(n, exclude_carriers=None):
-    """Annual net generation by display-name carrier [TWh].
-
-    n.statistics.energy_balance gives net bus injections (positive = supply,
-    negative = withdrawal) with correct sign conventions for all component
-    types. Load is dropped so only the supply side remains.
-    """
+    """Annual net generation by display-name carrier [TWh]."""
     exclude = set(exclude_carriers or [])
     nice = carrier_nice_names(n)
     result = _by_carrier(
@@ -242,11 +196,7 @@ def extract_co2_emissions(n, exclude_carriers=None):
 def build_comparison_dfs(
     networks, tech_colors=None, label_map=None, exclude_carriers=None
 ):
-    """Load each network; return comparison DataFrames and a merged color dict.
-
-    Colors are derived from n.carriers.color with tech_colors as fallback
-    for any carrier whose color is missing or empty.
-    """
+    """Load each network; return comparison DataFrames and a merged color dict."""
     capacity_cols = {}
     generation_cols = {}
     investment_cols = {}

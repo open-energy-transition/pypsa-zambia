@@ -6,19 +6,11 @@
 
 Reads the four wide-format ERB / IPP generation datasets (one row per year,
 one column per power plant, values in GWh), maps each plant to a reference
-fuel, and sums generation by (year, fuel). Output is long-format so it can be
-filtered to a single calendar year when overlaid on a scenario comparison
-plot.
+fuel, and sums generation by (year, fuel).
 
 Fuel is derived from data/custom_powerplants.csv wherever a plant is part of
 the network model, using the same Fueltype/Technology -> carrier logic as
-scripts/add_electricity.py (see derive_pypsa_fuel), so each row lands on the
-same raw carrier code (e.g. "hydro", "ror", "coal") the model itself would
-assign; plot_scenario_comparison.py then resolves those to display names via
-plotting.nice_names from the run config, same as it does for model carriers.
-data/reference_fuel_aliases.csv links each reference-data plant name to its
-data/custom_powerplants.csv Name; plants not part of the network model (small
-captive/industrial generators) fall back to a hand-set fuel_override instead.
+scripts/add_electricity.py
 """
 
 import pandas as pd
@@ -26,15 +18,11 @@ from _helpers import configure_logging, create_logger, to_csv_nafix
 
 logger = create_logger(__name__)
 
-# The diesel dataset's "Itezhi tezhi" plant is a different, unrelated plant
-# from the IPP dataset's "Itezhi tezhi Power Corporation" (a hydro plant).
-# Renamed here to the disambiguated name already used in the fuel aliases.
+# Itezhi tezhi is a hydro plant in the IPP dataset, but an oil plant in the diesel dataset.
+# Could be a backup diesel generator at the hydro site, but we don't have any way to know for sure.
+# We rename it to avoid double-counting its generation.
 DIESEL_PLANT_RENAMES = {"Itezhi tezhi": "Itezhi tezhi oil"}
 
-# Mirrors the Fueltype/Technology -> carrier logic in scripts/add_electricity.py
-# (attach_hydro's tech_to_carrier dict, and load_powerplants' carrier_dict):
-# same raw carrier codes the model assigns, so plotting can resolve display
-# names from plotting.nice_names in the run config instead of a second dict.
 HYDRO_TECHNOLOGY_TO_FUEL = {
     "Reservoir": "hydro",
     "Run-Of-River": "ror",
@@ -75,15 +63,7 @@ def load_plant_generation(path, rename=None):
 
 
 def build_fuel_mapping(alias_path, custom_powerplants_path):
-    """Build a Series mapping each reference-data plant name to a fuel label.
-
-    Plants with a `custom_powerplants_name` alias are joined against
-    data/custom_powerplants.csv and their fuel is derived from its
-    Fueltype/Technology columns (see derive_pypsa_fuel), so classification
-    stays consistent with how the model itself assigns carriers. Plants
-    without an alias (not part of the network model) fall back to the
-    alias file's `fuel_override` column.
-    """
+    """Build a Series mapping each reference-data plant name to a fuel label."""
     aliases = pd.read_csv(alias_path)
     custom_ppl = pd.read_csv(custom_powerplants_path).set_index("Name")[
         ["Fueltype", "Technology"]
