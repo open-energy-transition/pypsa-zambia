@@ -20,7 +20,7 @@ logger = create_logger(__name__)
 
 # Itezhi tezhi is a hydro plant in the IPP dataset, but an oil plant in the diesel dataset.
 # Could be a backup diesel generator at the hydro site, but we don't have any way to know for sure.
-# We rename it to avoid double-counting its generation.
+# We rename it to avoid it not being unmapped in the fuel mapping step and dropping it from the reference generation.
 DIESEL_PLANT_RENAMES = {"Itezhi tezhi": "Itezhi tezhi oil"}
 
 HYDRO_TECHNOLOGY_TO_FUEL = {

@@ -16,7 +16,7 @@ rule build_reference_generation:
         fuel_aliases="data/reference_fuel_aliases.csv",
         custom_powerplants="data/custom_powerplants.csv",
     output:
-        "resources/validation/reference_generation_by_fuel.csv",
+        "results/comparison_plots/reference_generation_by_fuel.csv",
     log:
         "logs/build_reference_generation.log",
     script:
