@@ -69,6 +69,13 @@ electricity:
 
   custom_powerplants: replace
   powerplants_filter: (DateOut >= 2025 or DateOut != DateOut) and (DateIn <= 2025 or DateIn != DateIn)  # default; overridden per scenario
+  existing_thermal_dispatch:
+    enable: true
+    base_year: 2025
+    carriers: [coal, oil]
+    plant_factors:
+      coal: 0.6557
+      oil: 0.6187
 
 renewable:
   hydro:

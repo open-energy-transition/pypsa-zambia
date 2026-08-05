@@ -86,6 +86,7 @@ def main():
         "base_network": ["base_network"],
         "load_options": ["load_options"],
         "electricity": ["electricity"],
+        "existing_thermal_dispatch": ["electricity", "existing_thermal_dispatch"],
         "lines": ["lines"],
         "links": ["links"],
         "transformers": ["transformers"],
