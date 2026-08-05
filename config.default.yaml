@@ -196,11 +196,6 @@ electricity:
     Link: [] # H2 pipeline
 
 
-  existing_thermal_dispatch:
-    enable: false
-    base_year: 2025
-    carriers: [coal, oil]
-
   conventional_carriers: [nuclear, oil, OCGT, CCGT, coal, lignite, geothermal, biomass]
   renewable_carriers: [solar, onwind, offwind-ac, offwind-dc, hydro]
 
