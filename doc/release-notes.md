@@ -25,6 +25,9 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Fixed bug whereby docs page was not included into nav tree of readthedocs [PR #328](https://github.com/open-energy-transition/pypsa-zambia/pull/328)
 
+* Added key energy sector metrics from ERB Annual Statistics Bulletin [PR #323](https://github.com/open-energy-transition/pypsa-zambia/pull/350)
+
+
 # PyPSA-Zambia v0.4
 
 ### New Features and Major Changes
