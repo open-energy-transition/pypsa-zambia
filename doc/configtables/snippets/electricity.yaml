@@ -6,6 +6,7 @@ electricity:
     Store: [battery, H2]
     Link: [] # H2 pipeline
 
+
   conventional_carriers: [nuclear, oil, OCGT, CCGT, coal, lignite, geothermal, biomass]
   renewable_carriers: [solar, onwind, offwind-ac, offwind-dc, hydro]
 

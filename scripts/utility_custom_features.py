@@ -70,10 +70,28 @@ def annual_gwh_to_average_mw(energy_gwh, hours_per_year=8760):
     return energy_gwh * 1000 / hours_per_year
 
 
-def load_interconnector_data(countries_path, links_path, substations_path):
-    """Load interconnector input data from CSV files."""
+def load_interconnector_data(countries_path, links_path, substations_path, year=None):
+    """Load interconnector input data from CSV files.
+
+    If sapp_countries.csv contains a 'year' column, the row set matching
+    *year* is selected.  When *year* is None or not present in the data the
+    most recent available year is used as a fallback.
+    """
+    countries = pd.read_csv(countries_path)
+
+    if "year" in countries.columns:
+        available_years = countries["year"].unique()
+        if year is None or year not in available_years:
+            if year is not None:
+                logger.warning(
+                    f"No trade data for year {year} in {countries_path}; "
+                    f"falling back to {available_years.max()}."
+                )
+            year = available_years.max()
+        countries = countries[countries["year"] == year].drop(columns=["year"])
+
     return (
-        pd.read_csv(countries_path),
+        countries,
         pd.read_csv(links_path),
         pd.read_csv(substations_path),
     )
@@ -484,7 +502,8 @@ def build_mining_raster(
     return output_path
 
 
-def set_existing_thermal_zero_mc(n, base_year, carriers):
+def set_existing_thermal_zero_mc(n, base_year, carriers, plant_factors=None):
+    """Force-dispatch existing thermal plants and optionally cap their output."""
     mask = (
         n.generators.carrier.isin(carriers)
         & ~n.generators.p_nom_extendable
@@ -492,6 +511,15 @@ def set_existing_thermal_zero_mc(n, base_year, carriers):
     )
     n.generators.loc[mask, "marginal_cost"] = 0.0
     logger.info(f"Zero marginal cost applied to: {n.generators.index[mask].tolist()}")
+
+    for pu_constrained_carrier, pu_factor in (plant_factors or {}).items():
+        pu_constrained_carrier_mask = mask & (
+            n.generators.carrier == pu_constrained_carrier
+        )
+        n.generators.loc[pu_constrained_carrier_mask, "p_max_pu"] = pu_factor
+        logger.info(
+            f"Plant factor {pu_factor:.0%} applied to: {n.generators.index[pu_constrained_carrier_mask].tolist()}"
+        )
 
 
 def apply_capital_cost_overrides(costs, config):
