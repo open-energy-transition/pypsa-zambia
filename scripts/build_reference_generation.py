@@ -2,13 +2,13 @@
 # SPDX-FileCopyrightText: Open Energy Transition gGmbH
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-"""Aggregate historical Zambian generation reference data by PyPSA fuel.
+"""Aggregate historical Zambian generation reference data by PyPSA carrier.
 
 Reads the four wide-format ERB / IPP generation datasets (one row per year,
 one column per power plant, values in GWh), maps each plant to a reference
-fuel, and sums generation by (year, fuel).
+fuel, and sums generation by (year, carrier).
 
-Fuel is derived from data/custom_powerplants.csv wherever a plant is part of
+Carrier is derived from data/custom_powerplants.csv wherever a plant is part of
 the network model, using the same Fueltype/Technology -> carrier logic as
 scripts/add_electricity.py
 """
