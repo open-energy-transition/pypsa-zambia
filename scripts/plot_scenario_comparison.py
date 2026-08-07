@@ -111,7 +111,9 @@ def load_reference_generation(path, year, nice_names=None):
     reference_generation = reference_generation[reference_generation["year"] == year]
     if reference_generation.empty:
         return pd.Series(dtype=float)
-    generation_by_fuel = reference_generation.set_index("fuel")["generation_gwh"] / 1e3
+    generation_by_fuel = (
+        reference_generation.set_index("carrier")["generation_gwh"] / 1e3
+    )
     generation_by_fuel.index = generation_by_fuel.index.map(
         lambda f: resolve_nice_name(f, nice_names)
     )

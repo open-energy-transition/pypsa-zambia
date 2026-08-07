@@ -16,7 +16,7 @@ rule build_reference_generation:
         fuel_aliases="data/reference_fuel_aliases.csv",
         custom_powerplants="data/custom_powerplants.csv",
     output:
-        "results/comparison_plots/reference_generation_by_fuel.csv",
+        "results/comparison_plots/reference_generation_by_carrier.csv",
     log:
         "logs/build_reference_generation.log",
     script:
@@ -29,7 +29,7 @@ def _compare_scenarios_group_reference_inputs(wildcards):
     reference_data = groups.get(wildcards.scenario_group, {}).get("reference_data", [])
     if "generation" in reference_data:
         return {
-            "reference_generation": "results/comparison_plots/reference_generation_by_fuel.csv"
+            "reference_generation": "results/comparison_plots/reference_generation_by_carrier.csv"
         }
     return {}
 

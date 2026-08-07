@@ -6,7 +6,7 @@
 
 Reads the four wide-format ERB / IPP generation datasets (one row per year,
 one column per power plant, values in GWh), maps each plant to a reference
-fuel, and sums generation by (year, carrier).
+carrier, and sums generation by (year, carrier).
 
 Carrier is derived from data/custom_powerplants.csv wherever a plant is part of
 the network model, using the same Fueltype/Technology -> carrier logic as
@@ -20,15 +20,15 @@ logger = create_logger(__name__)
 
 # Itezhi tezhi is a hydro plant in the IPP dataset, but an oil plant in the diesel dataset.
 # Could be a backup diesel generator at the hydro site, but we don't have any way to know for sure.
-# We rename it to avoid it not being unmapped in the fuel mapping step and dropping it from the reference generation.
+# We rename it to avoid it not being unmapped in the carrier mapping step and dropping it from the reference generation.
 DIESEL_PLANT_RENAMES = {"Itezhi tezhi": "Itezhi tezhi oil"}
 
-HYDRO_TECHNOLOGY_TO_FUEL = {
+HYDRO_TECHNOLOGY_TO_CARRIER = {
     "Reservoir": "hydro",
     "Run-Of-River": "ror",
     "Pumped Storage": "PHS",
 }
-FUELTYPE_TO_FUEL = {
+FUELTYPE_TO_CARRIER = {
     "Hard Coal": "coal",
     "Oil": "oil",
     "Bioenergy": "biomass",
@@ -36,11 +36,11 @@ FUELTYPE_TO_FUEL = {
 }
 
 
-def derive_pypsa_fuel(fueltype, technology):
+def derive_pypsa_carrier(fueltype, technology):
     """Map a custom_powerplants.csv (Fueltype, Technology) pair to a raw carrier code."""
     if fueltype == "Hydro":
-        return HYDRO_TECHNOLOGY_TO_FUEL.get(technology)
-    return FUELTYPE_TO_FUEL.get(fueltype)
+        return HYDRO_TECHNOLOGY_TO_CARRIER.get(technology)
+    return FUELTYPE_TO_CARRIER.get(fueltype)
 
 
 def _clean_columns(columns):
@@ -49,10 +49,7 @@ def _clean_columns(columns):
 
 
 def load_plant_generation(path, rename=None):
-    """Melt one wide (Year x plant) generation CSV into long format.
-
-    Returns a DataFrame with columns: year, plant, generation_gwh.
-    """
+    """Melt one wide (Year x plant) generation CSV into long format."""
     df = pd.read_csv(path)
     df.columns = _clean_columns(df.columns)
     if rename:
@@ -62,8 +59,8 @@ def load_plant_generation(path, rename=None):
     return long
 
 
-def build_fuel_mapping(alias_path, custom_powerplants_path):
-    """Build a Series mapping each reference-data plant name to a fuel label."""
+def build_carrier_mapping(alias_path, custom_powerplants_path):
+    """Build a Series mapping each reference-data plant name to a carrier."""
     aliases = pd.read_csv(alias_path)
     custom_ppl = pd.read_csv(custom_powerplants_path).set_index("Name")[
         ["Fueltype", "Technology"]
@@ -81,39 +78,39 @@ def build_fuel_mapping(alias_path, custom_powerplants_path):
             missing,
         )
     joined = joined.dropna(subset=["Fueltype"])
-    joined["fuel"] = joined.apply(
-        lambda row: derive_pypsa_fuel(row["Fueltype"], row["Technology"]), axis=1
+    joined["carrier"] = joined.apply(
+        lambda row: derive_pypsa_carrier(row["Fueltype"], row["Technology"]), axis=1
     )
 
     fallback = aliases.loc[~has_alias, ["data", "fuel_override"]].rename(
-        columns={"fuel_override": "fuel"}
+        columns={"fuel_override": "carrier"}
     )
 
-    mapping = pd.concat([joined[["data", "fuel"]], fallback], ignore_index=True)
-    unresolved = sorted(mapping.loc[mapping["fuel"].isna(), "data"])
+    mapping = pd.concat([joined[["data", "carrier"]], fallback], ignore_index=True)
+    unresolved = sorted(mapping.loc[mapping["carrier"].isna(), "data"])
     if unresolved:
-        logger.warning("Could not resolve a reference fuel for: %s", unresolved)
-    return mapping.dropna(subset=["fuel"]).set_index("data")["fuel"]
+        logger.warning("Could not resolve a reference carrier for: %s", unresolved)
+    return mapping.dropna(subset=["carrier"]).set_index("data")["carrier"]
 
 
-def aggregate_by_fuel(generation, fuel_mapping):
-    """Map plants to reference fuels and sum generation by (year, fuel)."""
-    unmapped = sorted(set(generation["plant"]) - set(fuel_mapping.index))
+def aggregate_by_carrier(generation, carrier_mapping):
+    """Map plants to reference carriers and sum generation by (year, carrier)."""
+    unmapped = sorted(set(generation["plant"]) - set(carrier_mapping.index))
     if unmapped:
         logger.warning(
-            "%d plant(s) missing from the fuel mapping and dropped: %s",
+            "%d plant(s) missing from the carrier mapping and dropped: %s",
             len(unmapped),
             unmapped,
         )
 
     generation = generation.copy()
-    generation["fuel"] = generation["plant"].map(fuel_mapping)
-    generation = generation.dropna(subset=["fuel"])
+    generation["carrier"] = generation["plant"].map(carrier_mapping)
+    generation = generation.dropna(subset=["carrier"])
 
     return (
-        generation.groupby(["year", "fuel"], as_index=False)["generation_gwh"]
+        generation.groupby(["year", "carrier"], as_index=False)["generation_gwh"]
         .sum()
-        .sort_values(["year", "fuel"])
+        .sort_values(["year", "carrier"])
         .reset_index(drop=True)
     )
 
@@ -136,9 +133,9 @@ if __name__ == "__main__":
         ignore_index=True,
     )
 
-    fuel_mapping = build_fuel_mapping(
+    carrier_mapping = build_carrier_mapping(
         snakemake.input.fuel_aliases, snakemake.input.custom_powerplants
     )
-    reference_generation = aggregate_by_fuel(generation, fuel_mapping)
+    reference_generation = aggregate_by_carrier(generation, carrier_mapping)
 
     to_csv_nafix(reference_generation, snakemake.output[0], index=False)
