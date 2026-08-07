@@ -3,7 +3,7 @@
 
 
 rule build_reference_generation:
-    """Aggregates historical ERB/IPP generation datasets by PyPSA fuel.
+    """Aggregates historical ERB/IPP generation datasets by PyPSA carrier.
 
     Consumed by _compare_scenarios_group for groups that opt in via
     plotting.scenario_comparison.<group>.reference_data: [generation].
