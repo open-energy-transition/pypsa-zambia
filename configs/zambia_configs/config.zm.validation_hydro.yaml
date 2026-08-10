@@ -6,7 +6,6 @@
 # distribution of the inflow using available reference data for 2023
 run:
   name: validation_dispatch_zambia_2023
-  shared_cutouts: true
 
 scenario:
   simpl: ['']

@@ -23,12 +23,15 @@ countries: [ZM]
 # =================== DATA RETRIEVAL ===================
 enable:
   # ----------------- Retrieving data -----------------
-  retrieve_databundle: true # recommended for first run
-  retrieve_cutout: true # retrieves the bundled 2013 cutout (cutout-2013-era5); changing load_options.weather_year (default: 2013) requires retrieve_cutout:false and build_cutout: true.
-  retrieve_cost_data: true # false: use existing data/costs.csv
+  retrieve_databundle: false # recommended for first run
+  retrieve_cutout: false # retrieves the bundled 2013 cutout (cutout-2013-era5); changing load_options.weather_year (default: 2013) requires retrieve_cutout:false and build_cutout: true.
+  retrieve_cost_data: false # false: use existing data/costs.csv
   download_global_buildings: false # download GlobalMLBuildingFootprints data for the countries specified above
   # ----------------- Building locally -----------------
-  build_cutout: false # requires CDS API key (see https://cds.climate.copernicus.eu/how-to-api); uses snapshots and countries
+  build_cutout: false
+  # If "build_cutout" : true, then environmental data is extracted according to `snapshots` date range and `countries`
+  # requires cds API key https://cds.climate.copernicus.eu/api-how-to
+  # More information https://atlite.readthedocs.io/en/latest/introduction.html#datasets
   build_natura_raster: false
 
 
@@ -40,6 +43,10 @@ load_options:
   weather_year: 2013 # Weather year of the load profile
   prediction_year: 2030 # Valid only if "gegis" used as a source
   scale: 1 # scales all load time-series, i.e. 2 = doubles load
+  demand_weights:
+    mining: 0.76
+    gdp: 0.24
+  zambia_demand_distribution: true
 
 electricity:
   # ----------------- Electricity generation -------------------
@@ -186,6 +193,37 @@ plotting:
     # (internal model carrier names are used)
     exclude_carriers:
     - "load shedding"
+
+
+data:
+  custom-powerplants:
+    source: primary
+    version: v1.0
+  zm-biomass:
+    source: primary
+    version: v1.0
+  cutout-era5:
+    source: primary
+    version: v1.0
+    # NB Must be adjusted according to the weather year
+    year: 2013
+  hydrobasins:
+    source: build
+    version: latest
+  irena:
+    source: primary
+    version: latest
+  landcover:
+    source: primary
+    version: Mar2026
+  natura_earth:
+    source: tutorial
+    version: v1.0
+  inflow-glofas:
+    source: primary
+    version: v1.0
+    # NB Must be adjusted according to the weather year
+    year: 2013
 
 
 # =================== SOLVING ===================

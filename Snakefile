@@ -43,7 +43,7 @@ EXPAND_HYDRO = False
 configfile: "config.default.yaml"
 configfile: "configs/bundle_config.yaml"
 configfile: "configs/powerplantmatching_config.yaml"
-configfile: "configs/validation_dispatch_zambia.yaml"
+configfile: "configs/zambia_configs/config.zm.default.yaml"
 configfile: "config_current_scenario.yaml"
 
 
@@ -2555,7 +2555,7 @@ if config["foresight"] == "myopic":
 
 rule run_scenario:
     input:
-        diff_config="configs/scenarios_zambia/config.{scenario_name}.yaml",
+        diff_config="configs/zambia_configs/scenarios_zambia/config.{scenario_name}.yaml",
     output:
         touchfile=touch("results/{scenario_name}/scenario.done"),
         copyconfig="results/{scenario_name}/config.yaml",
@@ -2609,6 +2609,8 @@ rule run_all_scenarios:
             "results/{scenario_name}/scenario.done",
             scenario_name=[
                 c.stem.replace("config.", "")
-                for c in Path("configs/scenarios_zambia").glob("config.*.yaml")
+                for c in Path("configs/zambia_configs/scenarios_zambia").glob(
+                    "config.*.yaml"
+                )
             ],
         ),
