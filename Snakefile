@@ -710,7 +710,11 @@ rule build_renewable_profiles:
     input:
         unpack(inputs_hydro),
         natura="resources/" + RDIR + "natura.tiff",
-        copernicus="data/copernicus/PROBAV_LC100_global_v3.0.1_2019-nrt_Discrete-Classification-map_EPSG-4326.tif",
+        copernicus=branch(
+            countries==["ZM"],
+            "data/copernicus/ZM_PROBAV_LC100_global_v3.0.1_2019-nrt_Discrete-Classification-map_EPSG-4326.tif",
+            "data/copernicus/PROBAV_LC100_global_v3.0.1_2019-nrt_Discrete-Classification-map_EPSG-4326.tif"
+        ),
         gebco=branch(
             countries==["ZM"],
             {},
