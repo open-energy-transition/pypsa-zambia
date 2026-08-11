@@ -45,6 +45,11 @@ renewable:
   hydro:
     source: custom # use "era5" for a regular cutout workflow and "custom" for custom renewable profiles
     extendable: false
+    resource:
+      method: hydro
+      # TODO Harmmonize inputs for retrival and portable data supply
+      # hydrobasins: data/hydrobasins/hybas_world.shp
+      hydrobasins: data/hydrobasins/hybas_af_lev01-12_v1c.zip    
     normalization:
       method: irena
       year: 2013
