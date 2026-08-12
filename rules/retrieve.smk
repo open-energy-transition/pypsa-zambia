@@ -269,6 +269,78 @@ rule retrieve_mining_data:
         copyfile(str(input["mining_polygons"]), output["mining_polygons"])
 
 
+rule retrieve_ipp_generation:
+    input:
+        url=HTTP.remote(
+            "https://sandbox.zenodo.org/records/573456/files/Electricity%20generation%20from%20independent%20power%20producers%20%28GWh%29%202013-2025.csv",
+            keep_local=True,
+            additional_request_string="?download=1",
+        ),
+    output:
+        "data/validation/ipp_generation.csv",
+    log:
+        "logs/retrieve_ipp_generation.log",
+    run:
+        import os
+
+        os.makedirs("data/validation", exist_ok=True)
+        copyfile(str(input["url"]), output[0])
+
+
+rule retrieve_zesco_diesel_generation:
+    input:
+        url=HTTP.remote(
+            "https://sandbox.zenodo.org/records/573462/files/Electricity%20generation%20from%20ZESCO%27s%20Diesel%20power%20plants%20%28GWh%29%202013-2025.csv",
+            keep_local=True,
+            additional_request_string="?download=1",
+        ),
+    output:
+        "data/validation/zesco_diesel_generation.csv",
+    log:
+        "logs/retrieve_zesco_diesel_generation.log",
+    run:
+        import os
+
+        os.makedirs("data/validation", exist_ok=True)
+        copyfile(str(input["url"]), output[0])
+
+
+rule retrieve_zesco_large_hydro_generation:
+    input:
+        url=HTTP.remote(
+            "https://sandbox.zenodo.org/records/573493/files/Electricity%20generation%20from%20ZESCO%27s%20large%20hydro%20power%20plants%20%28GWh%29%202013-2025.csv",
+            keep_local=True,
+            additional_request_string="?download=1",
+        ),
+    output:
+        "data/validation/zesco_large_hydro_generation.csv",
+    log:
+        "logs/retrieve_zesco_large_hydro_generation.log",
+    run:
+        import os
+
+        os.makedirs("data/validation", exist_ok=True)
+        copyfile(str(input["url"]), output[0])
+
+
+rule retrieve_zesco_mini_hydro_generation:
+    input:
+        url=HTTP.remote(
+            "https://sandbox.zenodo.org/records/573503/files/Electricity%20generation%20from%20ZESCO%27s%20mini-%20hydro%20power%20plants%20%28GWh%29%202013-2025.csv",
+            keep_local=True,
+            additional_request_string="?download=1",
+        ),
+    output:
+        "data/validation/zesco_mini_hydro_generation.csv",
+    log:
+        "logs/retrieve_zesco_mini_hydro_generation.log",
+    run:
+        import os
+
+        os.makedirs("data/validation", exist_ok=True)
+        copyfile(str(input["url"]), output[0])
+
+
 if config["enable"].get("retrieve_cost_data", True):
 
     rule retrieve_cost_data:

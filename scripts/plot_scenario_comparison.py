@@ -6,11 +6,10 @@
 Reads solved networks from multiple scenario runs and produces stacked bar
 charts of installed capacity, generation mix, demand, investments and CO2
 emissions for side-by-side scenario comparison.
-
-Outputs go to the directory defined by snakemake.output[0].
 """
 
 import os
+import re
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -21,7 +20,6 @@ from pypsa.statistics import get_carrier
 logger = create_logger(__name__)
 
 # Preferred stack order uses n.carriers.nice_name values.
-# Carriers not listed here are appended at the end.
 preferred_order = pd.Index(
     [
         "Reservoir & Dam",
@@ -44,12 +42,15 @@ preferred_order = pd.Index(
 )
 
 
-def carrier_nice_names(n):
-    """Series mapping raw carrier name → display name.
-
-    Uses n.carriers.nice_name; falls back to the carrier name itself for
-    entries that are missing or empty (e.g. custom or local carriers).
+def resolve_nice_name(carrier, nice_names=None):
+    """Display name for a raw carrier code, e.g. for a reference-data fuel
+    label that has no n.carriers entry to read nice_name from.
     """
+    return (nice_names or {}).get(carrier, carrier.title())
+
+
+def carrier_nice_names(n):
+    """Series mapping raw carrier name → display name."""
     names = n.carriers["nice_name"].copy()
     missing = names.isna() | (names.str.strip() == "")
     names[missing] = names.index[missing]
@@ -57,12 +58,7 @@ def carrier_nice_names(n):
 
 
 def carrier_colors(n, tech_colors=None):
-    """Dict mapping display name → color.
-
-    Primary source: n.carriers.color. For entries that are missing or
-    empty, falls back to tech_colors (from config) keys first by
-    display name, then by raw carrier name, then to a neutral grey.
-    """
+    """Dict mapping display name → color."""
     nice = carrier_nice_names(n)
     result = {}
     for carrier in n.carriers.index:
@@ -76,11 +72,7 @@ def carrier_colors(n, tech_colors=None):
 
 
 def find_scenario_networks(results_dir, scenario_filter):
-    """Return {scenario_label: path} for each run name in scenario_filter.
-
-    scenario_filter is a list of exact run.name values (folder names under
-    results/). Only folders whose name exactly matches an entry are included;
-    """
+    """Return {scenario_label: path} for each run name in scenario_filter."""
     results_dir = os.path.realpath(results_dir)
     networks = {}
     for dirpath, dirnames, filenames in os.walk(results_dir):
@@ -103,13 +95,29 @@ def find_scenario_networks(results_dir, scenario_filter):
 
 
 def clean_scenario_label(label, label_map=None):
-    """Return a display label for a scenario folder name.
-
-    label_map is a dict mapping raw folder names to display strings
-    (set via plotting.scenario_comparison.label_map in the run config).
-    The raw folder name is returned unchanged when no entry exists.
-    """
+    """Return a display label for a scenario folder name."""
     return (label_map or {}).get(label, label)
+
+
+def resolve_reference_year(run_name):
+    """Extract a calendar year from a trailing _YYYY in a run.name, if any."""
+    match = re.search(r"_(\d{4})$", run_name)
+    return int(match.group(1)) if match else None
+
+
+def load_reference_generation(path, year, nice_names=None):
+    """Annual generation by display-name carrier [TWh] for one calendar year."""
+    reference_generation = pd.read_csv(path)
+    reference_generation = reference_generation[reference_generation["year"] == year]
+    if reference_generation.empty:
+        return pd.Series(dtype=float)
+    generation_by_fuel = (
+        reference_generation.set_index("carrier")["generation_gwh"] / 1e3
+    )
+    generation_by_fuel.index = generation_by_fuel.index.map(
+        lambda f: resolve_nice_name(f, nice_names)
+    )
+    return generation_by_fuel.groupby(level=0).sum()
 
 
 def _by_carrier(s, exclude):
@@ -118,33 +126,19 @@ def _by_carrier(s, exclude):
 
 
 def extract_capacity(n, exclude_carriers=None):
-    """Installed optimised capacity by display-name carrier [GW / GWh].
-
-    Covers generators, storage units, links and stores. Passive transmission
-    branches (Line) are excluded as their capacity has different physical sense
-    as compared with generation and storages, and is not comparable
-    with them. Power components are in MW → GW; energy stores
-    (e_nom_opt) are in MWh → GWh.
-    """
+    """Installed optimised capacity by display-name carrier [GW / GWh]."""
     exclude = set(exclude_carriers or [])
     nice = carrier_nice_names(n)
-    result = _by_carrier(
-        n.statistics.optimal_capacity(groupby=get_carrier, nice_names=False).drop(
-            "Line", level="component", errors="ignore"
-        ),
-        exclude,
-    )
+    stats = n.statistics.optimal_capacity(groupby=get_carrier, nice_names=False)
+    stats = stats.drop("Line", level="component", errors="ignore")
+    stats = stats.drop(("Link", "AC"), errors="ignore")
+    result = _by_carrier(stats, exclude)
     result.index = result.index.map(nice)
     return result.groupby(level=0).sum() / 1e3
 
 
 def extract_generation(n, exclude_carriers=None):
-    """Annual net generation by display-name carrier [TWh].
-
-    n.statistics.energy_balance gives net bus injections (positive = supply,
-    negative = withdrawal) with correct sign conventions for all component
-    types. Load is dropped so only the supply side remains.
-    """
+    """Annual net generation by display-name carrier [TWh]."""
     exclude = set(exclude_carriers or [])
     nice = carrier_nice_names(n)
     result = _by_carrier(
@@ -204,11 +198,7 @@ def extract_co2_emissions(n, exclude_carriers=None):
 def build_comparison_dfs(
     networks, tech_colors=None, label_map=None, exclude_carriers=None
 ):
-    """Load each network; return comparison DataFrames and a merged color dict.
-
-    Colors are derived from n.carriers.color with tech_colors as fallback
-    for any carrier whose color is missing or empty.
-    """
+    """Load each network; return comparison DataFrames and a merged color dict."""
     capacity_cols = {}
     generation_cols = {}
     investment_cols = {}
@@ -326,6 +316,9 @@ def run_comparison(
     scenario_filter,
     label_map=None,
     exclude_carriers=None,
+    reference_data=None,
+    reference_generation_path=None,
+    nice_names=None,
 ):
     networks = find_scenario_networks(results_dir, scenario_filter)
     if not networks:
@@ -344,18 +337,50 @@ def run_comparison(
         )
     )
 
-    if label_map:
-        # label_map insertion order defines the x-axis scenario order; define
-        # the mapping once and get ordering without a separate param.
-        preferred = list(label_map.values())
-        cols = [c for c in preferred if c in capacity_df.columns] + [
-            c for c in capacity_df.columns if c not in preferred
-        ]
-        capacity_df = capacity_df[cols]
-        generation_df = generation_df[cols]
-        investment_df = investment_df[cols]
-        co2_df = co2_df[cols]
-        demand_s = demand_s.reindex(cols)
+    # scenario_filter order defines the x-axis order for every chart.
+    labels = [
+        clean_scenario_label(name, label_map=label_map) for name in scenario_filter
+    ]
+    cols = [c for c in labels if c in capacity_df.columns]
+    capacity_df = capacity_df[cols]
+    generation_df = generation_df[cols]
+    investment_df = investment_df[cols]
+    co2_df = co2_df[cols]
+    demand_s = demand_s.reindex(cols)
+
+    if "generation" in (reference_data or []) and reference_generation_path:
+        gen_order = []
+        reference_cols = {}
+        for raw_name, short in zip(scenario_filter, labels):
+            if short not in generation_df.columns:
+                continue
+            gen_order.append(short)
+            year = resolve_reference_year(raw_name)
+            if year is None:
+                logger.warning(
+                    "Could not resolve a reference year from run.name %r; "
+                    "skipping reference overlay for this scenario.",
+                    raw_name,
+                )
+                continue
+            ref_series = load_reference_generation(
+                reference_generation_path, year, nice_names=nice_names
+            )
+            if ref_series.empty:
+                logger.warning(
+                    "No reference generation data for year %d (scenario %s)",
+                    year,
+                    raw_name,
+                )
+                continue
+            ref_label = f"Actual {year}"
+            reference_cols[ref_label] = ref_series
+            gen_order.append(ref_label)
+
+        if reference_cols:
+            ref_df = pd.DataFrame(reference_cols)
+            generation_df = pd.concat([generation_df, ref_df], axis=1).fillna(0)
+            generation_df = generation_df[gen_order]
 
     if not capacity_df.empty:
         plot_stacked_bar(
@@ -411,12 +436,17 @@ if __name__ == "__main__":
     configure_logging(snakemake)
 
     tech_colors = snakemake.config["plotting"]["tech_colors"]
+    nice_names = snakemake.config["plotting"]["nice_names"]
     results_dir = snakemake.params.results_dir
-    sc_cfg = snakemake.config.get("plotting", {}).get("scenario_comparison", {})
-    # Exact run.name values to compare; defined in plotting.scenario_comparison.scenario_filter.
+    scenario_group = snakemake.wildcards.scenario_group
+    all_groups = snakemake.config.get("plotting", {}).get("scenario_comparison", {})
+    sc_cfg = all_groups.get(scenario_group, {})
+    # Exact run.name values to compare; defined in plotting.scenario_comparison.<group>.scenario_filter.
     scenario_filter = sc_cfg.get("scenario_filter", [])
     label_map = sc_cfg.get("label_map", None)
     exclude_carriers = sc_cfg.get("exclude_carriers", [])
+    reference_data = sc_cfg.get("reference_data", [])
+    reference_generation_path = getattr(snakemake.input, "reference_generation", None)
 
     run_comparison(
         results_dir=results_dir,
@@ -425,4 +455,7 @@ if __name__ == "__main__":
         scenario_filter=scenario_filter,
         label_map=label_map,
         exclude_carriers=exclude_carriers,
+        reference_data=reference_data,
+        reference_generation_path=reference_generation_path,
+        nice_names=nice_names,
     )

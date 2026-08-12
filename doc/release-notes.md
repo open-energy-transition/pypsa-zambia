@@ -12,6 +12,8 @@ This part of documentation collects descriptive release notes to capture the mai
 
 ### New Features and Major Changes
 
+* Add thermal plant factors for existing coal and oil generators based on IRP data, constraining dispatch via `electricity.existing_thermal_dispatch.plant_factors` in the config [PR #332](https://github.com/open-energy-transition/pypsa-zambia/pull/332)
+
 * Use separate custom powerplants datasets for dispatch validation (ERB 2023-2025 data with KGL as reservoir) and capacity expansion (IRP and proposed plants), configured via `data.custom-powerplants` in the respective config files [PR #302](https://github.com/open-energy-transition/pypsa-zambia/pull/302)
 
 
@@ -22,6 +24,9 @@ This part of documentation collects descriptive release notes to capture the mai
 * Added link to download PyPSA APP to docs [PR #319](https://github.com/open-energy-transition/pypsa-zambia/pull/319)
 
 * Fixed bug whereby docs page was not included into nav tree of readthedocs [PR #328](https://github.com/open-energy-transition/pypsa-zambia/pull/328)
+
+* Added key energy sector metrics from ERB Annual Statistics Bulletin [PR #323](https://github.com/open-energy-transition/pypsa-zambia/pull/350)
+
 
 # PyPSA-Zambia v0.4
 
