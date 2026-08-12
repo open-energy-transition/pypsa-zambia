@@ -2,11 +2,11 @@
 # SPDX-FileCopyrightText: Open Energy Transition gGmbH
 # SPDX-License-Identifier: CC0-1.0
 # Scenario diff — 2030 planning horizon
-# Merges with: configs/cap_exp_zambia_base.yaml
+# Merges with: configs/zambia_configs/config.zm.cap_exp_base.yaml
 
 run:
   name: cap_exp_zambia_2030
-  base_config: configs/cap_exp_zambia_base.yaml
+  base_config: configs/zambia_configs/config.zm.cap_exp_base.yaml
 
 electricity:
   powerplants_filter: (DateOut >= 2030 or DateOut != DateOut) and (DateIn <= 2030 or DateIn != DateIn)

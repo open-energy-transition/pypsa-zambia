@@ -6,11 +6,6 @@
 run:
   name: benchmark_run
 
-scenario:
-  ll: [v1.0]
-  clusters: ['10']
-  opts: [Co2L-3h]
-
 snapshots:
   start: '2023-01-01'
   end: '2024-01-01'
@@ -20,29 +15,12 @@ atlite:
   hydro: hydro/zm-2023-glofas.nc
 
 renewable:
-  onwind:
-    correction_factor: 0.93
-    extendable: false
-  offwind-ac:
-    extendable: false
-  offwind-dc:
-    extendable: false
-  solar:
-    correction_factor: 0.854337
-    extendable: false
   hydro:
-    source: custom # use "era5" for a regular cutout workflow and "custom" for custom renewable profiles
-    extendable: false
     normalization:
-      method: irena
       year: 2023
-    multiplier: 10 # has different meaning for custom and era5 sources
-  csp:
-    extendable: false
 
 load_options:
   weather_year: 2023
-  prediction_year: 2030
   scale: 0.9 #0.85  # scaled the model demand by a factor of 14.4/19.34 to match the national value
 
 validation:
@@ -62,6 +40,9 @@ validation:
 
 data:
   custom-powerplants:
-    source: primary
     # parameters of powerplants correspond to the real state of the national power system
     version: v4
+  cutout-era5:
+    year: 2023
+  inflow-glofas:
+    year: 2023

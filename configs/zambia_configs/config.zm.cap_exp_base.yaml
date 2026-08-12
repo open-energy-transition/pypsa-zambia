@@ -30,6 +30,7 @@ atlite:
       x: [21.5, 33.7]
       y: [-18.8, -7.8]
   default: cutout-2023-era5
+  hydro: hydro/zm-2023-glofas.nc
 
 renewable:
   hydro:
@@ -90,4 +91,6 @@ data:
     # parameters of powerplants aligned with IRP assumptions
     version: v6
   cutout-era5:
+    year: 2023
+  inflow-glofas:
     year: 2023
