@@ -25,5 +25,5 @@ generation-by-diesel-plants,v1,primary,supported,zm,,2026-07-28,Electricity gene
 generation-by-large-hydo,v1,primary,supported,zm,,2026-07-28,Electricity generation from ZESCO's large hydro power plants (GWh) 2013-2025,sandbox.zenodo.org/records/582003/files/generation-from-large-hydro-power.csv
 generation-by-mini-hydro,v1,primary,supported,zm,,2026-07-28,Electricity generation from ZESCO's mini-hydro power plants (GWh) 2013-2025,sandbox.zenodo.org/records/582002/files/generation-from-mini-hydro-power.csv
 total-exports,v1,primary,supported,zm,,2026-07-28,Total Exports,sandbox.zenodo.org/records/582000/files/zm-total-exports.csv
-custom-powerplants,v6,primary,supported,zm,,2026-07-08,Zambia capacity expansion power plants (IRP + proposed plants),sandbox.zenodo.org/records/537704/files/custom_powerplants.csv
+custom-powerplants,v5,primary,supported,zm,,2026-07-08,Zambia capacity expansion power plants (IRP + proposed plants),sandbox.zenodo.org/records/537704/files/custom_powerplants.csv
 sapp-countries,v1,primary,latest supported,zm,,2026-07-16,SAPP year-indexed trade data (ERB ESR 2020-2025),sandbox.zenodo.org/records/565480/files/sapp_countries.csv
