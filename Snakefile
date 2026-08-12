@@ -571,13 +571,13 @@ if config["enable"].get("build_natura_raster", False):
 if not config["enable"].get("build_natura_raster", False):
 
     rule copy_defaultnatura_tiff:
-        input: 
+        input:
             natura_in=branch(
                 countries == ["ZM"],
                 "data/natura/zm_natura.tiff",
                 "data/natura/natura.tiff",
             ),
-        output: 
+        output:
             natura_out=branch(
                 countries == ["ZM"],
                 "resources/" + RDIR + "zm_natura.tiff",
