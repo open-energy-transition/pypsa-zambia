@@ -575,7 +575,7 @@ if not config["enable"].get("build_natura_raster", False):
             countries == ["ZM"],
             "data/natura/zm_natura.tiff",
             "data/natura/natura.tiff",
-        ),    
+        ),
         output: branch(
             countries == ["ZM"],
             "resources/" + RDIR + "zm_natura.tiff",
