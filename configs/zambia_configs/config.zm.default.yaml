@@ -172,44 +172,35 @@ co2:
 
 
 # =================== Plotting ===================
-plotting:
-  # Each key defines one comparison group; the key itself is used as both the output folder name under results/comparison_plots/ and the target name for
-  # `snakemake results/comparison_plots/<key>`. `snakemake compare_scenarios` builds every group defined here.
-  # You can use snakemake -j 1 compare_scenarios to run the plotting comparison
-  scenario_comparison:
-    capacity_expansion:
-    # Exact run.name values from the scenario configs to compare.
-    # Each string must match a folder name under results/ (i.e. run.name in the
-    # respective config, e.g. run.name: cap_exp_zambia_2025 in cap_exp_zambia.yaml).
-    scenario_filter:
-    - "cap_exp_zambia_2025"
-    - "cap_exp_zambia_2030"
-    - "cap_exp_zambia_2040"
-    - "cap_exp_zambia_2050"
-    label_map:
-      cap_exp_zambia_2025: "cap_exp 2025"
-      cap_exp_zambia_2030: "cap_exp 2030"
-      cap_exp_zambia_2040: "cap_exp 2040"
-      cap_exp_zambia_2050: "cap_exp 2050"
-    # Carriers to hide from all comparison plots; set to [] to show everything.
-    # (internal model carrier names are used)
-    exclude_carriers:
-    - "load shedding"
+cap_exp_scenarios:
+  zm.cap_exp_2025: "cap_exp 2025"
+  zm.cap_exp_2030: "cap_exp 2030"
+  zm.cap_exp_2040: "cap_exp 2040"
+  zm.cap_exp_2050: "cap_exp 2050"
 
-  dispatch_validation:
-    scenario_filter:
-    - "validation_dispatch_zambia_2023"
-    - "validation_dispatch_zambia_2024"
-    exclude_carriers:
-    - "load shedding"
-    reference_data:   # generation data, imports and exports data are available from ERB Zambia (https://www.erb.org.zm/).
-    - generation
+plotting:
+  scenario_comparison:
+    # Each key defines one comparison group; the key itself is used as both the output folder name under results/comparison_plots/ and the target name for
+    # `snakemake results/comparison_plots/<key>`. `snakemake compare_scenarios` builds every group defined here.
+    # You can use snakemake -j 1 compare_scenarios to run the plotting comparison
+    capacity_expansion:
+      exclude_carriers:
+      - "load shedding"
+
+    dispatch_validation:
+      scenario_filter:
+      - "validation_dispatch_zambia_2023"
+      - "validation_dispatch_zambia_2024"
+      exclude_carriers:
+      - "load shedding"
+      reference_data:   # generation data, imports and exports data are available from ERB Zambia (https://www.erb.org.zm/).
+      - generation
 
 
 data:
   custom-powerplants:
     source: primary
-    version: v1.0
+    version: v4
   zm-biomass:
     source: primary
     version: v1.0

@@ -64,6 +64,16 @@ config["scenario"]["unc"] = [
 
 config = update_cutout_config(config)
 
+# derive the plotting comparison group from one place in cap_exp_scenarios
+if "cap_exp_scenarios" in config:
+    cap_exp_group = (
+        config.setdefault("plotting", {})
+        .setdefault("scenario_comparison", {})
+        .setdefault("capacity_expansion", {})
+    )
+    cap_exp_group["scenario_filter"] = list(config["cap_exp_scenarios"].keys())
+    cap_exp_group["label_map"] = config["cap_exp_scenarios"]
+
 run = config.get("run", {})
 RDIR = run["name"] + "/" if run.get("name") else ""
 CDIR = RDIR if not run.get("shared_cutouts") else ""
