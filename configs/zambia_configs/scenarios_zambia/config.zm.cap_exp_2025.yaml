@@ -4,7 +4,7 @@
 # Scenario diff — 2025 planning horizon
 # Merges with: configs/zambia_configs/config.zm.cap_exp_base.yaml
 run:
-  name: cap_exp_zambia_2025
+  name: zm.cap_exp_2025
   base_config: configs/zambia_configs/config.zm.cap_exp_base.yaml
 
 electricity:

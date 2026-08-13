@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: CC0-1.0
 
 run:
-  name: benchmark_run
+  name: validation_dispatch_zambia_2023
 
 snapshots:
   start: '2023-01-01'

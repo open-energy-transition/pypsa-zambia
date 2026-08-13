@@ -5,7 +5,7 @@
 # Merges with: configs/zambia_configs/config.zm.cap_exp_base.yaml
 
 run:
-  name: cap_exp_zambia_2030
+  name: zm.cap_exp_2030
   base_config: configs/zambia_configs/config.zm.cap_exp_base.yaml
 
 electricity:
