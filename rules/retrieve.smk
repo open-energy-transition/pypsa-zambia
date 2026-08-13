@@ -362,7 +362,7 @@ if config["enable"].get("retrieve_cost_data", True):
             move(input[0], output[0])
 
 
-if (NATURA_ZM_DATASET := dataset_version("natura_zm", config))["source"] in [
+if (countries == ["ZM"]) and (NATURA_ZM_DATASET := dataset_version("natura_zm", config))["source"] in [
     "primary",
     "tutorial",
     "archive",
