@@ -49,7 +49,7 @@ renewable:
       method: hydro
       # TODO Harmmonize inputs for retrival and portable data supply
       # hydrobasins: data/hydrobasins/hybas_world.shp
-      hydrobasins: data/hydrobasins/hybas_af_lev01-12_v1c.zip
+      hydrobasins: data/hydrobasins/hybas_continent.shp
     normalization:
       method: irena
       year: 2013

@@ -114,7 +114,7 @@ if (HYDROBASINS_DATASET := dataset_version("hydrobasins", config))["source"] in 
                 ext=[".dbf", ".prj", ".shp", ".shx"],
             ),
         output:
-            shp="data/hydrobasins/hybas_world.shp",
+            shp="data/hydrobasins/hybas_continent.shp",
             other=multiext(
                 "data/hydrobasins/hybas_world", ".cpg", ".dbf", ".prj", ".shx"
             ),
