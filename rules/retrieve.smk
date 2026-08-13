@@ -6,7 +6,7 @@ import os
 import requests
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from shutil import move, unpack_archive, rmtree, copy2
+from shutil import copytree, move, unpack_archive, rmtree, copy2
 from zipfile import ZipFile
 from scripts._common import dataset_version
 
@@ -381,11 +381,18 @@ if (NATURA_ZM_DATASET := dataset_version("natura_zm", config))["source"] in [
             ),
         output:
             unzip=directory(f"data/natura_zm/{source}"),
-            tiff=f"data/natura_zm/{source}" + "/zm_natura.tiff",
-            shp=f"data/natura/zm_natura.tiff",
+            natura=directory("data/natura"),
         run:
-            unpack_archive(str(input["natura_zip"]), output["unzip"])
-            copy2(os.path.join(output["tiff"]), output["shp"])
+            unpack_archive(
+                str(input.natura_zip),
+                output.unzip,
+            )
+
+            copytree(
+                os.path.join(output.unzip, "natura"),
+                output.natura,
+                dirs_exist_ok=True,
+            )
 
 
 if not (config["enable"].get("retrieve_cutout", False)) and (
