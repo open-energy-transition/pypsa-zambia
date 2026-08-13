@@ -380,8 +380,8 @@ if (NATURA_ZM_DATASET := dataset_version("natura_zm", config))["source"] in [
                 additional_request_string="?download=1",
             ),
         output:
-            unzip=directory(f"data/natura/{source}"),
-            tiff=f"data/natura/{source}" + "/zm_natura.tiff",
+            unzip=directory(f"data/natura_zm/{source}"),
+            tiff=f"data/natura_zm/{source}" + "/zm_natura.tiff",
             shp=f"data/natura/zm_natura.tiff",
         run:
             unpack_archive(str(input["natura_zip"]), output["unzip"])
