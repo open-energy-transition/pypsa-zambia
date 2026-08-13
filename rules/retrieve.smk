@@ -394,6 +394,30 @@ if (countries == ["ZM"]) and (NATURA_ZM_DATASET := dataset_version("natura_zm", 
                 output.natura,
                 dirs_exist_ok=True,
             )
+elif (NATURA_EARTH_DATASET := dataset_version("natura_earth", config))["source"] in [
+    "primary",
+    "tutorial",
+    "archive",
+]:
+    source = NATURA_EARTH_DATASET["source"]
+
+    rule retrieve_natura_earth:
+        message:
+            "Retrieving Natura Earth dataset for {source}"
+        input:
+            natura_zip=HTTP.remote(
+                NATURA_EARTH_DATASET["url"],
+                keep_local=True,
+                additional_request_string="?download=1",
+            ),
+        output:
+            unzip=directory(f"data/natura_earth/{source}"),
+            tiff=f"data/natura_earth/{source}" + "/natura.tiff",
+            shp=f"data/natura/natura.tiff",
+        run:
+            unpack_archive(str(input["natura_zip"]), output["unzip"])
+            copy2(os.path.join(output["tiff"]), output["shp"])
+
 
 
 if not (config["enable"].get("retrieve_cutout", False)) and (
