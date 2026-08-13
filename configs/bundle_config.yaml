@@ -271,7 +271,7 @@ databundles:
     category: common
     destination: "data"
     urls:
-      zenodo: https://zenodo.org/records/21908206/files/bundle_data_zm.zip?download=1
+      zenodo: https://zenodo.org/records/21918872/files/bundle_data_zm.zip?download=1
     output:
     - data/eez/eez_v11.gpkg
     - data/copernicus/ZM_PROBAV_LC100_global_v3.0.1_2019-nrt_Discrete-Classification-map_EPSG-4326.tif
@@ -285,7 +285,7 @@ databundles:
     tutorial: true
     destination: "data"
     urls:
-      zenodo: https://zenodo.org/records/21908206/files/bundle_data_zm.zip?download=1
+      zenodo: https://zenodo.org/records/21918872/files/bundle_data_zm.zip?download=1
     output:
     - data/eez/eez_v11.gpkg
     - data/copernicus/ZM_PROBAV_LC100_global_v3.0.1_2019-nrt_Discrete-Classification-map_EPSG-4326.tif
@@ -298,7 +298,7 @@ databundles:
     category: natura
     destination: "data/natura/"
     urls:
-      zenodo: https://zenodo.org/records/21908206/files/bundle_data_zm.zip?download=1
+      zenodo: https://zenodo.org/records/21918872/files/bundle_data_zm.zip?download=1
     output:
     - data/natura/zm_natura.tiff
 
