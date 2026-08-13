@@ -276,6 +276,8 @@ databundles:
     - data/eez/eez_v11.gpkg
     - data/copernicus/ZM_PROBAV_LC100_global_v3.0.1_2019-nrt_Discrete-Classification-map_EPSG-4326.tif
     - data/ssp2-2.6/2030/era5_2013/Africa.nc
+    - data/WorldPop/zmb_ppp_2020_UNadj_constrained.tif
+    - data/GDP/GDP_PPP_1990_2015_5arcmin_v2.tif
 
   bundle_data_zm_tutorial:
     countries: [ZM]
@@ -288,6 +290,8 @@ databundles:
     - data/eez/eez_v11.gpkg
     - data/copernicus/ZM_PROBAV_LC100_global_v3.0.1_2019-nrt_Discrete-Classification-map_EPSG-4326.tif
     - data/ssp2-2.6/2030/era5_2013/Africa.nc
+    - data/WorldPop/zmb_ppp_2020_UNadj_constrained.tif
+    - data/GDP/GDP_PPP_1990_2015_5arcmin_v2.tif
 
   bundle_natura_zm:
     countries: [ZM]
