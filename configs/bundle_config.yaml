@@ -166,17 +166,6 @@ databundles:
     disable_by_opt:
       build_cutout: [all]
 
-# GEBCO data are not used for ZM-focused workflow
-  bundle_tutorial_ZM:
-    countries: [ZM]
-    tutorial: true
-    category: data
-    destination: "data"
-    urls:
-      zenodo: https://zenodo.org/records/18851102/files/bundle_tutorial_NGBJ_with_gadmlike.zip?download=1
-    output:
-    - data/copernicus/PROBAV_LC100_global_v3.0.1_2019-nrt_Discrete-Classification-map_EPSG-4326.tif
-
   # tutorial bundle for all African countries
   bundle_tutorial_data_common:
     countries: [Africa]
@@ -287,6 +276,18 @@ databundles:
     - data/eez/eez_v11.gpkg
     - data/copernicus/ZM_PROBAV_LC100_global_v3.0.1_2019-nrt_Discrete-Classification-map_EPSG-4326.tif
     - data/ssp2-2.6/2030/era5_2013/Africa.nc
+
+  bundle_data_zm_tutorial:
+    countries: [ZM]
+    category: common
+    tutorial: true    
+    destination: "data"
+    urls:
+      zenodo: https://zenodo.org/records/21908206/files/bundle_data_zm.zip?download=1
+    output:
+    - data/eez/eez_v11.gpkg
+    - data/copernicus/ZM_PROBAV_LC100_global_v3.0.1_2019-nrt_Discrete-Classification-map_EPSG-4326.tif
+    - data/ssp2-2.6/2030/era5_2013/Africa.nc    
 
   bundle_natura_zm:
     countries: [ZM]
