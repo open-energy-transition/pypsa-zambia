@@ -362,7 +362,9 @@ if config["enable"].get("retrieve_cost_data", True):
             move(input[0], output[0])
 
 
-if (countries == ["ZM"]) and (NATURA_ZM_DATASET := dataset_version("natura_zm", config))["source"] in [
+if (countries == ["ZM"]) and (
+    NATURA_ZM_DATASET := dataset_version("natura_zm", config)
+)["source"] in [
     "primary",
     "tutorial",
     "archive",
@@ -394,6 +396,7 @@ if (countries == ["ZM"]) and (NATURA_ZM_DATASET := dataset_version("natura_zm", 
                 output.natura,
                 dirs_exist_ok=True,
             )
+
 elif (NATURA_EARTH_DATASET := dataset_version("natura_earth", config))["source"] in [
     "primary",
     "tutorial",
@@ -417,7 +420,6 @@ elif (NATURA_EARTH_DATASET := dataset_version("natura_earth", config))["source"]
         run:
             unpack_archive(str(input["natura_zip"]), output["unzip"])
             copy2(os.path.join(output["tiff"]), output["shp"])
-
 
 
 if not (config["enable"].get("retrieve_cutout", False)) and (
