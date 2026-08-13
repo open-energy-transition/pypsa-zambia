@@ -230,8 +230,8 @@ data:
   landcover:
     source: primary
     version: Mar2026
-  natura_earth:
-    source: tutorial
+  natura_zm:
+    source: primary
     version: v1.0
   inflow-glofas:
     source: primary

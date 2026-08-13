@@ -362,27 +362,27 @@ if config["enable"].get("retrieve_cost_data", True):
             move(input[0], output[0])
 
 
-if (NATURA_EARTH_DATASET := dataset_version("natura_earth", config))["source"] in [
+if (NATURA_ZM_DATASET := dataset_version("natura_zm", config))["source"] in [
     "primary",
     "tutorial",
     "archive",
 ]:
 
-    source = NATURA_EARTH_DATASET["source"]
+    source = NATURA_ZM_DATASET["source"]
 
-    rule retrieve_natura_earth:
+    rule retrieve_natura_zm:
         message:
-            "Retrieving Natura Earth dataset for {source}"
+            "Retrieving Natura Zambia dataset for {source}"
         input:
             natura_zip=HTTP.remote(
-                NATURA_EARTH_DATASET["url"],
+                NATURA_ZM_DATASET["url"],
                 keep_local=True,
                 additional_request_string="?download=1",
             ),
         output:
-            unzip=directory(f"data/natura_earth/{source}"),
-            tiff=f"data/natura_earth/{source}" + "/natura.tiff",
-            shp=f"data/natura/natura.tiff",
+            unzip=directory(f"data/natura/{source}"),
+            tiff=f"data/natura/{source}" + "/zm_natura.tiff",
+            shp=f"data/natura/zm_natura.tiff",
         run:
             unpack_archive(str(input["natura_zip"]), output["unzip"])
             copy2(os.path.join(output["tiff"]), output["shp"])
