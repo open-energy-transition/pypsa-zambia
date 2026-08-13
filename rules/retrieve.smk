@@ -382,6 +382,7 @@ if (NATURA_ZM_DATASET := dataset_version("natura_zm", config))["source"] in [
         output:
             unzip=directory(f"data/natura_zm/{source}"),
             natura=directory("data/natura"),
+            tiff="data/natura/zm_natura.tiff",
         run:
             unpack_archive(
                 str(input.natura_zip),
