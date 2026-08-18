@@ -64,5 +64,3 @@ The objective function can change in an expected way in some cases. That include
 2. In the output of CI, locate the `Summary` tab, scroll down to the `Artifacts` section and download `ref_objectives-ubuntu`.
 3. Unzip the downloaded `ref_objectives-ubuntu.zip` file and copy and paste the objective values from it into `utils/obj_ref.csv`.
 4. Create a feature branch, commit the changes, push to the remote repo and open a PR.
-
-
