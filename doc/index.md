@@ -94,7 +94,7 @@ There are multiple ways to get involved and learn more about our work:
 - [Data Versioning](data_sources.md) - Manage different versions of data
 - [Rules Overview](user-guide/rules-overview.md) - Snakemake rules explained
 - [Rules Reference](user-guide/rules-reference/download-and-filter/index.md) - Detailed rule descriptions
-- [Repo Maintainance](maintatinace_note.md) - Manage different versions of data
+- [Repo Maintenance](maintatinace_note.md) - Manage different versions of data
 
 ### Educational Materials
 
