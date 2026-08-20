@@ -25,7 +25,7 @@ enable:
   # ----------------- Retrieving data -----------------
   retrieve_databundle: false # recommended for first run
   retrieve_cutout: false # retrieves the bundled 2013 cutout (cutout-2013-era5); changing load_options.weather_year (default: 2013) requires retrieve_cutout:false and build_cutout: true.
-  retrieve_cost_data: true # false: use existing data/costs.csv
+  retrieve_cost_data: false # false: use existing data/costs.csv
   download_global_buildings: false # download GlobalMLBuildingFootprints data for the countries specified above
   # ----------------- Building locally -----------------
   build_cutout: false
@@ -35,6 +35,13 @@ enable:
   build_natura_raster: false
 
 
+# =================== GEOGRAPHY & SHAPES ===================
+# ------------------- Clustering -------------------
+clustering:
+  simplify_network:
+    p_threshold_drop_isolated: 100  # MW — drop isolated subnetworks with load below this threshold
+
+
 # =================== NETWORK & RESOURCES ===================
 
 # ------------------- Demand -------------------
@@ -42,7 +49,6 @@ load_options:
   source: "gegis" # "gegis" (scenario-based: 2011, 2013, 2018 available) or "demcast" (hourly 2000–2024 available): view [issue #1724](https://github.com/pypsa-meets-earth/pypsa-earth/issues/1724) for more details
   weather_year: 2013 # Weather year of the load profile
   prediction_year: 2030 # Valid only if "gegis" used as a source
-  scale: 1 # scales all load time-series, i.e. 2 = doubles load
   demand_weights:
     mining: 0.76
     gdp: 0.24
@@ -195,6 +201,22 @@ plotting:
       - "load shedding"
       reference_data:   # generation data, imports and exports data are available from ERB Zambia (https://www.erb.org.zm/).
       - generation
+
+
+validation:
+  # TODO Get back once #243 is fixed
+  interconnectors:
+    enable: false
+    download_data: false
+  custom_powerplants:
+    enable: true
+    download_data: true
+  line_types:
+    download_data: true
+  mining_data:
+    download_data: true
+  biomass:
+    download_data: true
 
 
 data:
