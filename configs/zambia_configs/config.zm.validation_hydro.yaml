@@ -20,7 +20,6 @@ snapshots:
 countries: [ZM]
 
 atlite:
-  nprocesses: 4
   default: cutout-2023-era5
 
 renewable:
