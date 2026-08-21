@@ -14,14 +14,19 @@ atlite:
   default: cutout-2023-era5
   hydro: hydro/zm-2023-glofas.nc
 
-renewable:
-  hydro:
-    normalization:
-      year: 2023
-
 load_options:
   weather_year: 2023
   scale: 0.9 #0.85  # scaled the model demand by a factor of 14.4/19.34 to match the national value
+
+electricity:
+  extendable_carriers:
+    Generator: []
+    StorageUnit: []
+    Store: []
+    Link: []
+
+lines:
+  s_nom_extendable: false
 
 data:
   custom-powerplants:
