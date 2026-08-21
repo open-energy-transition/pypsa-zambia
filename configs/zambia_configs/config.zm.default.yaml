@@ -65,10 +65,6 @@ electricity:
   conventional_carriers: [oil, OCGT, CCGT, coal, geothermal, biomass]
   renewable_carriers: [solar, onwind, hydro]
 
-  max_hours: # Storage duration [h]: fill time at max power for extendable battery/H2 storage
-    battery: 6
-    H2: 168
-
   # ----------------- Grid topology -------------------
   base_voltage: 330.
   voltages: [66., 88., 132., 220., 330.]
@@ -99,16 +95,6 @@ atlite:
   hydro: hydro/zm-2013-glofas.nc
 
 renewable:
-  onwind:
-    correction_factor: 0.93
-    extendable: false
-  offwind-ac:
-    extendable: false
-  offwind-dc:
-    extendable: false
-  solar:
-    correction_factor: 0.854337
-    extendable: false
   hydro:
     source: custom # use "era5" for a regular cutout workflow and "custom" for custom renewable profiles
     extendable: false
@@ -116,8 +102,6 @@ renewable:
       method: irena
       year: 2013
     multiplier: 10 # has different meaning for custom and era5 sources
-  csp:
-    extendable: false
 
 # ------------------- Costs & emissions -------------------
 costs:
@@ -169,11 +153,9 @@ costs:
     oil: 30
 
 co2:
-  limit: 7.75e+7     # annual cap [tCO2/year]; European default — adjust for your region; active via Co2L wildcard
-  base: 1.487e+9     # baseline emissions used for relative reduction targets; European default
   emission_price: 0. # [currency/tCO2]; active via Ep wildcard
   automatic_emission: # derive co2.limit from historical emission data instead of the value above
-    enable: false
+    enable: true
     base_year: 1990  # any year from 1970 to 2018
 
 
