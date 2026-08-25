@@ -18,6 +18,8 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Improved organisation and layout of config files significantly [PR #356](https://github.com/open-energy-transition/pypsa-zambia/pull/356)
 
+* Updated docs to reflect new configs management methodolody [PR #356](https://github.com/open-energy-transition/pypsa-zambia/pull/356)
+
 
 ### Minor Changes and bug-fixing
 
