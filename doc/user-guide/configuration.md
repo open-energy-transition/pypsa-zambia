@@ -606,7 +606,7 @@ it, and Snakemake merges the layers in order
 
 ## Config layering
  - `config.default.yaml` (PyPSA-Earth's own generic defaults)
- - `config.zm.default.yaml` (Zambia-wide defaults — every run)
+ - `config.zm.default.yaml` (Zambia-wide defaults applied at every run)
  - `config.zm.validation_dispatch.yaml` (dispatch-mode overrides)
  - `config.zm.cap_exp_base.yaml` (capacity-expansion overrides)
  - `scenarios_zambia/config.zm.cap_exp_{year}.yaml` (per-year diff)
