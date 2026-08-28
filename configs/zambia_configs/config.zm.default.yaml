@@ -25,7 +25,7 @@ enable:
   # ----------------- Retrieving data -----------------
   retrieve_databundle: false # recommended for first run
   retrieve_cutout: false # retrieves the bundled 2013 cutout (cutout-2013-era5); changing load_options.weather_year (default: 2013) requires retrieve_cutout:false and build_cutout: true.
-  retrieve_cost_data: false # false: use existing data/costs.csv
+  retrieve_cost_data: true # false: use existing data/costs.csv
   download_global_buildings: false # download GlobalMLBuildingFootprints data for the countries specified above
   # ----------------- Building locally -----------------
   build_cutout: false
