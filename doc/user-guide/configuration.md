@@ -617,7 +617,7 @@ should only hold values that are genuinely the same for both modes (data
 source versions, line types, country selection, base costs). Anything
 specific to one mode belongs in that mode's own file instead, even if it
 means restating a key. A value that quietly falls back to a setting tuned
-for a different mode is a common source of surprising results.
+for a different mode is a common source of unexpectedly surprising results.
 
 `config.zm.validation_dispatch.yaml` and `config.zm.cap_exp_base.yaml` sit on
 top of the shared default and are pulled in explicitly, not automatically:
@@ -646,7 +646,7 @@ while making it unambiguous at a glance which files are Zambia-specific. All
 of them live under `configs/zambia_configs/`
 
 Before adding a key to any of these files, check whether it already resolves
-correctly by inheritance. The exception is a small number of safety-critical settings such as non-extendable
+correctly by inheritance. The exception is a small number of settings such as non-extendable
 transmission and generation in dispatch mode, for instance, which are worth
 restating explicitly even though they're technically inherited, because the
 cost of forgetting them is high and the cost of the duplication is one line
