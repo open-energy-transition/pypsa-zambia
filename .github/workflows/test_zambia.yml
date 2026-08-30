@@ -101,6 +101,31 @@ jobs:
       if: steps.filter.outputs.src == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
       run: conda list
 
+    - name: Prepare HydroBASINS input
+      shell: bash -l {0}
+      run: |
+        set -euo pipefail
+
+        remote_dir="data.hydrosheds.org/file/hydrobasins/standard"
+        archive="${remote_dir}/hybas_af_lev01-12_v1c.zip"
+        url="https://data.hydrosheds.org/file/hydrobasins/standard/hybas_af_lev01-12_v1c.zip"
+
+        mkdir -p "$remote_dir"
+
+        curl \
+          --fail \
+          --location \
+          --retry 5 \
+          --retry-all-errors \
+          --user-agent "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/126 Safari/537.36" \
+          --referer "https://www.hydrosheds.org/products/hydrobasins" \
+          --header "Accept: application/zip,application/octet-stream,*/*" \
+          --output "${archive}.part" \
+          "$url"
+
+        mv "${archive}.part" "$archive"
+        test -s "$archive"
+
     - name: Run Zambia Dispatch Test
       if: steps.filter.outputs.src == 'true' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
       run: snakemake -j 1 solve_all_networks --configfile config.zm.tutorial.yaml test/config.zm.dispatch.yaml
