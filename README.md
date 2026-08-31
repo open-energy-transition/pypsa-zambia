@@ -155,15 +155,11 @@ A set of notebooks which provides insights on outputs of the model and ways to a
 
 ## Test run on tutorial
 
-- In the folder open a terminal/command window to be located at this path `~/pypsa-earth/`
+- In the folder open a terminal/command window to be located at this path `~/pypsa-zambia/`
 - Activate the environment `conda activate pypsa-earth`
-- Rename config.tutorial.yaml to config.yaml. For instance in Linux:
-  ```bash
-  mv config.tutorial.yaml config.yaml
-  ```
 - Run a dryrun of the Snakemake workflow by typing simply in the terminal:
   ```bash
-  snakemake -j 1 solve_all_networks -n
+  snakemake -j 1 solve_all_networks --configfile config.zm.tutorial.yaml -n
   ```
 
   Remove the -n to do a real run. Follow the tutorial of PyPSA-Eur 1 and 2 on [YouTube](https://www.youtube.com/watch?v=ty47YU1_eeQ) to continue with an analysis.
