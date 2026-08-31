@@ -98,7 +98,7 @@ snakemake -j 1 run_all_scenarios
       .../pypsa-zambia % conda env create -f envs/win-64.lock.yaml
      ```
 
-   If the above takes longer than 30 min, you might want to try mamba for faster installation:
+If the above takes longer than 30 min, you might want to try mamba for faster installation:
 
    ```bash
    (base) conda install -c conda-forge mamba
@@ -106,7 +106,7 @@ snakemake -j 1 run_all_scenarios
    .../pypsa-zambia % mamba env create -f envs/{{your operating system}}64.lock.yaml
    ```
 
-   Alternatively, you can use [pixi](https://pixi.prefix.dev/latest/) for faster and simpler dependency management (no separate lock files per OS):
+Alternatively, you can use [pixi](https://pixi.prefix.dev/latest/) for faster and simpler dependency management (no separate lock files per OS):
 
    ```bash
    # install pixi: https://pixi.prefix.dev/latest/#installation
