@@ -151,7 +151,7 @@ To use them, you need to go through the following steps:
 
 ## Validation
 
-A set of notebooks which provides ingights on outputs of the model and ways to analyse them are available in [zambia-dev-notebooks](https://github.com/open-energy-transition/zambia-dev-notebooks) repo.
+A set of notebooks which provides insights on outputs of the model and ways to analyse them are available in [zambia-dev-notebooks](https://github.com/open-energy-transition/zambia-dev-notebooks) repo.
 
 ## Test run on tutorial
 
