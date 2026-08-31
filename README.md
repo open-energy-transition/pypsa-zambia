@@ -159,7 +159,7 @@ A set of notebooks which provides insights on outputs of the model and ways to a
 - Activate the environment `conda activate pypsa-earth`
 - Run a dryrun of the Snakemake workflow by typing simply in the terminal:
   ```bash
-  snakemake -j 1 solve_all_networks --configfile config.zm.tutorial.yaml -n
+  snakemake -j 1 solve_all_networks --configfile config.zm.tutorial.yaml test/config.zm.dispatch.yaml -n
   ```
 
   Remove the -n to do a real run. Follow the tutorial of PyPSA-Eur 1 and 2 on [YouTube](https://www.youtube.com/watch?v=ty47YU1_eeQ) to continue with an analysis.

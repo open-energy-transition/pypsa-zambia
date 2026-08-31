@@ -14,7 +14,7 @@ enable:
   retrieve_databundle: true
   retrieve_databundle_sector: true
   retrieve_cutout: true
-  build_natura_raster: false
+  build_natura_raster: true
   progress_bar: false
 
 data:
