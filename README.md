@@ -52,7 +52,7 @@ investment and dispatch jointly. The `existing_thermal_dispatch` feature forces
 existing coal and oil plants to always dispatch, reflecting their
 sunk-cost status in forward-looking runs.
 
-The base config is: `configs/cap_exp_zambia.yaml` (base) + year-specific overrides in
+The base config is: `configs/cap_exp_zambia_base.yaml` + year-specific overrides in
 `configs/scenarios_zambia/`
 
 ```bash
