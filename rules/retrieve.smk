@@ -6,7 +6,7 @@ import os
 import requests
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from shutil import move, unpack_archive, rmtree, copy2
+from shutil import copytree, move, unpack_archive, rmtree, copy2
 from zipfile import ZipFile
 from scripts._common import dataset_version
 
@@ -114,7 +114,7 @@ if (HYDROBASINS_DATASET := dataset_version("hydrobasins", config))["source"] in 
                 ext=[".dbf", ".prj", ".shp", ".shx"],
             ),
         output:
-            shp="data/hydrobasins/hybas_world.shp",
+            shp="data/hydrobasins/hybas_continent.shp",
             other=multiext(
                 "data/hydrobasins/hybas_world", ".cpg", ".dbf", ".prj", ".shx"
             ),
@@ -362,12 +362,46 @@ if config["enable"].get("retrieve_cost_data", True):
             move(input[0], output[0])
 
 
-if (NATURA_EARTH_DATASET := dataset_version("natura_earth", config))["source"] in [
+if (countries == ["ZM"]) and (
+    NATURA_ZM_DATASET := dataset_version("natura_zm", config)
+)["source"] in [
     "primary",
     "tutorial",
     "archive",
 ]:
 
+    source = NATURA_ZM_DATASET["source"]
+
+    rule retrieve_natura_zm:
+        message:
+            "Retrieving Natura Zambia dataset for {source}"
+        input:
+            natura_zip=HTTP.remote(
+                NATURA_ZM_DATASET["url"],
+                keep_local=True,
+                additional_request_string="?download=1",
+            ),
+        output:
+            unzip=directory(f"data/natura_zm/{source}"),
+            natura=directory("data/natura"),
+            tiff="data/natura/zm_natura.tiff",
+        run:
+            unpack_archive(
+                str(input.natura_zip),
+                output.unzip,
+            )
+
+            copytree(
+                os.path.join(output.unzip, "natura"),
+                output.natura,
+                dirs_exist_ok=True,
+            )
+
+elif (NATURA_EARTH_DATASET := dataset_version("natura_earth", config))["source"] in [
+    "primary",
+    "tutorial",
+    "archive",
+]:
     source = NATURA_EARTH_DATASET["source"]
 
     rule retrieve_natura_earth:

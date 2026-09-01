@@ -45,6 +45,11 @@ renewable:
   hydro:
     source: custom # use "era5" for a regular cutout workflow and "custom" for custom renewable profiles
     extendable: false
+    resource:
+      method: hydro
+      # TODO Harmmonize inputs for retrival and portable data supply
+      # hydrobasins: data/hydrobasins/hybas_world.shp
+      hydrobasins: data/hydrobasins/hybas_continent.shp
     normalization:
       method: irena
       year: 2013
@@ -225,8 +230,8 @@ data:
   landcover:
     source: primary
     version: Mar2026
-  natura_earth:
-    source: tutorial
+  natura_zm:
+    source: primary
     version: v1.0
   inflow-glofas:
     source: primary

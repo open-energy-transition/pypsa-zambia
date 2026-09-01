@@ -27,6 +27,8 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Added key energy sector metrics from ERB Annual Statistics Bulletin [PR #323](https://github.com/open-energy-transition/pypsa-zambia/pull/350)
 
+* Enable using regional-tailored spatial datasets [PR #370](https://github.com/open-energy-transition/pypsa-zambia/pull/370)
+
 
 # PyPSA-Zambia v0.4
 

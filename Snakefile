@@ -555,7 +555,11 @@ if config["enable"].get("build_natura_raster", False):
             country_shapes="resources/" + RDIR + "shapes/country_shapes.geojson",
             offshore_shapes="resources/" + RDIR + "shapes/offshore_shapes.geojson",
         output:
-            "resources/" + RDIR + "natura.tiff",
+            branch(
+                countries == ["ZM"],
+                "resources/" + RDIR + "zm_natura.tiff",
+                "resources/" + RDIR + "natura.tiff",
+            ),
         log:
             "logs/" + RDIR + "build_natura_raster.log",
         benchmark:
@@ -568,9 +572,17 @@ if not config["enable"].get("build_natura_raster", False):
 
     rule copy_defaultnatura_tiff:
         input:
-            "data/natura/natura.tiff",
+            natura_in=branch(
+                countries == ["ZM"],
+                "data/natura/zm_natura.tiff",
+                "data/natura/natura.tiff",
+            ),
         output:
-            "resources/" + RDIR + "natura.tiff",
+            natura_out=branch(
+                countries == ["ZM"],
+                "resources/" + RDIR + "zm_natura.tiff",
+                "resources/" + RDIR + "natura.tiff",
+            ),
         run:
             import shutil
 
@@ -709,9 +721,21 @@ rule build_renewable_profiles:
         alternative_clustering=config["clustering"]["alternative_clustering"],
     input:
         unpack(inputs_hydro),
-        natura="resources/" + RDIR + "natura.tiff",
-        copernicus="data/copernicus/PROBAV_LC100_global_v3.0.1_2019-nrt_Discrete-Classification-map_EPSG-4326.tif",
-        gebco="data/gebco/GEBCO_2025_sub_ice.nc",
+        natura=branch(
+            countries == ["ZM"],
+            "resources/" + RDIR + "zm_natura.tiff",
+            "resources/" + RDIR + "natura.tiff",
+        ),
+        copernicus=branch(
+            countries == ["ZM"],
+            "data/copernicus/ZM_PROBAV_LC100_global_v3.0.1_2019-nrt_Discrete-Classification-map_EPSG-4326.tif",
+            "data/copernicus/PROBAV_LC100_global_v3.0.1_2019-nrt_Discrete-Classification-map_EPSG-4326.tif",
+        ),
+        gebco=branch(
+            countries == ["ZM"],
+            {},
+            "data/gebco/GEBCO_2025_sub_ice.nc",
+        ),
         country_shapes="resources/" + RDIR + "shapes/country_shapes.geojson",
         offshore_shapes="resources/" + RDIR + "shapes/offshore_shapes.geojson",
         regions=lambda w: (
