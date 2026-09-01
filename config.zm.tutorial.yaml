@@ -46,8 +46,8 @@ base_network:
   min_voltage_rebase_voltage: 35000
 
 co2:
-  limit: 1.487e+9     # annual cap [tCO2/year]; European default — adjust for your region; active via Co2L wildcard
-  base: 1.487e+9     # baseline emissions used for relative reduction targets; European default
+  limit: 3.100e+6     # annual cap 2023 [tCO2/year]; Source: https://www.iea.org/countries/zambia/emissions
+  base: 3.100e+6     # baseline emissions used for relative reduction targets; Source: https://www.iea.org/countries/zambia/emissions
   emission_price: 0. # [currency/tCO2]; active via Ep wildcard
   automatic_emission: true
 
