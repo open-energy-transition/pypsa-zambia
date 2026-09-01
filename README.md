@@ -42,7 +42,7 @@ operating cost.
 The key config in carrying out this operation is the: `configs/validation_dispatch_zambia.yaml`
 
 ```bash
-snakemake -j 1 solve_all_networks configfile --configs/validation_dispatch_zambia.yaml
+snakemake -j 1 solve_all_networks --configfile configs/validation_dispatch_zambia.yaml
 ```
 
 ### Capacity expansion
