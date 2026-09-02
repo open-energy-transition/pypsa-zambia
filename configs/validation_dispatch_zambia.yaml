@@ -4,13 +4,13 @@
 # SPDX-License-Identifier: CC0-1.0
 
 run:
-  name: benchmark_run
+  name: validation_dispatch_zambia_2023_osm_update
   shared_cutouts: true
 enable:
   retrieve_cutout: false
   retrieve_databundle: false #  Recommended 'true', for the first run. Otherwise data might be missing.
   retrieve_databundle_sector: false
-  retrieve_cost_data: true # true: retrieves cost data from technology data and saves in resources/costs.csv, false: uses cost data in data/costs.csv
+  retrieve_cost_data: false # true: retrieves cost data from technology data and saves in resources/costs.csv, false: uses cost data in data/costs.csv
   download_global_buildings: false # If 'true', GlobalMLBuildingFootprints data will be downloaded for the above given countries
   build_natura_raster: false # If 'true', then an exclusion raster will be build. Otherwise use pregenerated raster.
   build_cutout: false
@@ -21,15 +21,15 @@ scenario:
   opts: [Co2L-3h]
 
 snapshots:
-  start: '2013-01-01'
-  end: '2014-01-01'
+  start: '2023-01-01'
+  end: '2024-01-01'
   inclusive: left   # end is not inclusive
 countries: [ZM]
 
 atlite:
   nprocesses: 4
-  default: cutout-2013-era5
-  hydro: hydro/zm-2013-glofas.nc
+  default: cutout-2023-era5
+  hydro: hydro/zm-2023-glofas.nc
 
 renewable:
   onwind:
@@ -47,14 +47,14 @@ renewable:
     extendable: false
     normalization:
       method: irena
-      year: 2013
+      year: 2023
     multiplier: 10 # has different meaning for custom and era5 sources
   csp:
     extendable: false
 
 load_options:
-  source: gegis
-  weather_year: 2013
+  source: demcast
+  weather_year: 2023
   prediction_year: 2030
   scale: 0.9 #0.85  # scaled the model demand by a factor of 14.4/19.34 to match the national value
   demand_weights:
@@ -98,7 +98,7 @@ electricity:
     stats: false # wind and solar generation provided by the custom powerplants file
   existing_thermal_dispatch:
     enable: false
-    base_year: 2024
+    base_year: 2023
     carriers: [coal, oil]
     plant_factors:
       coal: 0.6557
@@ -215,7 +215,7 @@ data:
     source: primary
     version: v1.0
     # NB Must be adjusted according to the weather year
-    year: 2013
+    year: 2023
   hydrobasins:
     source: build
     version: latest
@@ -232,4 +232,4 @@ data:
     source: primary
     version: v1.0
     # NB Must be adjusted according to the weather year
-    year: 2013
+    year: 2023
