@@ -27,6 +27,8 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Added key energy sector metrics from ERB Annual Statistics Bulletin [PR #323](https://github.com/open-energy-transition/pypsa-zambia/pull/350)
 
+* Added documentation for preparing and running offline (no internet access required) packages of pixi-based models, split into a developer/instructor guide and an end-user guide [PR #399](https://github.com/open-energy-transition/pypsa-zambia/pull/399)
+
 
 # PyPSA-Zambia v0.4
 
