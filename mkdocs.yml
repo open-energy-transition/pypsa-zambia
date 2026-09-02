@@ -25,6 +25,7 @@ nav:
   - index.md
   - Introduction: home/introduction.md
   - Installation: home/installation.md
+  - Offline Setup: home/offline-setup.md
   - Quick Start: home/quick-start.md
 
 - Tutorials:
