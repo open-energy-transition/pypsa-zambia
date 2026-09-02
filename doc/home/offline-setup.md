@@ -135,3 +135,4 @@ Three things go into the final package (for example, onto a USB drive):
 ## Other things worth knowing
 
 - Install the environment somewhere the user's account can always write to (their own user folder), rather than a system-wide location — this way it also works on computers with restricted permissions.
+- There is more than one way to package a pixi (or conda) environment for offline use — `conda-pack` is a conda-based alternative that works similarly but needs a separate `conda-unpack` step and tends to produce a larger archive. `pixi-pack` with `--create-executable` was found to be simpler to hand to a non-technical end user, since it is a single file with no separate unpack tool required.
