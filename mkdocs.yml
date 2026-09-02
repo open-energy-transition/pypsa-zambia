@@ -25,7 +25,9 @@ nav:
   - index.md
   - Introduction: home/introduction.md
   - Installation: home/installation.md
-  - Offline Setup: home/offline-setup.md
+  - Offline Setup:
+    - Preparing an Offline Package: home/offline-setup-prepare.md
+    - Running from an Offline Package: home/offline-setup-run.md
   - Quick Start: home/quick-start.md
 
 - Tutorials:
