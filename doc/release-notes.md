@@ -19,6 +19,8 @@ This part of documentation collects descriptive release notes to capture the mai
 
 ### Minor Changes and bug-fixing
 
+* Fix typos and improve the README [PR #392](https://github.com/open-energy-transition/pypsa-zambia/pull/392)
+
 * Correct SAPP cross-border trade values to match ERB Energy Sector Report data. The `sapp_countries.csv` is now filtered by snapshot year automatically[PR #320](https://github.com/open-energy-transition/pypsa-zambia/pull/320)
 
 * Added link to download PyPSA APP to docs [PR #319](https://github.com/open-energy-transition/pypsa-zambia/pull/319)

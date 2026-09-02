@@ -39,10 +39,10 @@ This mode is used to reproduce a historical year's operation. All `extendable_ca
 solver only determines how to schedule existing plants to minimise
 operating cost.
 
-The key config in carrying out this operation is the: `configs/validation_dispatch_zambia.yaml`
+The key config in carrying out this operation is the: `config.zm.validation_dispatch.yaml`
 
 ```bash
-snakemake -j 1 solve_all_networks configfile configs/validation_dispatch_zambia.yaml
+snakemake -j 1 solve_all_networks --configfile configs/zambia_configs/config.zm.validation_dispatch.yaml
 ```
 
 ### Capacity expansion
@@ -52,8 +52,8 @@ investment and dispatch jointly. The `existing_thermal_dispatch` feature forces
 existing coal and oil plants to always dispatch, reflecting their
 sunk-cost status in forward-looking runs.
 
-The base config is: `configs/cap_exp_zambia.yaml` (base) + year-specific overrides in
-`configs/scenarios_zambia/`
+The base config is: `configs/zambia_configs/config.zm.cap_exp_base.yaml` + year-specific overrides in
+`configs/zambia_configs/scenarios_zambia/config.zm.cap_exp_2025.yaml`
 
 ```bash
 snakemake -j 1 run_all_scenarios
@@ -98,7 +98,7 @@ snakemake -j 1 run_all_scenarios
       .../pypsa-zambia % conda env create -f envs/win-64.lock.yaml
      ```
 
-   If the above takes longer than 30 min, you might want to try mamba for faster installation:
+If the above takes longer than 30 min, you might want to try mamba for faster installation:
 
    ```bash
    (base) conda install -c conda-forge mamba
@@ -106,7 +106,7 @@ snakemake -j 1 run_all_scenarios
    .../pypsa-zambia % mamba env create -f envs/{{your operating system}}64.lock.yaml
    ```
 
-   Alternatively, you can use [pixi](https://pixi.prefix.dev/latest/) for faster and simpler dependency management (no separate lock files per OS):
+Alternatively, you can use [pixi](https://pixi.prefix.dev/latest/) for faster and simpler dependency management (no separate lock files per OS):
 
    ```bash
    # install pixi: https://pixi.prefix.dev/latest/#installation
@@ -139,31 +139,27 @@ snakemake -j 1 run_all_scenarios
 ## Customisation
 
 To build a regional cutout, you can use pre-compiled configuration files:
-- "configs/build_cutout_tutorial_zambia_config.yaml" for a smaller tutorial-styled cutout (good for testing)
-- "configs/build_cutout_zambia_config.yaml" for a full-scale cutout
+- "configs/zambia_configs/config.zm.build_cutout_tutorial.yaml" for a smaller tutorial-styled cutout (good for testing)
+- "configs/zambia_configs/config.zm.build_cutout.yaml" for a full-scale cutout
 
 To use them, you need to go through the following steps:
 1. Comment-out a line in Snakemake which fetches a default configuration
-`configfile: "configs/validation_dispatch_zambia.yaml"``
-2. Add a name of a suitable cutout-building configuration file to Smakemake under `#configfile: "configs/validation_dispatch_zambia.yaml"`, e.g. `configfile: "configs/build_cutout_zambia_config.yaml"`
+`configfile: "configs/zambia_configs/config.zm.default.yaml"`
+2. Add a name of a suitable cutout-building configuration file to Smakemake under `#configfile: "configs/zambia_configs/config.zm.validation_dispatch.yaml"`, e.g. `configfile: "configs/zambia_configs/config.zm.build_cutout.yaml"`
 3. Set-up Copernicus API
 4. run `build_cutout` rule
 
 ## Validation
 
-A set of notebooks which provides ingights on outputs of the model and ways to analyse them are available in [zambia-dev-notebooks](https://github.com/open-energy-transition/zambia-dev-notebooks) repo.
+A set of notebooks which provides insights on outputs of the model and ways to analyse them are available in [zambia-dev-notebooks](https://github.com/open-energy-transition/zambia-dev-notebooks) repo.
 
 ## Test run on tutorial
 
-- In the folder open a terminal/command window to be located at this path `~/pypsa-earth/`
+- In the folder open a terminal/command window to be located at this path `~/pypsa-zambia/`
 - Activate the environment `conda activate pypsa-earth`
-- Rename config.tutorial.yaml to config.yaml. For instance in Linux:
-  ```bash
-  mv config.tutorial.yaml config.yaml
-  ```
 - Run a dryrun of the Snakemake workflow by typing simply in the terminal:
   ```bash
-  snakemake -j 1 solve_all_networks -n
+  snakemake -j 1 solve_all_networks --configfile config.zm.tutorial.yaml test/config.zm.dispatch.yaml -n
   ```
 
   Remove the -n to do a real run. Follow the tutorial of PyPSA-Eur 1 and 2 on [YouTube](https://www.youtube.com/watch?v=ty47YU1_eeQ) to continue with an analysis.
