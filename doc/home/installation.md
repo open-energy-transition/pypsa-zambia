@@ -288,6 +288,9 @@ pixi install
 
     After this, any Jupyter session can select the `pypsa-earth` kernel regardless of the working directory.
 
+!!! tip "Need to run this without an internet connection?"
+    See [Preparing an Offline Package](offline-setup-prepare.md) for how to package a pixi environment and a model's input data so it can be installed and run on a computer with no internet access. If you have already been given such a package, see [Running from an Offline Package](offline-setup-run.md) instead.
+
 ## Solver Installation
 
 An optimization solver is needed to solve the mathematical problem that is built with the automated workflow of PyPSA-Earth. With the goal of supporting completely open source initiative, we focus on relying on Open-Source solvers, such as:
