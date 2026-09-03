@@ -1,0 +1,81 @@
+# SPDX-FileCopyrightText: Contributors to PyPSA-Earth
+# SPDX-FileCopyrightText: Open Energy Transition gGmbH
+#
+# SPDX-License-Identifier: CC0-1.0
+#
+# Base configuration for Zambia capacity expansion scenarios.
+# Parameters common to all planning years (2025, 2030, 2040, 2050).
+# Year-specific overrides live in configs/zambia_configs/scenarios_zambia/config.*.yaml.
+
+run:
+  name: "cap_exp_zambia_base"   # overridden by each scenario diff
+
+scenario:
+  ll: ["copt"]
+  clusters: ["22"]
+  opts: [3h]
+
+snapshots:
+  start: "2023-01-01"
+  end: "2024-01-01"
+
+
+atlite:
+  default: cutout-2023-era5
+  hydro: hydro/zm-2023-glofas.nc
+
+renewable:
+  hydro:
+    cutout: cutout-2023-era5
+    normalization:
+      year: 2023
+    multiplier: 2.19
+  solar:
+    cutout: cutout-2023-era5
+    correction_factor: 0.93
+  onwind:
+    cutout: cutout-2023-era5
+    correction_factor: 0.83
+
+electricity:
+  biomass_potential: false
+  automatic_emission: false
+  # TODO Adjust according to NDCs
+  automatic_emission_base_year: 1990
+  powerplants_filter: (DateOut >= 2025 or DateOut != DateOut) and (DateIn <= 2025 or DateIn != DateIn)  # default; overridden per scenario
+
+solving:
+  options:
+    load_shedding: 100  # load shedding cost for unmet demand (EUR/MWh)
+
+lines:
+  ac_types:
+    330.: "ACSR Zebra 2-bundle 330.0"  # SAPP standard 330 kV expansion conductor
+
+load_options:
+  source: "demcast"    # DemandCast
+  weather_year: 2023
+  scale: 1.44  # overridden per scenario
+
+costs:
+  FOM: # % of investment per year — IRP Annex 3
+    solar: 1.1
+    solar-utility: 1.1
+    onwind: 2.6
+    coal: 1.5
+    hydro: 1.6
+    ror: 1.6
+    biomass: 3.6
+    geothermal: 1.6
+    nuclear: 1.5
+    oil: 2.0
+  rooftop_share: 0  # utility-scale solar only
+
+data:
+  custom-powerplants:
+    # parameters of powerplants aligned with IRP assumptions
+    version: v6
+  cutout-era5:
+    year: 2023
+  inflow-glofas:
+    year: 2023

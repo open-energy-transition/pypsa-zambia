@@ -3,8 +3,6 @@
 #
 # SPDX-License-Identifier: CC0-1.0
 
-countries: ["ZM"]
-
 snapshots:
   start: "2024-01-01"
   end: "2025-01-01"
@@ -19,16 +17,8 @@ run:
   allow_scenario_failure: false # If True, the workflow will continue even if a scenario in run_scnenario fails
 
 enable:
-  retrieve_databundle: false #  Recommended 'true', for the first run. Otherwise data might be missing.
   retrieve_databundle_sector: false
-  retrieve_cost_data: true # true: retrieves cost data from technology data and saves in resources/costs.csv, false: uses cost data in data/costs.csv
   download_osm_data: true # If 'true', OpenStreetMap data will be downloaded for the above given countries
-  download_global_buildings: false # If 'true', GlobalMLBuildingFootprints data will be downloaded for the above given countries
-  build_natura_raster: false # If 'true', then an exclusion raster will be build. Otherwise use pregenerated raster.
-  build_cutout: true
-  # If "build_cutout" : true, then environmental data is extracted according to `snapshots` date range and `countries`
-  # requires cds API key https://cds.climate.copernicus.eu/api-how-to
-  # More information https://atlite.readthedocs.io/en/latest/introduction.html#datasets
   progress_bar: true # show progress bar during downloading routines and other long-running tasks
   custom_busmap: false # if true, use "data/custom_busmap_elec_s{simpl}_{clusters}.csv" for the clustering instead of the clustering algorithms
 
@@ -39,7 +29,6 @@ build_shape_options:
   gdp_method: false # "standard" pulls from web 1x1km raster, false (not "false") no gdp addition to shape which useful when generating only cutout
 
 atlite:
-  nprocesses: 4
   cutouts:
     cutout-2024-era5:
       module: era5

@@ -1,0 +1,39 @@
+# SPDX-FileCopyrightText: Contributors to PyPSA-Earth
+# SPDX-FileCopyrightText: Open Energy Transition gGmbH
+#
+# SPDX-License-Identifier: CC0-1.0
+
+run:
+  name: validation_dispatch_zambia_2023
+
+snapshots:
+  start: '2023-01-01'
+  end: '2024-01-01'
+
+atlite:
+  default: cutout-2023-era5
+  hydro: hydro/zm-2023-glofas.nc
+
+load_options:
+  source: "demcast"
+  weather_year: 2023
+  scale: 0.9 #0.85  # scaled the model demand by a factor of 14.4/19.34 to match the national value
+
+electricity:
+  extendable_carriers:
+    Generator: []
+    StorageUnit: []
+    Store: []
+    Link: []
+
+lines:
+  s_nom_extendable: false
+
+data:
+  custom-powerplants:
+    # parameters of powerplants correspond to the real state of the national power system
+    version: v4
+  cutout-era5:
+    year: 2023
+  inflow-glofas:
+    year: 2023
