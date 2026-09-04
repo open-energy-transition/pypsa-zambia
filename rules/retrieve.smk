@@ -508,7 +508,7 @@ if (BUNDLE_DATA := dataset_version("bundle_data", config))["source"] in [
             "data/ssp2-2.6/2030/era5_2013/SouthAmerica.nc",
             "data/ssp2-2.6/2030/era5_2013/Oceania.nc",
         run:
-            unpack_archive(input["bundle"], f"data")
+            unpack_archive(str(input["bundle"]), str(f"data"))
 
 
 if (DEMAND_CAST := dataset_version("demand_cast", config))["source"] in [
