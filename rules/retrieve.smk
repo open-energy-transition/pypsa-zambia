@@ -233,8 +233,9 @@ rule download_interconnection_data:
 rule download_line_types:
     input:
         url=HTTP.remote(
-            "https://sandbox.zenodo.org/records/473405/files/pypsa_line_types%20%281%29.csv",
+            "sandbox.zenodo.org/records/473405/files/pypsa_line_types (1).csv",
             keep_local=True,
+            additional_request_string="?download=1",
         ),
     output:
         "data/line_types.csv",
@@ -247,12 +248,12 @@ rule download_line_types:
 rule retrieve_mining_data:
     input:
         provincial_demand=HTTP.remote(
-            "https://sandbox.zenodo.org/records/495635/files/zambia_provincial_mining_demand.csv",
+            "sandbox.zenodo.org/records/495635/files/zambia_provincial_mining_demand.csv",
             keep_local=True,
             additional_request_string="?download=1",
         ),
         mining_polygons=HTTP.remote(
-            "https://sandbox.zenodo.org/records/495635/files/zambia_pangaea_mining_polygons.csv",
+            "sandbox.zenodo.org/records/495635/files/zambia_pangaea_mining_polygons.csv",
             keep_local=True,
             additional_request_string="?download=1",
         ),
@@ -539,4 +540,4 @@ if (DEMAND_CAST := dataset_version("demand_cast", config))["source"] in [
         output:
             f"data/demand/forecasts_on_historical_period.parquet",
         run:
-            copy2(input["bundle"], output[0])
+            copy2(str(input["bundle"]), str(output[0]))
