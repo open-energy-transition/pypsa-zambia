@@ -24,7 +24,7 @@ PyPSA-Zambia project is maintained as a soft-fork which means that it's kept in 
 - Upstream is always merged using a merge commit. This is necessary to preserve the blame information from upstream.
 - Merge upstream often to simplify the merges.
 - Keep your project code separate from upstream code if possible (new files or functions). It helps with merging upstream.
-- When resolving merge conflicts, it's worth to add a comment to facilitate reviews 
+- When resolving merge conflicts, it's worth to add a comment to facilitate reviews
 
 #### Git hand-ons
 
@@ -59,27 +59,27 @@ $ git merge upstream_main  # Merges the branch tracking upstream/main into new_u
 $ git push origin -u new_upstream_merge  # Push the branch to PyPSA-Zambia remote and open PR
 ```
 2. Version 2
-Follows up OET soft-fork guide. A detailed original soft-fork maintainance methodology is available in [this document](https://docs.google.com/document/d/1q5Ro2yVpK5lBG2JTIuVAWm5UjnC1-6Tb_SOEVAyruVI/edit?usp=sharing). To use it in this project, we have added a few modifications which are highlighted bellow.
+Follows up OET soft-fork guide. A detailed original soft-fork maintenance methodology is available in [this document](https://docs.google.com/document/d/1q5Ro2yVpK5lBG2JTIuVAWm5UjnC1-6Tb_SOEVAyruVI/edit?usp=sharing). To use it in this project, we have added a few modifications which are highlighted below.
 
 !!! note
 The original line (`git push --set-upstream origin upstream`) is a bit risky as it can lead to pushing into upstream and could be modified into
 
-First, the upstream changes must be fetched and placed into a dedicated local branch `upstream_local_branch`. In contrast to the original soft-fork methodology, a name of this local branch allows for a clear distinction between `upstream` as a remote name and a name of a branch which is synchronised with the upstream.
+First, the upstream changes must be fetched and placed into a dedicated local branch `upstream_local_branch`. In contrast to the original soft-fork methodology, a name of this local branch allows for a clear distinction between `upstream` as a remote name and a name of a branch which is synchronized with the upstream.
 
 ```
 ### fetch latest changes
 $ git fetch upstream --filter=blob:none
-$ 
+$
 $ git checkout upstream/main
 # remove an old branch if needed (assuming the old branch is upstream_local_branch)
 $ git branch -d upstream_local_branch
 $ git checkout -b upstream_local_branch
 ```
 
-Everything is now ready to be pushed. To be on a safe side, check first where the origin repo is located with `git remote show origin`. Once confindent, push the changes.
+Everything is now ready to be pushed. To be on a safe side, check first where the origin repo is located with `git remote show origin`. Once confident, push the changes.
 
 ```
-git push --set-upstream origin upstream_local_branch 
+git push --set-upstream origin upstream_local_branch
 ```
 
 ## Linter
