@@ -43,6 +43,8 @@ upstream        git@github.com:pypsa-meets-earth/pypsa-earth.git (push)
 
 ```
 
+#### Merging procedure
+
 1. Version 1
 Based on our successful [experience]((https://github.com/open-energy-transition/pypsa-zambia/pull/109)) in this project:
 ```
