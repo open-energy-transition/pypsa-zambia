@@ -1,0 +1,20 @@
+# SPDX-FileCopyrightText: Contributors to PyPSA-Earth
+# SPDX-FileCopyrightText: Open Energy Transition gGmbH
+# SPDX-License-Identifier: CC0-1.0
+# Scenario diff — 2040 planning horizon
+# Merges with: configs/zambia_configs/config.zm.cap_exp_base.yaml
+
+run:
+  name: zm.cap_exp_2040
+  base_config: configs/zambia_configs/config.zm.cap_exp_base.yaml
+
+electricity:
+  powerplants_filter: (DateOut >= 2040 or DateOut != DateOut) and (DateIn <= 2040 or DateIn != DateIn)
+  extendable_carriers:
+    Generator: [solar, onwind]
+
+load_options:
+  scale: 3.75  # IRP Table 3 2040 demand 59,674 GWh / DemandCast base 15,909 GWh
+
+costs:
+  year: 2040

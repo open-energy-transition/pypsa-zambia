@@ -9,7 +9,7 @@ import pathlib
 
 sys.path.append("./scripts")
 
-from shutil import copyfile, move
+from shutil import copyfile, move, unpack_archive
 
 from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
 
@@ -18,6 +18,7 @@ from _helpers import (
     get_last_commit_message,
     check_config_version,
     copy_default_files,
+    migrate_config,
     update_cutout_config,
     BASE_DIR,
     branch,  # Remove if Snakemake >= 8.3.0
@@ -27,7 +28,6 @@ from retrieve_databundle_light import (
     datafiles_retrivedatabundle,
     get_best_bundles_in_snakemake,
 )
-
 from scripts.utility_custom_features import load_mining_data, build_mining_raster
 
 from pathlib import Path
@@ -37,14 +37,19 @@ HTTP = HTTPRemoteProvider()
 
 copy_default_files()
 
+EXPAND_HYDRO = False
+
 
 configfile: "config.default.yaml"
 configfile: "configs/bundle_config.yaml"
 configfile: "configs/powerplantmatching_config.yaml"
-configfile: "configs/validation_dispatch_zambia.yaml"
+configfile: "configs/zambia_configs/config.zm.default.yaml"
+configfile: "config_current_scenario.yaml"
 
 
 check_config_version(config=config)
+
+config = migrate_config(config)
 
 config.update({"git_commit": get_last_commit_message(".")})
 
@@ -59,6 +64,16 @@ config["scenario"]["unc"] = [
 
 config = update_cutout_config(config)
 
+# derive the plotting comparison group from one place in cap_exp_scenarios
+if "cap_exp_scenarios" in config:
+    cap_exp_group = (
+        config.setdefault("plotting", {})
+        .setdefault("scenario_comparison", {})
+        .setdefault("capacity_expansion", {})
+    )
+    cap_exp_group["scenario_filter"] = list(config["cap_exp_scenarios"].keys())
+    cap_exp_group["label_map"] = config["cap_exp_scenarios"]
+
 run = config.get("run", {})
 RDIR = run["name"] + "/" if run.get("name") else ""
 CDIR = RDIR if not run.get("shared_cutouts") else ""
@@ -66,7 +81,6 @@ SECDIR = run["sector_name"] + "/" if run.get("sector_name") else ""
 SDIR = config["summary_dir"].strip("/") + f"/{SECDIR}"
 RESDIR = config["results_dir"].strip("/") + f"/{SECDIR}"
 
-load_data_paths = get_load_paths_gegis("data", config)
 ATLITE_NPROCESSES = config["atlite"].get("nprocesses", 4)
 
 
@@ -84,6 +98,7 @@ wildcard_constraints:
 
 
 include: "rules/retrieve.smk"
+include: "rules/postprocessing.smk"
 
 
 if config["custom_rules"] is not []:
@@ -149,7 +164,7 @@ if config["enable"].get("retrieve_databundle", True):
 
     # Exclude categories which are implemented in retrieve rules (retrieve.smk)
     bundles_to_download = get_best_bundles_in_snakemake(
-        config, exclude_categories=["natura", "hydrobasins", "cutouts"]
+        config, exclude_categories=["natura", "hydrobasins", "cutouts", "irena"]
     )
 
     rule retrieve_databundle_light:
@@ -171,95 +186,26 @@ if config["enable"].get("retrieve_databundle", True):
             "scripts/retrieve_databundle_light.py"
 
 
-if config["validation"]["custom_powerplants"].get("download_data", False):
+if config["enable"].get("retrieve_databundle", True) and config["tutorial"]:
 
-    rule download_custom_powerplants:
-        input:
-            url=HTTP.remote(
-                "https://sandbox.zenodo.org/records/491391/files/custom_powerplants.csv",
-                keep_local=True,
-                additional_request_string="?download=1",
-            ),
+    hydrobasins_to_download = get_best_bundles_in_snakemake(
+        config, include_categories=["hydrobasins"]
+    )
+
+    rule retrieve_hydrobasins_tutorial:
+        params:
+            bundles_to_download=hydrobasins_to_download,
         output:
-            "data/custom_powerplants.csv",
+            expand(
+                "{file}",
+                file=datafiles_retrivedatabundle(config, hydrobasins_to_download),
+            ),
         log:
-            "logs/download_custom_powerplants.log",
-        run:
-            copyfile(str(input["url"]), output[0])
-
-
-if config["validation"]["interconnectors"].get("download_data", False):
-
-    rule download_interconnection_data:
-        input:
-            substations=HTTP.remote(
-                "https://sandbox.zenodo.org/records/471583/files/zm_substations.csv",
-                keep_local=True,
-                additional_request_string="?download=1",
-            ),
-            links=HTTP.remote(
-                "https://sandbox.zenodo.org/records/471583/files/sapp_links.csv",
-                keep_local=True,
-                additional_request_string="?download=1",
-            ),
-            countries=HTTP.remote(
-                "https://sandbox.zenodo.org/records/471583/files/sapp_countries.csv",
-                keep_local=True,
-                additional_request_string="?download=1",
-            ),
-        output:
-            substations="data/zm_substations.csv",
-            links="data/sapp_links.csv",
-            countries="data/sapp_countries.csv",
-        log:
-            "logs/download_interconnection_data.log",
-        run:
-            copyfile(str(input["substations"]), output["substations"])
-            copyfile(str(input["links"]), output["links"])
-            copyfile(str(input["countries"]), output["countries"])
-
-
-if config["validation"]["line_types"].get("download_data", False):
-
-    rule download_line_types:
-        input:
-            url=HTTP.remote(
-                "https://sandbox.zenodo.org/records/473405/files/pypsa_line_types%20%281%29.csv",
-                keep_local=True,
-            ),
-        output:
-            "data/line_types.csv",
-        log:
-            "logs/download_line_types.log",
-        run:
-            copyfile(str(input["url"]), output[0])
-
-
-if config["validation"]["mining_data"].get("download_data", False):
-
-    rule retrieve_mining_data:
-        input:
-            provincial_demand=HTTP.remote(
-                "https://sandbox.zenodo.org/records/495635/files/zambia_provincial_mining_demand.csv",
-                keep_local=True,
-                additional_request_string="?download=1",
-            ),
-            mining_polygons=HTTP.remote(
-                "https://sandbox.zenodo.org/records/495635/files/zambia_pangaea_mining_polygons.csv",
-                keep_local=True,
-                additional_request_string="?download=1",
-            ),
-        output:
-            provincial_demand="data/mining/zambia_provincial_mining_demand.csv",
-            mining_polygons="data/mining/zambia_pangaea_mining_polygons.csv",
-        log:
-            "logs/retrieve_mining_data.log",
-        run:
-            import os
-
-            os.makedirs("data/mining", exist_ok=True)
-            copyfile(str(input["provincial_demand"]), output["provincial_demand"])
-            copyfile(str(input["mining_polygons"]), output["mining_polygons"])
+            "logs/" + RDIR + "retrieve_databundle.log",
+        benchmark:
+            "benchmarks/" + RDIR + "retrieve_databundle_light"
+        script:
+            "scripts/retrieve_databundle_light.py"
 
 
 if config["enable"].get("download_global_buildings", True):
@@ -295,7 +241,7 @@ if config["enable"].get("download_osm_data", True):
 rule clean_osm_data:
     params:
         crs=config["crs"],
-        clean_osm_data_options=config["clean_osm_data_options"],
+        clean_osm_data_options=config["osm"]["clean_osm_data"],
     input:
         cables="resources/" + RDIR + "osm/raw/all_raw_cables.geojson",
         generators="resources/" + RDIR + "osm/raw/all_raw_generators.geojson",
@@ -303,7 +249,9 @@ rule clean_osm_data:
         substations="resources/" + RDIR + "osm/raw/all_raw_substations.geojson",
         country_shapes="resources/" + RDIR + "shapes/country_shapes.geojson",
         offshore_shapes="resources/" + RDIR + "shapes/offshore_shapes.geojson",
-        africa_shape="resources/" + RDIR + "shapes/africa_shape.geojson",
+        extended_country_shape="resources/"
+        + RDIR
+        + "shapes/extended_country_shape.geojson",
     output:
         generators="resources/" + RDIR + "osm/clean/all_clean_generators.geojson",
         generators_csv="resources/" + RDIR + "osm/clean/all_clean_generators.csv",
@@ -319,7 +267,7 @@ rule clean_osm_data:
 
 rule build_osm_network:
     params:
-        build_osm_network=config.get("build_osm_network", {}),
+        build_osm_network=config.get("osm", {}).get("build_osm_network", {}),
         countries=config["countries"],
         crs=config["crs"],
     input:
@@ -353,10 +301,11 @@ rule build_osm_network:
 
 
 # Ensure mining data is only used if Zambia-specific load-options are set in config
-if config["load_options"]["zambia_demand_distribution"]:
+if config["load_options"].get("zambia_demand_distribution", False):
 
     rule build_shapes:
         params:
+            custom_gadm=config.get("custom_gadm", False),
             build_shape_options=config["build_shape_options"],
             crs=config["crs"],
             countries=config["countries"],
@@ -368,7 +317,9 @@ if config["load_options"]["zambia_demand_distribution"]:
         output:
             country_shapes="resources/" + RDIR + "shapes/country_shapes.geojson",
             offshore_shapes="resources/" + RDIR + "shapes/offshore_shapes.geojson",
-            africa_shape="resources/" + RDIR + "shapes/africa_shape.geojson",
+            extended_country_shape="resources/"
+            + RDIR
+            + "shapes/extended_country_shape.geojson",
             gadm_shapes="resources/" + RDIR + "shapes/gadm_shapes.geojson",
             subregion_shapes="resources/" + RDIR + "shapes/subregion_shapes.geojson",
             subregion_offshore="resources/" + RDIR + "shapes/subregion_offshore.geojson",
@@ -386,6 +337,7 @@ else:
 
     rule build_shapes:
         params:
+            custom_gadm=config.get("custom_gadm", False),
             build_shape_options=config["build_shape_options"],
             crs=config["crs"],
             countries=config["countries"],
@@ -395,7 +347,9 @@ else:
         output:
             country_shapes="resources/" + RDIR + "shapes/country_shapes.geojson",
             offshore_shapes="resources/" + RDIR + "shapes/offshore_shapes.geojson",
-            africa_shape="resources/" + RDIR + "shapes/africa_shape.geojson",
+            extended_country_shape="resources/"
+            + RDIR
+            + "shapes/extended_country_shape.geojson",
             gadm_shapes="resources/" + RDIR + "shapes/gadm_shapes.geojson",
             subregion_shapes="resources/" + RDIR + "shapes/subregion_shapes.geojson",
             subregion_offshore="resources/" + RDIR + "shapes/subregion_offshore.geojson",
@@ -501,7 +455,7 @@ rule base_network:
 
 rule build_bus_regions:
     params:
-        alternative_clustering=config["cluster_options"]["alternative_clustering"],
+        alternative_clustering=config["clustering"]["alternative_clustering"],
         crs=config["crs"],
         countries=config["countries"],
     input:
@@ -647,27 +601,6 @@ else:
     cost_directory = ""
 
 
-if config["enable"].get("retrieve_cost_data", True):
-
-    rule retrieve_cost_data:
-        params:
-            version=config["costs"]["technology_data_version"],
-        input:
-            HTTP.remote(
-                f"raw.githubusercontent.com/PyPSA/technology-data/{config['costs']['technology_data_version']}/outputs/{cost_directory}"
-                + "costs_{year}.csv",
-                keep_local=True,
-            ),
-        output:
-            "resources/" + RDIR + "costs_{year}.csv",
-        log:
-            "logs/" + RDIR + "retrieve_cost_data_{year}.log",
-        resources:
-            mem_mb=5000,
-        run:
-            move(input[0], output[0])
-
-
 rule process_cost_data:
     params:
         costs=config["costs"],
@@ -700,7 +633,11 @@ rule build_demand_profiles:
     input:
         base_network="networks/" + RDIR + "base.nc",
         regions="resources/" + RDIR + "bus_regions/regions_onshore.geojson",
-        load=load_data_paths,
+        load=branch(
+            config["load_options"].get("source", "gegis") in ["gegis", "ssp"],
+            get_load_paths_gegis("data", config),
+            "data/demand/forecasts_on_historical_period.parquet",
+        ),
         #gadm_shapes="resources/" + RDIR + "shapes/MAR2.geojson",
         #using this line instead of the following will test updated gadm shapes for MA.
         #To use: downlaod file from the google drive and place it in resources/" + RDIR + "shapes/
@@ -719,28 +656,29 @@ rule build_demand_profiles:
         "scripts/build_demand_profiles.py"
 
 
-HYDRO_PROFILES = {
-    "hydro_capacities": "data/hydro_capacities.csv",
-    "eia_hydro_generation": "data/eia_hydro_annual_generation.csv",
-    "irena_stats": "data/IRENA_Statistics_Extract_2025H2.xlsx",
-    "powerplants": "resources/" + RDIR + "powerplants.csv",
-    "hydrobasins": "data/hydrobasins/hybas_world.shp",
-}
-
-
 def inputs_hydro(w):
-    return HYDRO_PROFILES if w.technology == "hydro" else {}
+    if w.technology == "hydro":
+        HYDRO_PROFILES = {
+            "hydro_capacities": "data/hydro_capacities.csv",
+            "eia_hydro_generation": "data/eia_hydro_annual_generation.csv",
+            "irena_stats": "data/IRENA_Statistics_Extract_2025H2.xlsx",
+            "powerplants": "resources/" + RDIR + "powerplants.csv",
+            "hydrobasins": config["renewable"]["hydro"]["resource"]["hydrobasins"],
+        }
+        return HYDRO_PROFILES
+    else:
+        return {}
 
 
 rule build_glofas_profile:
     params:
         snapshots=config["snapshots"],
-    # TODO replace hardcoding
+        multiplier=config["renewable"]["hydro"].get("multiplier", 1),
     input:
         powerplants="resources/" + RDIR + "powerplants.csv",
-        glofas="cutouts/" + CDIR + "zm-2013-glofas.nc",
+        glofas="cutouts/" + config["atlite"].get("hydro"),
     output:
-        profile="cutouts/" + CDIR + "profile_hydro_glofas.nc",
+        profile="resources/" + RDIR + "renewable_profiles/profile_hydro_glofas.nc",
     log:
         "logs/" + RDIR + "build_glofas_profile.log",
     benchmark:
@@ -752,12 +690,33 @@ rule build_glofas_profile:
         "scripts/build_glofas_profile.py"
 
 
+rule build_glofas_potential:
+    params:
+        snapshots=config["snapshots"],
+        multiplier=config["renewable"]["hydro"].get("multiplier", 1),
+    input:
+        hydro_sites="resources/" + RDIR + "powerplants.csv",
+        glofas="cutouts/" + config["atlite"].get("hydro"),
+    output:
+        potential="resources/" + RDIR + "potential_hydro_glofas.nc",
+        # potential="data/hydro_profiles/glofas_potential.nc",
+    log:
+        "logs/" + RDIR + "build_glofas_potential.log",
+    benchmark:
+        "benchmarks/" + RDIR + "build_glofas_potential"
+    threads: ATLITE_NPROCESSES
+    resources:
+        mem_mb=ATLITE_NPROCESSES * 5000,
+    script:
+        "scripts/build_glofas_potential.py"
+
+
 rule build_renewable_profiles:
     params:
         crs=config["crs"],
         renewable=config["renewable"],
         countries=config["countries"],
-        alternative_clustering=config["cluster_options"]["alternative_clustering"],
+        alternative_clustering=config["clustering"]["alternative_clustering"],
     input:
         unpack(inputs_hydro),
         natura="resources/" + RDIR + "natura.tiff",
@@ -792,8 +751,9 @@ rule build_powerplants:
         geo_crs=config["crs"]["geo_crs"],
         countries=config["countries"],
         gadm_layer_id=config["build_shape_options"]["gadm_layer_id"],
-        alternative_clustering=config["cluster_options"]["alternative_clustering"],
+        alternative_clustering=config["clustering"]["alternative_clustering"],
         powerplants_filter=config["electricity"]["powerplants_filter"],
+        custom_powerplants_option=config["electricity"]["custom_powerplants"],
     input:
         base_network="networks/" + RDIR + "base.nc",
         pm_config="configs/powerplantmatching_config.yaml",
@@ -818,65 +778,145 @@ rule build_powerplants:
         "scripts/build_powerplants.py"
 
 
-rule add_electricity:
-    params:
-        countries=config["countries"],
-        output_currency=config["costs"]["output_currency"],
-        fill_values=config["costs"]["fill_values"],
-        conventional=config.get("conventional", {}),
-        electricity=config["electricity"],
-        alternative_clustering=config["cluster_options"]["alternative_clustering"],
-        renewable=config["renewable"],
-        length_factor=config["lines"]["length_factor"],
-        existing_capacities=config["existing_capacities"],
-    input:
-        **{
-            f"profile_{tech}": (
-                # config["renewable"][tech]["path"]
-                f"data/hydro_profiles/glofas_profile.nc"
-                if config["renewable"][tech].get("source", "era5") == "custom"
-                else f"resources/{RDIR}renewable_profiles/profile_{tech}.nc"
-            )
-            for tech in config["renewable"]
-            if tech in config["electricity"]["renewable_carriers"]
-        },
-        **{
-            f"conventional_{carrier}_{attr}": fn
-            for carrier, d in config.get("conventional", {None: {}}).items()
-            for attr, fn in d.items()
-            if str(fn).startswith("data/")
-        },
-        base_network="networks/" + RDIR + "base.nc",
-        tech_costs="resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv",
-        powerplants="resources/" + RDIR + "powerplants.csv",
-        #gadm_shapes="resources/" + RDIR + "shapes/MAR2.geojson",
-        #using this line instead of the following will test updated gadm shapes for MA.
-        #To use: downlaod file from the google drive and place it in resources/" + RDIR + "shapes/
-        #Link: https://drive.google.com/drive/u/1/folders/1dkW1wKBWvSY4i-XEuQFFBj242p0VdUlM
-        gadm_shapes="resources/" + RDIR + "shapes/gadm_shapes.geojson",
-        hydro_capacities="data/hydro_capacities.csv",
-        demand_profiles="resources/" + RDIR + "demand_profiles.csv",
-        nuclear_p_max_pu="data/nuclear_p_max_pu.csv",
-    output:
-        "networks/" + RDIR + "elec.nc",
-    log:
-        "logs/" + RDIR + "add_electricity.log",
-    benchmark:
-        "benchmarks/" + RDIR + "add_electricity"
-    threads: 1
-    resources:
-        mem_mb=3000,
-    script:
-        "scripts/add_electricity.py"
+if config["validation"].get("biomass"):
+
+    rule add_electricity:
+        params:
+            countries=config["countries"],
+            output_currency=config["costs"]["output_currency"],
+            fill_values=config["costs"]["fill_values"],
+            conventional=config.get("conventional", {}),
+            electricity=config["electricity"],
+            alternative_clustering=config["clustering"]["alternative_clustering"],
+            renewable=config["renewable"],
+            length_factor=config["lines"]["length_factor"],
+            existing_capacities=config["existing_capacities"],
+        input:
+            **{
+                f"profile_{tech}": (
+                    f"resources/{RDIR}renewable_profiles/profile_hydro_glofas.nc"
+                    # TODO Account for `glofas` value for `source`
+                    if config["renewable"][tech].get("source", "era5") == "custom"
+                    else f"resources/{RDIR}renewable_profiles/profile_{tech}.nc"
+                )
+                for tech in config["renewable"]
+                if tech in config["electricity"]["renewable_carriers"]
+            },
+            **{
+                f"conventional_{carrier}_{attr}": fn
+                for carrier, d in config.get("conventional", {None: {}}).items()
+                for attr, fn in d.items()
+                if str(fn).startswith("data/")
+            },
+            base_network="networks/" + RDIR + "base.nc",
+            tech_costs="resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv",
+            powerplants="resources/" + RDIR + "powerplants.csv",
+            gadm_shapes="resources/" + RDIR + "shapes/gadm_shapes.geojson",
+            hydro_capacities="data/hydro_capacities.csv",
+            demand_profiles="resources/" + RDIR + "demand_profiles.csv",
+            nuclear_p_max_pu="data/nuclear_p_max_pu.csv",
+            biomass_geojson="data/biomass.geojson",
+        output:
+            branch(
+                EXPAND_HYDRO,
+                "networks/" + RDIR + "elec_pre_hydro_expansion.nc",
+                "networks/" + RDIR + "elec.nc",
+            ),
+        log:
+            "logs/" + RDIR + "add_electricity.log",
+        benchmark:
+            "benchmarks/" + RDIR + "add_electricity"
+        threads: 1
+        resources:
+            mem_mb=3000,
+        script:
+            "scripts/add_electricity.py"
+
+else:
+
+    # TODO Check conflicts resolution
+    rule add_electricity:
+        params:
+            countries=config["countries"],
+            output_currency=config["costs"]["output_currency"],
+            fill_values=config["costs"]["fill_values"],
+            conventional=config.get("conventional", {}),
+            electricity=config["electricity"],
+            alternative_clustering=config["clustering"]["alternative_clustering"],
+            renewable=config["renewable"],
+            length_factor=config["lines"]["length_factor"],
+            existing_capacities=config["existing_capacities"],
+        input:
+            **{
+                f"profile_{tech}": (
+                    # f"data/hydro_profiles/glofas_profile.nc"
+                    f"resources/{RDIR}renewable_profiles/profile_hydro_glofas.nc"
+                    if config["renewable"][tech].get("source", "era5") == "custom"
+                    else f"resources/{RDIR}renewable_profiles/profile_{tech}.nc"
+                )
+                for tech in config["renewable"]
+                if tech in config["electricity"]["renewable_carriers"]
+            },
+            **{
+                f"conventional_{carrier}_{attr}": fn
+                for carrier, d in config.get("conventional", {None: {}}).items()
+                for attr, fn in d.items()
+                if str(fn).startswith("data/")
+            },
+            base_network="networks/" + RDIR + "base.nc",
+            tech_costs="resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv",
+            powerplants="resources/" + RDIR + "powerplants.csv",
+            gadm_shapes="resources/" + RDIR + "shapes/gadm_shapes.geojson",
+            hydro_capacities="data/hydro_capacities.csv",
+            demand_profiles="resources/" + RDIR + "demand_profiles.csv",
+            nuclear_p_max_pu="data/nuclear_p_max_pu.csv",
+        output:
+            branch(
+                EXPAND_HYDRO,
+                "networks/" + RDIR + "elec_pre_hydro_expansion.nc",
+                "networks/" + RDIR + "elec.nc",
+            ),
+        log:
+            "logs/" + RDIR + "add_electricity.log",
+        benchmark:
+            "benchmarks/" + RDIR + "add_electricity"
+        threads: 1
+        resources:
+            mem_mb=3000,
+        script:
+            "scripts/add_electricity.py"
+
+
+if EXPAND_HYDRO:
+
+    rule add_hydro_expansion:
+        params:
+            renewable=config["renewable"],
+        input:
+            elec_network="networks/" + RDIR + "elec_pre_hydro_expansion.nc",
+            potential="data/hydro_profiles/glofas_potential.nc",
+            tech_costs="resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv",
+            hydro_sites="resources/" + RDIR + "powerplants.csv",
+        output:
+            "networks/" + RDIR + "elec.nc",
+        log:
+            "logs/" + RDIR + "add_electricity.log",
+        benchmark:
+            "benchmarks/" + RDIR + "add_electricity"
+        threads: 1
+        resources:
+            mem_mb=3000,
+        script:
+            "scripts/add_hydro_expansion.py"
 
 
 rule simplify_network:
     params:
-        aggregation_strategies=config["cluster_options"]["aggregation_strategies"],
+        aggregation_strategies=config["clustering"]["aggregation_strategies"],
         disaggregate_flag=config["electricity"].get("disaggregate_powerplants", False),
         renewable=config["renewable"],
         crs=config["crs"],
-        cluster_options=config["cluster_options"],
+        clustering=config["clustering"],
         countries=config["countries"],
         build_shape_options=config["build_shape_options"],
         electricity=config["electricity"],
@@ -915,14 +955,14 @@ rule simplify_network:
 
 rule cluster_network:
     params:
-        aggregation_strategies=config["cluster_options"]["aggregation_strategies"],
+        aggregation_strategies=config["clustering"]["aggregation_strategies"],
         build_shape_options=config["build_shape_options"],
         electricity=config["electricity"],
         length_factor=config["lines"]["length_factor"],
         renewable=config["renewable"],
         crs=config["crs"],
         countries=config["countries"],
-        cluster_options=config["cluster_options"],
+        clustering=config["clustering"],
         focus_weights=config.get("focus_weights", None),
         custom_busmap=config["enable"].get("custom_busmap", False),
     input:
@@ -1062,7 +1102,7 @@ rule prepare_network:
         lines=config["lines"],
         s_max_pu=config["lines"]["s_max_pu"],
         electricity=config["electricity"],
-        emission_prices=config["costs"]["emission_prices"],
+        co2=config["co2"],
     input:
         "networks/" + RDIR + "elec_s{simpl}_{clusters}_ec.nc",
         tech_costs="resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv",
@@ -1325,12 +1365,54 @@ rule prepare_transport_data_input:
         "scripts/prepare_transport_data_input.py"
 
 
+rule retrieve_potash_data:
+    input:
+        potash_zip=HTTP.remote(
+            "https://pubs.usgs.gov/sir/2010/5090/s/PotashGIS.zip",
+            keep_local=True,
+        ),
+    output:
+        potash_dir=directory("data/potash_gis"),
+        potash_files="data/potash_gis/PotashGIS/global_potash/Shapefiles/PotashTracts.shp",
+    run:
+        unpack_archive(str(input.potash_zip), output["potash_dir"])
+
+
+if (
+    not config["custom_data"]["h2_underground"]
+    and config["sector"]["hydrogen"]["underground_storage"]["enabled"]
+):
+
+    rule build_salt_cavern_potentials:
+        input:
+            copernicus="data/copernicus/PROBAV_LC100_global_v3.0.1_2019-nrt_Discrete-Classification-map_EPSG-4326.tif",
+            regions_onshore="resources/"
+            + RDIR
+            + "bus_regions/regions_onshore_elec_s{simpl}_{clusters}.geojson",
+            regions_offshore="resources/"
+            + RDIR
+            + "bus_regions/regions_offshore_elec_s{simpl}_{clusters}.geojson",
+            potash_shp="data/potash_gis/PotashGIS/global_potash/Shapefiles/PotashTracts.shp",
+        output:
+            h2_cavern="resources/"
+            + RDIR
+            + "salt_cavern_potentials_s{simpl}_{clusters}.csv",
+        params:
+            crs=config["crs"],
+            underground_storage=config["sector"]["hydrogen"]["underground_storage"],
+        threads: 1
+        resources:
+            mem_mb=2000,
+        script:
+            "scripts/build_salt_cavern_potentials.py"
+
+
 if not config["custom_data"]["gas_network"]:
 
     rule prepare_gas_network:
         params:
             gas_config=config["sector"]["gas"],
-            alternative_clustering=config["cluster_options"]["alternative_clustering"],
+            alternative_clustering=config["clustering"]["alternative_clustering"],
             custom_gas_network=config["custom_data"]["gas_network"],
         input:
             regions_onshore="resources/"
@@ -1386,19 +1468,29 @@ HEAT = {
 rule prepare_sector_network:
     params:
         electricity=config["electricity"],
-        fossil_reserves=config["fossil_reserves"],
         h2_underground=config["custom_data"]["h2_underground"],
         countries=config["countries"],
         gadm_layer_id=config["build_shape_options"]["gadm_layer_id"],
-        alternative_clustering=config["cluster_options"]["alternative_clustering"],
+        alternative_clustering=config["clustering"]["alternative_clustering"],
         h2_policy=config["policy_config"]["hydrogen"],
         sector_options=config["sector"],
         foresight=config["foresight"],
         water_costs=config["custom_data"]["water_costs"],
-        co2_budget=config["co2_budget"],
+        co2=config["co2"],
     input:
         **branch(sector_enable["land_transport"], TRANSPORT),
         **branch(sector_enable["heat"], HEAT),
+        **branch(
+            config["custom_data"]["h2_underground"]
+            or config["sector"]["hydrogen"]["underground_storage"]["enabled"],
+            {
+                "h2_cavern": branch(
+                    config["custom_data"]["h2_underground"],
+                    "data/hydrogen_salt_cavern_potentials.csv",
+                    f"resources/{RDIR}salt_cavern_potentials_s{{simpl}}_{{clusters}}.csv",
+                )
+            },
+        ),
         **branch(
             solar_rooftop_enable,
             {
@@ -1411,7 +1503,6 @@ rule prepare_sector_network:
         ),
         network="networks/" + RDIR + "elec_s{simpl}_{clusters}_ec_l{ll}_{opts}.nc",
         costs="resources/" + RDIR + "costs_{planning_horizons}_sec.csv",
-        h2_cavern="data/hydrogen_salt_cavern_potentials.csv",
         nodal_energy_totals=branch(
             sector_enable["rail_transport"] or sector_enable["agriculture"],
             "resources/"
@@ -1477,7 +1568,7 @@ rule build_ship_profile:
 rule add_export:
     params:
         gadm_layer_id=config["build_shape_options"]["gadm_layer_id"],
-        alternative_clustering=config["cluster_options"]["alternative_clustering"],
+        alternative_clustering=config["clustering"]["alternative_clustering"],
         store=config["export"]["store"],
         store_capital_costs=config["export"]["store_capital_costs"],
         export_profile=config["export"]["export_profile"],
@@ -1671,7 +1762,7 @@ rule prepare_energy_totals:
 
 rule build_solar_thermal_profiles:
     params:
-        solar_thermal_config=config["solar_thermal"],
+        solar_thermal_config=config["sector"]["solar_thermal_collector"],
         snapshots=config["snapshots"],
     input:
         pop_layout_total="resources/"
@@ -2025,7 +2116,9 @@ rule plot_network:
         network="results/"
         + RDIR
         + "networks/elec_s{simpl}_{clusters}_ec_l{ll}_{opts}.nc",
-        africa_shape="resources/" + RDIR + "shapes/africa_shape.geojson",
+        extended_country_shape="resources/"
+        + RDIR
+        + "shapes/extended_country_shape.geojson",
         tech_costs="resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv",
     output:
         only_map="results/"
@@ -2094,8 +2187,10 @@ rule plot_sector_summary:
 
 
 rule build_industrial_database:
+    input:
+        ammonia_plants="resources/ammonia_plants.csv",
     output:
-        industrial_database="data/industrial_database.csv",
+        industrial_database="resources/industrial_database.csv",
     script:
         "scripts/build_industrial_database.py"
 
@@ -2125,7 +2220,7 @@ rule build_industrial_distribution_key:  #default data
     params:
         countries=config["countries"],
         gadm_layer_id=config["build_shape_options"]["gadm_layer_id"],
-        alternative_clustering=config["cluster_options"]["alternative_clustering"],
+        alternative_clustering=config["clustering"]["alternative_clustering"],
         industry_database=config["custom_data"]["industry_database"],
     input:
         regions_onshore="resources/"
@@ -2137,7 +2232,7 @@ rule build_industrial_distribution_key:  #default data
         clustered_gdp_layout="resources/"
         + SECDIR
         + "gdp_shares/gdp_layout_elec_s{simpl}_{clusters}_{planning_horizons}.csv",
-        industrial_database="data/industrial_database.csv",
+        industrial_database="resources/industrial_database.csv",
         shapes_path="resources/"
         + RDIR
         + "bus_regions/regions_onshore_elec_s{simpl}_{clusters}.geojson",
@@ -2193,6 +2288,10 @@ rule build_industry_demand:  #default data
         base_year=config["demand_data"]["base_year"],
         industry_util_factor=config["sector"]["industry_util_factor"],
         aluminium_year=config["demand_data"]["aluminium_year"],
+        ammonia_enable=config["sector"]["ammonia"]["enable"],
+        ammonia_gas_mwh_per_t=config["sector"]["ammonia"]["gas_MWh_per_tNH3"],
+        ammonia_elec_mwh_per_t=config["sector"]["ammonia"]["elec_MWh_per_tNH3"],
+        ammonia_year=config["sector"]["ammonia"]["production_year"],
     input:
         industrial_distribution_key="resources/"
         + SECDIR
@@ -2202,7 +2301,8 @@ rule build_industry_demand:  #default data
         base_industry_totals="resources/"
         + SECDIR
         + "demand/base_industry_totals_{planning_horizons}_{demand}.csv",
-        industrial_database="data/industrial_database.csv",
+        industrial_database="resources/industrial_database.csv",
+        ammonia_production="resources/ammonia_production.csv",
         costs="resources/" + RDIR + "costs_{planning_horizons}_sec.csv",
         industry_growth_cagr="data/demand/industry_growth_cagr.csv",
     output:
@@ -2220,6 +2320,39 @@ rule build_industry_demand:  #default data
         )
     script:
         "scripts/build_industry_demand.py"
+
+
+rule retrieve_us_cities_dataset:
+    output:
+        us_cities="data/industry/us_cities.csv",
+    script:
+        "scripts/retrieve_us_cities_dataset.py"
+
+
+rule retrieve_ammonia_dataset:
+    output:
+        usgs_ammonia_dataset="data/industry/USGS_ammonia_dataset.xlsx",
+    script:
+        "scripts/retrieve_ammonia_dataset.py"
+
+
+rule build_ammonia_production:
+    input:
+        ammonia_plants="data/industry/ammonia_plants.csv",
+        us_cities="data/industry/us_cities.csv",
+        usgs_ammonia_dataset="data/industry/USGS_ammonia_dataset.xlsx",
+    output:
+        ammonia_production="resources/ammonia_production.csv",
+        ammonia_plants="resources/ammonia_plants.csv",
+    threads: 1
+    resources:
+        mem_mb=1000,
+    log:
+        RESDIR + "logs/build_ammonia_production.log",
+    benchmark:
+        RESDIR + "benchmarks/build_ammonia_production"
+    script:
+        "scripts/build_ammonia_production.py"
 
 
 rule build_existing_heating_distribution:
@@ -2432,13 +2565,14 @@ if config["foresight"] == "myopic":
 
 rule run_scenario:
     input:
-        diff_config="configs/scenarios_zambia/config.{scenario_name}.yaml",
+        diff_config="configs/zambia_configs/scenarios_zambia/config.{scenario_name}.yaml",
     output:
         touchfile=touch("results/{scenario_name}/scenario.done"),
         copyconfig="results/{scenario_name}/config.yaml",
     threads: 1
     resources:
         mem_mb=5000,
+        scenario_runner=1,  # ensures only one scenario runs at a time (shared config_current_scenario.yaml)
     run:
         from build_test_configs import create_test_config
         import yaml
@@ -2460,18 +2594,22 @@ rule run_scenario:
             input.diff_config,
         )
         # merge the default config file with the difference
-        create_test_config(base_config_path, input.diff_config, "config.yaml")
+        create_test_config(
+            base_config_path, input.diff_config, "config_current_scenario.yaml"
+        )
+        # --nolock: inner snakemake must not compete for the project lock with the outer process
         run(
-            "snakemake -j all solve_all_networks --rerun-incomplete",
+            "snakemake --cores all solve_all_networks --rerun-incomplete --nolock",
             shell=True,
             check=not config["run"]["allow_scenario_failure"],
         )
         run(
-            "snakemake -j1 make_statistics --force",
+            "snakemake --cores 1 make_statistics --force --nolock",
             shell=True,
             check=not config["run"]["allow_scenario_failure"],
         )
-        copyfile("config.yaml", output.copyconfig)
+        os.makedirs(os.path.dirname(output.copyconfig), exist_ok=True)
+        copyfile("config_current_scenario.yaml", output.copyconfig)
 
 
 
@@ -2481,6 +2619,8 @@ rule run_all_scenarios:
             "results/{scenario_name}/scenario.done",
             scenario_name=[
                 c.stem.replace("config.", "")
-                for c in Path("configs/scenarios_zambia").glob("config.*.yaml")
+                for c in Path("configs/zambia_configs/scenarios_zambia").glob(
+                    "config.*.yaml"
+                )
             ],
         ),

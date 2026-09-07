@@ -25,7 +25,6 @@ aimed at improving data-driven power system planning in Zambia. The project will
 Open Energy Transition are developing this customized energy system model based on PyPSA (Python for Power System Analysis), tailored to the Zambian energy system and designed with scaling potential for other African utilities. Tool development will be guided by local insights to ensure the resulting solutions are practical, accessible, and trusted by those who rely on them. Other partners include Association of Power Utilities in Africa (APUA), the Zambian Ministry of Energy, and academic partners.
 
 The collaboration will run for 36 months. Initial concept development began in Q4 2025 and is now in implementation.
-The project is funded by the Quadrature Climate Foundation.
 
 As Africa’s electricity systems expand rapidly, planning decisions made today will shape reliability, affordability, and emissions for decades. Zambia is an ideal pilot country as energy shocks and multi-day blackouts have highlighted the urgent need for resilient energy planning. Meanwhile, the African Continental Master Plan depends on local capacity to develop national plans.
 
@@ -92,14 +91,16 @@ There are multiple ways to get involved and learn more about our work:
 - [Wildcards](user-guide/wildcards.md) - Understand wildcard patterns
 - [Costs](user-guide/costs.md) - Technology cost assumptions
 - [Custom Data Integration](user-guide/custom-data.md) - Integrate custom datasets into the model
+- [Data Versioning](data_sources.md) - Manage different versions of data
 - [Rules Overview](user-guide/rules-overview.md) - Snakemake rules explained
 - [Rules Reference](user-guide/rules-reference/download-and-filter/index.md) - Detailed rule descriptions
+- [Repo Maintenance](maintatinace_note.md) - Manage different versions of data
 
 ### Educational Materials
 
 - [Optimization](user-guide/optimization.md) - Optimization theory and methods
 
-### Utilities
+### Features
 
 - [Monte Carlo](utilities/monte-carlo.md) - Uncertainty quantification and sensitivity analysis
 

@@ -6,7 +6,7 @@
 run:
   name: "zm_glofas"
   shared_cutouts: true
-  base_config: config.tutorial.yaml  # base configuration file
+  base_config: config.zm.tutorial.yaml  # base for run_all_scenarios
 
 scenario:
   simpl: [""]
@@ -20,6 +20,11 @@ snapshots:
   inclusive: "left" # end is not inclusive
 countries: ["ZM"]
 
+atlite:
+  nprocesses: 4
+  # TODO Replace with a tutorial dataset to use in testing
+  hydro: hydro/zm-2013-glofas.nc
+
 enable:
   build_natura_raster: false # If 'true', then an exclusion raster will be build. Otherwise use pregenerated raster.
   retrieve_databundle: true
@@ -27,7 +32,7 @@ enable:
 download_osm_data_nprocesses: 4
 
 load_options:
-  ssp: "ssp2-2.6"
+  source: gegis
   weather_year: 2013
   prediction_year: 2030
   scale: 0.74  # scaled the model demand by a factor of 14.4/19.34 to match the national value
@@ -38,9 +43,6 @@ electricity:
     StorageUnit: []
     Store: []
     Link: []
-
-  automatic_emission: false
-  automatic_emission_base_year: 1990 # 1990 is taken as default. Any year from 1970 to 2018 can be selected.
 
   powerplants_filter: (DateOut >= 2023 or DateOut != DateOut) and (DateIn <= 2023 or DateIn != DateIn)
   custom_powerplants: replace # set to "merge" or "replace" if you have a custom_powerplants.csv for Zambia
@@ -94,7 +96,6 @@ renewable:
     max_shore_distance: false
   hydro:
     source: custom # use "era5" for a regular cutout workflow and "custom" for custom renewable profiles
-    path: cutouts/hydro/glofas_profile_2013_tutorial.nc
     extendable: false
     normalization:
       method: irena
@@ -106,6 +107,10 @@ renewable:
     max_depth: false
     min_shore_distance: false
     max_shore_distance: false
+
+co2:
+  automatic_emission: # derive co2.limit from historical emission data instead of the value above
+    enable: false
 
 sector:
   enable:

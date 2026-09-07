@@ -25,7 +25,7 @@ Thus, considering all required software tools, at least 40 GB of storage space i
 
 Prior to installing PyPSA-Earth, you'll need to ensure the following software tools are installed and configured on your system:
 
-- [Miniconda](https://docs.conda.io/projects/miniconda/en/latest/miniconda-install.html)
+- [Miniconda](https://docs.conda.io/projects/miniconda/en/latest/miniconda-install.html) (or [pixi](https://pixi.prefix.dev/latest/#installation) as an alternative — see [Installation with pixi](#installation-with-pixi-alternative))
 - [Git](https://git-scm.com/downloads)
 - [VSCode](https://code.visualstudio.com/) (or any other IDE)
 - [Java](https://www.oracle.com/java/technologies/downloads/)
@@ -167,6 +167,127 @@ To confirm the installation, run the following command in the activated environm
 snakemake --version
 ```
 
+## Installation with pixi (Alternative)
+
+[pixi](https://pixi.prefix.dev/latest/) is a modern, fast package manager built on the conda ecosystem. It offers faster installation using a single cross-platform lock file (`pixi.lock`).
+
+### Install pixi
+
+Follow the [pixi installation guide](https://pixi.prefix.dev/latest/#installation) for your OS, or run:
+
+=== "Linux / macOS"
+
+    ```bash
+    curl -fsSL https://pixi.sh/install.sh | sh
+    ```
+
+=== "Windows"
+
+    Use the installer available in the [pixi installation guide](https://pixi.prefix.dev/latest/#__tabbed_1_2) or execute the following in the powershell:
+    ```powershell
+    iwr -useb https://pixi.sh/install.ps1 | iex
+    ```
+
+Verify the installation with:
+
+```bash
+pixi --version
+```
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/pypsa-meets-earth/pypsa-earth.git
+cd pypsa-earth
+```
+
+### Install Dependencies
+
+pixi reads the [pixi.toml](https://github.com/pypsa-meets-earth/pypsa-earth/blob/main/pixi.toml) file at the root of the repository and automatically resolves and locks all dependencies into `pixi.lock`.
+
+```bash
+pixi install
+```
+
+This typically completes in a few minutes and creates a local `.pixi/` environment — no global environment management required.
+
+### Enable Prompt Indicator (Recommended)
+
+By default pixi does not modify your terminal prompt. Enable it once globally so your prompt shows the active environment — similar to conda:
+
+```bash
+pixi config set shell.change-ps1 true --global
+```
+
+After this, `pixi shell` will show `(pypsa-earth)` in your prompt:
+
+```
+(pypsa-earth) user@machine ~/pypsa-earth $
+```
+
+To check if you are inside a pixi shell at any time:
+
+```bash
+echo $PIXI_IN_SHELL   # prints 1 if inside, empty if not
+```
+
+### Run Commands
+
+There are two ways to use the environment:
+
+**Option 1 — `pixi shell` (interactive use, closest to conda):**
+
+```bash
+pixi shell            # enter the environment
+snakemake --version   # run commands normally, no prefix needed
+exit                  # leave the environment (never use conda deactivate)
+```
+
+**Option 2 — `pixi run` (scripts and CI):**
+
+```bash
+pixi run snakemake --version   # run a single command inside the environment
+pixi run make test
+```
+
+### Remove the Environment
+
+To remove the installed environment (e.g. to free up disk space or reinstall cleanly):
+
+```bash
+pixi clean
+```
+
+This deletes `.pixi/envs/` but keeps `pixi.toml` and `pixi.lock` intact. To reinstall:
+
+```bash
+pixi install
+```
+
+!!! note
+    The `pixi.lock` file pins all package versions across platforms (Linux, macOS, Windows) in a single file, ensuring reproducibility without needing separate lock files per OS.
+
+!!! danger "Do not use conda deactivate inside pixi shell"
+    If you are inside a `pixi shell`, always exit using `exit` or `Ctrl+D`. Running `conda deactivate` inside a pixi shell will crash conda because pixi uses conda's environment variables internally in a way that conda's deactivation logic cannot handle.
+
+!!! warning "Project-scoped environment"
+    Unlike conda, pixi environments are local to the project directory (`.pixi/envs/`). `pixi run` and `pixi shell` only work when invoked from the `pypsa-earth` root directory.
+
+    To use the environment from a different directory (e.g., a separate notebooks repo), you can source the environment into your current shell:
+
+    ```bash
+    # run from within the pypsa-earth directory
+    eval "$(pixi shell-hook)"
+    ```
+
+    For Jupyter, register the environment as a named kernel once:
+
+    ```bash
+    pixi run install-kernel
+    ```
+
+    After this, any Jupyter session can select the `pypsa-earth` kernel regardless of the working directory.
+
 ## Solver Installation
 
 An optimization solver is needed to solve the mathematical problem that is built with the automated workflow of PyPSA-Earth. With the goal of supporting completely open source initiative, we focus on relying on Open-Source solvers, such as:
@@ -236,3 +357,7 @@ This section provides a step-by-step guide on how to set up and use Docker conta
     - Wait for the container to build and open the repository in the container.
 
 The environment will be ready for use. You can now run PyPSA-Earth in the container.
+
+## Installing the PyPSA APP
+
+We also have the PyPSA APP installers, which provide an alternative way to run PyPSA workflows through the use of a user friendly graphical user interface. Currently there is support for [Windows](https://drive.google.com/file/d/1EEin8vZ9AxPRT73N9bMFJlDz79CovfkA/view?usp=drive_link) Operating system, which can be identified by the `.exe` extension and as well as MacOS for the [arm](https://drive.google.com/file/d/16BOcpUnl2k_AX4zT49vhGen6mHXPUbjl/view?usp=drive_link) architecture and the [x86/64 bit](https://drive.google.com/file/d/1_LX2QpFCFJCiLxQpw8cULbWubABHrNyD/view?usp=drive_link) architecture. To run effectively, `git` and `pixi` must be installed on your local machine. You can find information on how to install them above.

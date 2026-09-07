@@ -5,3 +5,13 @@
 run:
   name: tutorial
   sector_name: "tutorial"
+
+load_options:
+  source: "gegis"
+  weather_year: 2013
+
+renewable:
+  hydro:
+    source: era5 # use "era5" for a regular cutout workflow and "custom" for custom renewable profiles
+    extendable: false
+    multiplier: 5 # has different meaning for custom and era5 sources

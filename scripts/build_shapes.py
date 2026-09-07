@@ -82,7 +82,10 @@ def get_GADM_filename(country_code: str) -> str:
 
 
 def download_GADM(
-    country_code: str, update: bool = False, out_logging: bool = False
+    country_code: str,
+    update: bool = False,
+    out_logging: bool = False,
+    custom_gadm: bool = False,
 ) -> tuple[str, str]:
     """
     Download gpkg file from GADM for a given country code.
@@ -102,7 +105,13 @@ def download_GADM(
         Name of the gpkg file per country
     """
     GADM_filename = get_GADM_filename(country_code)
-    GADM_url = f"https://geodata.ucdavis.edu/gadm/gadm4.1/gpkg/{GADM_filename}.gpkg"
+    # TODO Avoid hard-coding
+    if custom_gadm:
+        GADM_url = (
+            "https://zenodo.org/records/20737414/files/gadm41_ZMB.gpkg?download=1"
+        )
+    else:
+        GADM_url = f"https://geodata.ucdavis.edu/gadm/gadm4.1/gpkg/{GADM_filename}.gpkg"
 
     GADM_inputfile_gpkg = os.path.join(
         BASE_DIR,
@@ -253,7 +262,9 @@ def get_GADM_layer(
         cur_layer_id = layer_id
 
         # download file gpkg
-        file_gpkg, name_file = download_GADM(country_code, update, outlogging)
+        file_gpkg, name_file = download_GADM(
+            country_code, update, outlogging, custom_gadm=custom_gadm
+        )
 
         # get layers of a geopackage
         list_layers = fiona.listlayers(file_gpkg)
@@ -429,9 +440,9 @@ def country_cover(
     if eez_shapes is not None:
         shapes_list += list(eez_shapes)
 
-    africa_shape = make_valid(unary_union(shapes_list))
+    extended_country_shape = make_valid(unary_union(shapes_list))
 
-    return africa_shape
+    return extended_country_shape
 
 
 def load_EEZ(
@@ -1183,7 +1194,7 @@ def sum_values_using_geomask(
 ) -> pd.DataFrame:
     """
     Function that sums all the population values in np_pop_val into the correct
-    GADM_ID It uses np_pop_xy to access the key stored in region_geomask[x][y]
+    GADM_ID It uses ``np_pop_xy`` to access the key stored in ``region_geomask[x][y]``
 
     The relation of this key to GADM_ID is stored in id_mapping
 
@@ -2027,6 +2038,8 @@ if __name__ == "__main__":
     geo_crs = snakemake.params.crs["geo_crs"]
     distance_crs = snakemake.params.crs["distance_crs"]
 
+    custom_gadm = snakemake.params["custom_gadm"]
+
     layer_id = snakemake.params.build_shape_options["gadm_layer_id"]
     update = snakemake.params.build_shape_options["update_file"]
     out_logging = snakemake.params.build_shape_options["out_logging"]
@@ -2062,10 +2075,10 @@ if __name__ == "__main__":
 
     offshore_shapes.reset_index().to_file(out.offshore_shapes)
 
-    africa_shape = gpd.GeoDataFrame(
+    extended_country_shape = gpd.GeoDataFrame(
         geometry=[country_cover(country_shapes, offshore_shapes.geometry)]
     )
-    africa_shape.reset_index().to_file(out.africa_shape)
+    extended_country_shape.reset_index().to_file(out.extended_country_shape)
 
     gadm_shapes = gadm(
         worldpop_method,
@@ -2082,7 +2095,7 @@ if __name__ == "__main__":
         simplify_gadm=simplify_gadm,
         tolerance=tolerance,
         minarea=minarea,
-        mining_raster_path=snakemake.input.mining_raster,
+        mining_raster_path=snakemake.input.get("mining_raster", None),
     )
 
     save_to_geojson(gadm_shapes, out.gadm_shapes)

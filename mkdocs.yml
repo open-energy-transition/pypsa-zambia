@@ -17,7 +17,6 @@ watch:
 - scripts
 
 hooks:
-- doc/gen_dags.py
 - doc/assets/hooks/cleanup.py
 
 # Navigation
@@ -43,9 +42,11 @@ nav:
   - Structure: user-guide/structure.md
   - Data Workflow: user-guide/data-workflow.md
   - Configuration: user-guide/configuration.md
+  - Modelling Notes: modelling_note.md
   - Wildcards: user-guide/wildcards.md
   - Costs: user-guide/costs.md
   - Custom Data Integration: user-guide/custom-data.md
+  - Data Versioning: data_sources.md
   - Rules Overview: user-guide/rules-overview.md
   - Rules Reference:
     - Download & Filter:
@@ -76,7 +77,7 @@ nav:
 - Educational Materials:
   - Optimization: user-guide/optimization.md
 
-- Utilities:
+- Features:
   - Monte Carlo: utilities/monte-carlo.md
 
 - Community & Resources:

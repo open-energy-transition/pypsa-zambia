@@ -11,9 +11,22 @@ from zipfile import ZipFile
 from scripts._common import dataset_version
 
 
+country_data = config["costs"].get("country_specific_data", "")
+countries = config.get("countries", [])
+
+if country_data and countries == [country_data]:
+    cost_directory = f"{country_data}/"
+elif country_data:
+    cost_directory = f"{country_data}/"
+    warnings.warn(
+        f"'country_specific_data' is set to '{country_data}', but 'countries' is {countries}. Make sure the '{country_data}' directory exists and that this is intentional."
+    )
+else:
+    cost_directory = ""
+
+
 if (HYDROBASINS_DATASET := dataset_version("hydrobasins", config))["source"] in [
-    "build",
-    "tutorial",
+    "build"
 ]:
 
     """
@@ -164,27 +177,189 @@ if (LANDCOVER_DATASET := dataset_version("landcover", config))["source"] in ["pr
             ),
 
 
-if (HYDRO_PROFILE_DATASET := dataset_version("hydro_profile", config))["source"] in [
-    "primary",
-    "tutorial",
-]:
+# Fallback for configs that do not declare a custom-powerplants version:
+# record 514032 is the legacy Zambia powerplants dataset
+_custom_ppl_url = (
+    dataset_version("custom-powerplants", config)["url"]
+    if "custom-powerplants" in config.get("data", {})
+    else "sandbox.zenodo.org/records/514032/files/custom_powerplants.csv"
+)
 
-    region = HYDRO_PROFILE_DATASET["region"]
-    source = HYDRO_PROFILE_DATASET["source"]
 
-    rule retrieve_hydro_profile:
-        message:
-            "Retrieving hydro profile dataset for {region} and {source}"
+rule download_custom_powerplants:
+    input:
+        url=HTTP.remote(
+            _custom_ppl_url,
+            keep_local=True,
+            additional_request_string="?download=1",
+        ),
+    output:
+        "data/custom_powerplants.csv",
+    log:
+        "logs/download_custom_powerplants.log",
+    run:
+        copyfile(str(input["url"]), output[0])
+
+
+rule download_interconnection_data:
+    input:
+        substations=HTTP.remote(
+            "https://sandbox.zenodo.org/records/471583/files/zm_substations.csv",
+            keep_local=True,
+            additional_request_string="?download=1",
+        ),
+        links=HTTP.remote(
+            "https://sandbox.zenodo.org/records/471583/files/sapp_links.csv",
+            keep_local=True,
+            additional_request_string="?download=1",
+        ),
+        countries=HTTP.remote(
+            "https://sandbox.zenodo.org/records/565480/files/sapp_countries.csv",
+            keep_local=True,
+            additional_request_string="?download=1",
+        ),
+    output:
+        substations="data/zm_substations.csv",
+        links="data/sapp_links.csv",
+        countries="data/sapp_countries.csv",
+    log:
+        "logs/download_interconnection_data.log",
+    run:
+        copyfile(str(input["substations"]), output["substations"])
+        copyfile(str(input["links"]), output["links"])
+        copyfile(str(input["countries"]), output["countries"])
+
+
+rule download_line_types:
+    input:
+        url=HTTP.remote(
+            "https://sandbox.zenodo.org/records/473405/files/pypsa_line_types%20%281%29.csv",
+            keep_local=True,
+        ),
+    output:
+        "data/line_types.csv",
+    log:
+        "logs/download_line_types.log",
+    run:
+        copyfile(str(input["url"]), output[0])
+
+
+rule retrieve_mining_data:
+    input:
+        provincial_demand=HTTP.remote(
+            "https://sandbox.zenodo.org/records/495635/files/zambia_provincial_mining_demand.csv",
+            keep_local=True,
+            additional_request_string="?download=1",
+        ),
+        mining_polygons=HTTP.remote(
+            "https://sandbox.zenodo.org/records/495635/files/zambia_pangaea_mining_polygons.csv",
+            keep_local=True,
+            additional_request_string="?download=1",
+        ),
+    output:
+        provincial_demand="data/mining/zambia_provincial_mining_demand.csv",
+        mining_polygons="data/mining/zambia_pangaea_mining_polygons.csv",
+    log:
+        "logs/retrieve_mining_data.log",
+    run:
+        import os
+
+        os.makedirs("data/mining", exist_ok=True)
+        copyfile(str(input["provincial_demand"]), output["provincial_demand"])
+        copyfile(str(input["mining_polygons"]), output["mining_polygons"])
+
+
+rule retrieve_ipp_generation:
+    input:
+        url=HTTP.remote(
+            "https://sandbox.zenodo.org/records/573456/files/Electricity%20generation%20from%20independent%20power%20producers%20%28GWh%29%202013-2025.csv",
+            keep_local=True,
+            additional_request_string="?download=1",
+        ),
+    output:
+        "data/validation/ipp_generation.csv",
+    log:
+        "logs/retrieve_ipp_generation.log",
+    run:
+        import os
+
+        os.makedirs("data/validation", exist_ok=True)
+        copyfile(str(input["url"]), output[0])
+
+
+rule retrieve_zesco_diesel_generation:
+    input:
+        url=HTTP.remote(
+            "https://sandbox.zenodo.org/records/573462/files/Electricity%20generation%20from%20ZESCO%27s%20Diesel%20power%20plants%20%28GWh%29%202013-2025.csv",
+            keep_local=True,
+            additional_request_string="?download=1",
+        ),
+    output:
+        "data/validation/zesco_diesel_generation.csv",
+    log:
+        "logs/retrieve_zesco_diesel_generation.log",
+    run:
+        import os
+
+        os.makedirs("data/validation", exist_ok=True)
+        copyfile(str(input["url"]), output[0])
+
+
+rule retrieve_zesco_large_hydro_generation:
+    input:
+        url=HTTP.remote(
+            "https://sandbox.zenodo.org/records/573493/files/Electricity%20generation%20from%20ZESCO%27s%20large%20hydro%20power%20plants%20%28GWh%29%202013-2025.csv",
+            keep_local=True,
+            additional_request_string="?download=1",
+        ),
+    output:
+        "data/validation/zesco_large_hydro_generation.csv",
+    log:
+        "logs/retrieve_zesco_large_hydro_generation.log",
+    run:
+        import os
+
+        os.makedirs("data/validation", exist_ok=True)
+        copyfile(str(input["url"]), output[0])
+
+
+rule retrieve_zesco_mini_hydro_generation:
+    input:
+        url=HTTP.remote(
+            "https://sandbox.zenodo.org/records/573503/files/Electricity%20generation%20from%20ZESCO%27s%20mini-%20hydro%20power%20plants%20%28GWh%29%202013-2025.csv",
+            keep_local=True,
+            additional_request_string="?download=1",
+        ),
+    output:
+        "data/validation/zesco_mini_hydro_generation.csv",
+    log:
+        "logs/retrieve_zesco_mini_hydro_generation.log",
+    run:
+        import os
+
+        os.makedirs("data/validation", exist_ok=True)
+        copyfile(str(input["url"]), output[0])
+
+
+if config["enable"].get("retrieve_cost_data", True):
+
+    rule retrieve_cost_data:
+        params:
+            version=config["costs"]["technology_data_version"],
         input:
-            hydro_profile_nc=HTTP.remote(
-                HYDRO_PROFILE_DATASET["url"],
+            HTTP.remote(
+                f"raw.githubusercontent.com/PyPSA/technology-data/{config['costs']['technology_data_version']}/outputs/{cost_directory}"
+                + "costs_{year}.csv",
                 keep_local=True,
-                additional_request_string="?download=1",
             ),
         output:
-            f"data/hydro_profiles/glofas_profile.nc",
+            "resources/" + RDIR + "costs_{year}.csv",
+        log:
+            "logs/" + RDIR + "retrieve_cost_data_{year}.log",
+        resources:
+            mem_mb=5000,
         run:
-            copy2(str(input[0]), output[0])
+            move(input[0], output[0])
 
 
 if (NATURA_EARTH_DATASET := dataset_version("natura_earth", config))["source"] in [
@@ -211,3 +386,78 @@ if (NATURA_EARTH_DATASET := dataset_version("natura_earth", config))["source"] i
         run:
             unpack_archive(str(input["natura_zip"]), output["unzip"])
             copy2(os.path.join(output["tiff"]), output["shp"])
+
+
+if not (config["enable"].get("retrieve_cutout", False)) and (
+    (ERA5_CUTOUT := dataset_version("cutout-era5", config))["source"]
+    in [
+        "primary",
+        "tutorial",
+    ]
+):
+    year = int(float(ERA5_CUTOUT["year"]))
+    region = ERA5_CUTOUT["region"]
+
+    rule retrieve_era5_cutout:
+        message:
+            f"Retrieving ERA5 cutout for region {region} ({year})"
+        input:
+            cutout=HTTP.remote(
+                ERA5_CUTOUT["url"],
+                keep_local=True,
+                additional_request_string="?download=1",
+            ),
+        output:
+            f"cutouts/{CDIR}cutout-{year}-era5.nc",
+        log:
+            f"logs/{RDIR}retrieve_era5_cutout.log",
+        benchmark:
+            f"benchmarks/{RDIR}retrieve_era5_cutout"
+        run:
+            copy2(str(input[0]), output[0])
+
+
+if (ZM_BIOMASS := dataset_version("zm-biomass", config))["source"] in [
+    "primary",
+    "tutorial",
+]:
+
+    rule download_biomass_data:
+        input:
+            url=HTTP.remote(
+                "https://sandbox.zenodo.org/records/505798/files/biomass.geojson",
+                keep_local=True,
+                additional_request_string="?download=1",
+            ),
+        output:
+            "data/biomass.geojson",
+        log:
+            "logs/download_biomass_data.log",
+        run:
+            copyfile(str(input["url"]), output[0])
+
+
+if (INFLOW_GLOFAS := dataset_version("inflow-glofas", config))["source"] in [
+    "primary",
+    "tutorial",
+]:
+    year = int(float(INFLOW_GLOFAS["year"]))
+    region = INFLOW_GLOFAS["region"]
+
+    rule retrieve_inflow_glofas:
+        message:
+            f"Retrieving GloFAS dataset for region {region} ({year})"
+        input:
+            cutout=HTTP.remote(
+                INFLOW_GLOFAS["url"],
+                keep_local=True,
+                additional_request_string="?download=1",
+            ),
+        output:
+            f"cutouts/hydro/{region}-{year}-glofas.nc",
+        log:
+            f"logs/{RDIR}retrieve_inflow_glofas.log",
+        benchmark:
+            f"benchmarks/{RDIR}retrieve_inflow_glofas"
+        run:
+            copy2(str(input[0]), output[0])

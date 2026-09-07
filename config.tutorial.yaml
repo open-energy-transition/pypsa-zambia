@@ -12,10 +12,14 @@ enable:
   retrieve_databundle: true
   retrieve_databundle_sector: true
   retrieve_cutout: true
-  build_natura_raster: true
+  # TODO get back building natura raster
+  build_natura_raster: false
   progress_bar: false
 
 data:
+  custom-powerplants:
+    source: primary
+    version: v4
   hydrobasins:
     source: tutorial
     version: latest
@@ -35,18 +39,20 @@ snapshots:
   end: "2013-03-7"
 
 
-clean_osm_data_options:
-  threshold_voltage: 35000
+osm:
+  clean_osm_data:
+    threshold_voltage: 35000
 
 base_network:
   min_voltage_substation_offshore: 35000
   min_voltage_rebase_voltage: 35000
 
 
-electricity:
-  co2limit: 1.487e+9
-  co2base: 1.487e+9
-  automatic_emission: true
+co2:
+  limit: 1.487e+9
+  base: 1.487e+9
+  automatic_emission:
+    enable: true
 
 
 atlite:
@@ -55,33 +61,47 @@ atlite:
     # use 'base' to determine geographical bounds and time span from config
     # base:
     # module: era5
-    zm-2013-tutorial-era5: {}
+    cutout-2013-era5-tutorial: {}
 
 renewable:
   onwind:
-    cutout: zm-2013-tutorial-era5
+    cutout: cutout-2013-era5-tutorial
   offwind-ac:
-    cutout: zm-2013-tutorial-era5
+    cutout: cutout-2013-era5-tutorial
   offwind-dc:
-    cutout: zm-2013-tutorial-era5
+    cutout: cutout-2013-era5-tutorial
   solar:
-    cutout: zm-2013-tutorial-era5
+    cutout: cutout-2013-era5-tutorial
   hydro:
-    cutout: zm-2013-tutorial-era5
+    cutout: cutout-2013-era5-tutorial
     hydrobasins_level: 4
     hydro_max_hours: "energy_capacity_totals_by_country"
+    resource:
+      method: hydro
+      hydrobasins: data/hydrobasins_hydroshare/africa-geoglows-atlite.shp
+  # TODO Check conflicts resolution
   csp:
-    cutout: zm-2013-tutorial-era5
+    cutout: cutout-2013-era5-tutorial
 
 
 solving:
   solver:
     name: glpk
     options: glpk-default
+
+# Zambia-specific parameters --------------------------------------------------
+
 validation:
   interconnectors:
-    enable: true
-    download_data: true
+    enable: false
+    download_data: false
   custom_powerplants:
-    enable: true
-    download_data: true
+    enable: false
+    download_data: false
+  line_types:
+    download_data: false
+  mining_data:
+    download_data: false
+
+load_options:
+  zambia_demand_distribution: false # if true, distributes load using mining and GDP rasters (Zambia-specific)
