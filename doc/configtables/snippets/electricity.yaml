@@ -7,6 +7,7 @@ electricity:
     # See all available options for Store and StorageUnit in https://pypsa-earth.readthedocs.io/en/latest/user-guide/configuration/#storage-technologies
     Link: [] # H2 pipeline
 
+
   conventional_carriers: [nuclear, oil, OCGT, CCGT, coal, lignite, geothermal, biomass]
   renewable_carriers: [solar, onwind, offwind-ac, offwind-dc, hydro]
 
@@ -44,6 +45,11 @@ electricity:
       Offshore: [offwind-ac, offwind-dc]
       Onshore: [onwind]
       PV: [solar]
+
+  existing_thermal_dispatch:
+    enable: false
+    base_year: 2025
+    carriers: [coal, oil]
 
   # ----------------- Grid topology -------------------
   base_voltage: 380.

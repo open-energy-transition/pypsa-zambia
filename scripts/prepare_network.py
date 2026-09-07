@@ -70,6 +70,12 @@ from _helpers import (
     sanitize_locations,
 )
 from add_electricity import update_transmission_costs
+from utility_custom_features import (
+    add_custom_line_types,
+    add_interconnectors,
+    load_custom_line_types,
+    load_interconnector_data,
+)
 
 idx = pd.IndexSlice
 
@@ -345,6 +351,9 @@ if __name__ == "__main__":
     n = pypsa.Network(snakemake.input[0])
     Nyears = n.snapshot_weightings.objective.sum() / 8760.0
     costs = pd.read_csv(snakemake.input.tech_costs, index_col=0)
+    # TODO Remove adding custom line types once they will be incorporated into a currently used PyPSA version
+    custom_line_types = load_custom_line_types(snakemake.input.line_types)
+    n = add_custom_line_types(n, custom_line_types)
     s_max_pu = snakemake.params.lines["s_max_pu"]
 
     set_line_s_max_pu(n, s_max_pu)
@@ -438,6 +447,32 @@ if __name__ == "__main__":
 
     sanitize_carriers(n, snakemake.config)
     sanitize_locations(n)
+    if snakemake.config["validation"]["interconnectors"]["enable"]:
+        snapshot_years = n.snapshots.year.unique()
+        if len(snapshot_years) > 1:
+            logger.warning(
+                f"Snapshots span multiple years {sorted(snapshot_years)}; "
+                f"using {snapshot_years.min()} for trade data selection."
+            )
+        snapshot_year = int(snapshot_years.min())
+        power_pool_countries, power_pool_links, substations = load_interconnector_data(
+            snakemake.input.power_pool_countries,
+            snakemake.input.power_pool_links,
+            snakemake.input.substations,
+            year=snapshot_year,
+        )
+
+        n = add_interconnectors(
+            n,
+            power_pool_countries,
+            power_pool_links,
+            substations,
+            distance_crs=snakemake.config["crs"]["distance_crs"],
+        )
+    else:
+        logger.info(
+            "Interconnectors are not added to the network as per config settings."
+        )
 
     n.meta = dict(snakemake.config, **dict(wildcards=dict(snakemake.wildcards)))
     n.export_to_netcdf(snakemake.output[0])

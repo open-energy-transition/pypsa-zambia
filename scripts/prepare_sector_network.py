@@ -718,7 +718,6 @@ def add_hydrogen(n: pypsa.Network, costs: pd.DataFrame) -> None:
 
     if snakemake.params.sector_options["hydrogen"]["underground_storage"]["enabled"]:
         if snakemake.params.h2_underground:
-            cavern_nodes = pd.DataFrame()
             custom_cavern = read_csv_nafix(
                 os.path.join(
                     BASE_DIR,

@@ -155,6 +155,31 @@ databundles:
     disable_by_opt:
       build_cutout: [all]
 
+  # Cutout of Zambia for CI test of pypsa-zambia (10 MB)
+  bundle_cutouts_test_ZM:
+    countries: [ZM]
+    tutorial: true
+    category: cutouts
+    destination: "cutouts"
+    urls:
+      zenodo: https://sandbox.zenodo.org/records/469893/files/bundle_cutouts_tutorial_ZM.zip?download=1
+    output: [cutouts/zm-2013-tutorial-era5.nc]
+    disable_by_opt:
+      build_cutout: [all]
+
+# TODO Replace NG&BJ data with ZM data once available
+  bundle_tutorial_ZM_fake:
+    countries: [ZM]
+    tutorial: true
+    category: data
+    destination: "data"
+    urls:
+      zenodo: https://zenodo.org/records/18851102/files/bundle_tutorial_NGBJ_with_gadmlike.zip?download=1
+      gdrive: https://drive.google.com/file/d/1XnTP6bZoVl5kFjZQlAcmjNXgazOHtFqX/view?usp=drive_link
+    output:
+    - data/gebco/GEBCO_2025_sub_ice.nc
+    - data/copernicus/PROBAV_LC100_global_v3.0.1_2019-nrt_Discrete-Classification-map_EPSG-4326.tif
+
   # tutorial bundle for all African countries
   bundle_tutorial_data_common:
     countries: [Africa]
@@ -492,11 +517,31 @@ databundles:
     disable_by_opt:
       build_cutout: [all]
 
-  # data bundle containing the protected data for the whole world
-  bundle_landcover_earth:
-    countries: [Earth]
-    category: landcover
-    destination: "data/landcover/world_protected_areas"
+  # national-level cutouts for Zambia
+  # 0.5 GB
+  bundle_cutouts_africa_zm:
+    countries: [ZM]
+    category: cutouts
+    destination: "cutouts"
     urls:
-      protectedplanet: https://d1gam3xoknrgr2.cloudfront.net/current/WDPA_{month:s}{year:d}_Public_shp.zip
-    output: [data/landcover/world_protected_areas/*]
+      zenodo: https://sandbox.zenodo.org/records/470328/files/bundle_cutouts_zm_2013.zip?download=1
+      gdrive: https://drive.google.com/file/d/1gTKSQFCCw3BK3AIuRL0AQKTU9airIxW8/view?usp=drive_link
+    output: [cutouts/cutout-2013-era5.nc]
+    disable_by_opt:
+      build_cutout: [all]
+
+  # 0.5 GB
+  bundle_cutouts_africa_zm-2024:
+    countries: [ZM-2024]
+    category: cutouts
+    destination: "cutouts"
+    urls:
+      zenodo: https://sandbox.zenodo.org/records/470328/files/bundle_cutouts_zm_2024.zip?download=1
+      gdrive: https://drive.google.com/file/d/1Fv-dNk4ZonEKEEMU94U-HHo-hiAp_ZLd/view?usp=drive_link
+    output: [cutouts/cutout-2024-era5.nc]
+    disable_by_opt:
+      build_cutout: [all]
+
+  bundle_natura_earth_tutorial:
+    countries: [Earth]
+    urls:

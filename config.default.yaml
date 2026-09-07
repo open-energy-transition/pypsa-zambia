@@ -203,6 +203,7 @@ electricity:
     # See all available options for Store and StorageUnit in https://pypsa-earth.readthedocs.io/en/latest/user-guide/configuration/#storage-technologies
     Link: [] # H2 pipeline
 
+
   conventional_carriers: [nuclear, oil, OCGT, CCGT, coal, lignite, geothermal, biomass]
   renewable_carriers: [solar, onwind, offwind-ac, offwind-dc, hydro]
 
@@ -240,6 +241,11 @@ electricity:
       Offshore: [offwind-ac, offwind-dc]
       Onshore: [onwind]
       PV: [solar]
+
+  existing_thermal_dispatch:
+    enable: false
+    base_year: 2025
+    carriers: [coal, oil]
 
   # ----------------- Grid topology -------------------
   base_voltage: 380.
@@ -664,7 +670,7 @@ custom_data:
   h2_underground: false
   add_existing: false
   custom_sectors: false
-  gas_network: false # If "True" then a custom .csv file must be placed in "resources/custom_data/pipelines.csv" , If "False" the user can choose btw "greenfield" or Model built-in datasets. Please refer to ["sector"] below.
+  gas_network: false # If "True" then a custom .csv file must be placed in "resources/custom_data/pipelines.csv" , If "False" the user can choose between "greenfield" or Model built-in datasets. Please refer to ["sector"] below.
   export_ports: false # If "True" then a custom .csv file must be placed in "data/custom/export_ports.csv"
   airports: false # If "True" then a custom .csv file must be placed in "data/custom/airports.csv". Data format for aiports must be in the format of the airports.csv file in the data folder.
 

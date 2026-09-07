@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: Contributors to PyPSA-Earth
+# SPDX-FileCopyrightText: Open Energy Transition gGmbH
+# SPDX-License-Identifier: CC0-1.0
+# Scenario diff — 2025 planning horizon
+# Merges with: configs/zambia_configs/config.zm.cap_exp_base.yaml
+run:
+  name: zm.cap_exp_2025
+  base_config: configs/zambia_configs/config.zm.cap_exp_base.yaml
+
+electricity:
+  extendable_carriers:
+    Generator: [solar, onwind]
+
+# TODO Reconcile the learning rates with custom costs definitions
+costs:
+  year: 2025

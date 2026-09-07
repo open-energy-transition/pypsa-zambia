@@ -1,0 +1,15 @@
+# SPDX-FileCopyrightText:  PyPSA-Earth and PyPSA-Eur Authors
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+run:
+  name: test_upstream
+  sector_name: test_upstream
+  base_config: config.tutorial.yaml  # base configuration file
+  shared_cutouts: true
+
+renewable:
+  hydro:
+    source: era5 # use "era5" for a regular cutout workflow and "custom" for custom renewable profiles
+    extendable: false
+    multiplier: 10 # has different meaning for custom and era5 sources

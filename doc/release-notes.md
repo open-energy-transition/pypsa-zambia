@@ -4,13 +4,153 @@ SPDX-FileCopyrightText:  PyPSA-Earth and PyPSA-Eur Authors
 SPDX-License-Identifier: CC-BY-4.0
 -->
 
-Release Notes
+# Release Notes
 
-# Upcoming release
+## Upcoming PyPSA-Zambia release
 
 This part of documentation collects descriptive release notes to capture the main improvements introduced by developing the model before the next release.
 
-**New Features and Major Changes**
+### New Features and Major Changes
+
+* Add thermal plant factors for existing coal and oil generators based on IRP data, constraining dispatch via `electricity.existing_thermal_dispatch.plant_factors` in the config [PR #332](https://github.com/open-energy-transition/pypsa-zambia/pull/332)
+
+* Use separate custom powerplants datasets for dispatch validation (ERB 2023-2025 data with KGL as reservoir) and capacity expansion (IRP and proposed plants), configured via `data.custom-powerplants` in the respective config files [PR #302](https://github.com/open-energy-transition/pypsa-zambia/pull/302)
+
+* Improved organisation and layout of config files significantly [PR #356](https://github.com/open-energy-transition/pypsa-zambia/pull/356)
+
+* Updated docs to reflect new configs management methodolody [PR #356](https://github.com/open-energy-transition/pypsa-zambia/pull/356)
+
+
+### Minor Changes and bug-fixing
+
+* Correct SAPP cross-border trade values to match ERB Energy Sector Report data. The `sapp_countries.csv` is now filtered by snapshot year automatically[PR #320](https://github.com/open-energy-transition/pypsa-zambia/pull/320)
+
+* Added link to download PyPSA APP to docs [PR #319](https://github.com/open-energy-transition/pypsa-zambia/pull/319)
+
+* Fixed bug whereby docs page was not included into nav tree of readthedocs [PR #328](https://github.com/open-energy-transition/pypsa-zambia/pull/328)
+
+* Added key energy sector metrics from ERB Annual Statistics Bulletin [PR #323](https://github.com/open-energy-transition/pypsa-zambia/pull/350)
+
+
+# PyPSA-Zambia v0.4
+
+### New Features and Major Changes
+
+* Enable expansion of biomass generators considering realistic regional values of biomass potential [PR #220](https://github.com/open-energy-transition/pypsa-zambia/pull/220)
+
+* Priority dispatch for existing thermal plants to reflect IRP assumptions [PR #280](https://github.com/open-energy-transition/pypsa-zambia/pull/280)
+
+* Add cross-scenario comparison plots functionality to allow for comparison across scenario runs [PR #276](https://github.com/open-energy-transition/pypsa-zambia/pull/276)
+
+* Fix run_all_scenarios to allow running all scenarios in a clean and robust way [PR #243](https://github.com/open-energy-transition/pypsa-zambia/pull/243)
+
+### Minor Changes and bug-fixing
+
+* Fixed double-annualisation of IRP capital costs for wind and solar by introducing `investment_annualised` config key, which applies pre-annualised costs directly without CRF [PR #293](https://github.com/open-energy-transition/pypsa-zambia/pull/293)
+
+* Added link to data versioning in docs, and tidied up the links and licenses in the data inventory [PR #233](https://github.com/open-energy-transition/pypsa-zambia/pull/233)
+
+* Added a baseline configuration for capacity expansion runs [PR #242](https://github.com/open-energy-transition/pypsa-zambia/pull/242)
+
+* Added proposed hydro powerplants projects from IPPPO to the custom powerplants file [PR #242](https://github.com/open-energy-transition/pypsa-zambia/pull/265)
+
+* Add GloFAS inflow datasets for different years[PR #262](https://github.com/open-energy-transition/pypsa-zambia/pull/262)
+
+* Fix CI by replacing unresponsive remote data sources [PR #279](https://github.com/open-energy-transition/pypsa-zambia/pull/279)
+
+* Drop isolated subnetworks from the network that do not meet threshold value greater than 100mw [PR #272](https://github.com/open-energy-transition/pypsa-zambia/pull/272)
+
+* Add future scenario configs for years 2025,2030, 2040 and 2050 [PR #264](https://github.com/open-energy-transition/pypsa-zambia/pull/264)
+
+* Created hydro validation config [PR #231](https://github.com/open-energy-transition/pypsa-zambia/pull/231)
+
+* Updated CI to support weather years greater than 2013 [PR #231](https://github.com/open-energy-transition/pypsa-zambia/pull/231)
+
+* Updated ReadMe and Docs [PR #295](https://github.com/open-energy-transition/pypsa-zambia/pull/295)
+
+* Updated Docs to include capacity expansion design [PR #304](https://github.com/open-energy-transition/pypsa-zambia/pull/304)
+* Fix affecting full reuse compliance of the project  [PR #298](https://github.com/open-energy-transition/pypsa-zambia/pull/298)
+
+* Merge latest upstream changes from PyPSA-Earth [PR #286](https://github.com/open-energy-transition/pypsa-zambia/pull/286)
+
+# PyPSA-Zambia v0.3
+
+## New Features and Major Changes
+
+* Power Plant disaggregation allowing power plants to retain individual identities [PR #153](https://github.com/open-energy-transition/pypsa-zambia/pull/153)
+
+* Ability to use custom hydro inflow data in the workflow [PR #178](https://github.com/open-energy-transition/pypsa-zambia/pull/178)
+
+* Ability to specify cutout retrieval by year for specified years via config file [PR #218](https://github.com/open-energy-transition/pypsa-zambia/pull/218)
+
+* Merge upstream changes [PR #221](https://github.com/open-energy-transition/pypsa-zambia/pull/221)
+
+* Enable capacity expansion runs by adding a dedicated configuration file [PR #219](https://github.com/open-energy-transition/pypsa-zambia/pull/219)
+
+### Minor Changes and bug-fixing
+
+* Add test to standard CI to ensure no workflow breaking changes are integrated when introducing custom configuration [PR #201](https://github.com/open-energy-transition/pypsa-zambia/pull/201)
+
+## Upcoming changes from upstream
+
+This part of documentation collects descriptive release notes to capture the main improvements introduced by developing the model before the next release.
+
+
+# PyPSA-Zambia v0.2
+
+## New Features and Major Changes
+
+* Add regional-focused marginal costs, efficiencies and hydro reservoir data [PR #171](https://github.com/open-energy-transition/pypsa-zambia/pull/171)
+
+* Add regional-focused investment costs [PR #171](https://github.com/open-energy-transition/pypsa-zambia/pull/208)
+
+## Minor Changes and bug-fixing
+* advance testing infrastructure to update the objective reference values, ensure that run artifacts are always available, add a manual run trigger, and amend an example on adding a new test [PR #166](https://github.com/open-energy-transition/pypsa-zambia/pull/166)
+
+* Updated readme to align more closely with the Zambian context. Fixed overall consistency [PR #170](https://github.com/open-energy-transition/pypsa-zambia/pull/170)
+
+* Improved instructions for creating version release [PR #181](https://github.com/open-energy-transition/pypsa-zambia/pull/181)
+
+# PyPSA-Zambia v0.1
+
+## New Features and Major Changes
+
+* update Snakefile, add utility_custom_features.py, update prepare_network and add validation notebook [PR #88](https://github.com/open-energy-transition/pypsa-zambia/pull/88)
+
+* Provide a reproducible way to build a cutout [PR #86](https://github.com/open-energy-transition/pypsa-zambia/pull/86)
+
+* Retrieve hydrobasins, IRENA and landcover in separate snakemake module [PR #74](https://github.com/open-energy-transition/pypsa-zambia/pull/74)
+
+* Integrate African transmission line types into PyPSA line type library for improved regional representation.[PR #128](https://github.com/open-energy-transition/pypsa-zambia/pull/128)
+
+* Add voltage levels for the Zambian PowerGrid [PR #122](https://github.com/open-energy-transition/pypsa-zambia/pull/122)
+
+* Integrate a regional cutout into a testing workflow for the Zambia model [PR #75](https://github.com/open-energy-transition/pypsa-zambia/pull/75)
+
+* Adds a PyPSA-Zambia specific GitHub Actions workflow for the Zambia model [PR #60](https://github.com/open-energy-transition/pypsa-zambia/pull/60)
+
+* Only run Github Action test workflows when workflow-relevant files are changed [PR #94](https://github.com/open-energy-transition/pypsa-zambia/pull/94)
+
+* Add regional-focused cutouts to the databundles [PR #87](https://github.com/open-energy-transition/pypsa-zambia/pull/87)
+
+
+## Minor Changes and bug-fixing
+
+* Prevent pre-commit from providing automatic corrections to pull requests [PR #89](https://github.com/open-energy-transition/pypsa-zambia/pull/89)
+
+* Add release process PR template [PR #126](https://github.com/open-energy-transition/pypsa-zambia/pull/126)
+
+* Add line_types_data [PR #123](https://github.com/open-energy-transition/pypsa-zambia/pull/123)
+
+* Add a modelling note [PR #120](https://github.com/open-energy-transition/pypsa-zambia/pull/120)
+
+* Add maintenance note [PR #119](https://github.com/open-energy-transition/pypsa-zambia/pull/119)
+
+* Create templates for data collection [PR #118](https://github.com/open-energy-transition/pypsa-zambia/pull/118)
+
+* Fix linting issues [PR #95](https://github.com/open-energy-transition/pypsa-zambia/pull/95)
+
+## New Features and Major Changes from upstream
 
 *
 
@@ -61,6 +201,8 @@ This part of documentation collects descriptive release notes to capture the mai
 * Drop use of override_components that is no longer needed in newer PyPSA versions [PR #1699](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1699)
 
 * Ensure connectivity of transformers in buses with several transformers [PR #1706](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1706)
+
+## Minor Changes and bug-fixing from upstream
 
 * Enable green-field capacity expansion of custom lines under construction [PR #1778](https://github.com/pypsa-meets-earth/pypsa-earth/pull/1778)
 

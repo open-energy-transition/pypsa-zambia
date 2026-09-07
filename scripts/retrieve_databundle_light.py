@@ -946,7 +946,7 @@ def normalise_hydrobasins(config_hydrobasin: dict) -> None:
 def retrieve_databundle(
     bundles_to_download: list,
     config_bundles: dict,
-    hydrobasins_level: int,
+    # hydrobasins_level: int,
     rootpath: str = ".",
     disable_progress: bool = False,
     output_path: str | None = None,
@@ -987,6 +987,7 @@ def retrieve_databundle(
 
     logger.info("Bundles to be downloaded:\n\t" + "\n\t".join(bundles_to_download))
 
+    # TODO-MERGE check conflicts resolution
     if output_path:
         for b_name in bundles_to_download:
             if config_bundles[b_name]["category"] == "cutouts":
@@ -1028,6 +1029,7 @@ def retrieve_databundle(
         if not downloaded_bundle:
             logger.error(f"Bundle {b_name} cannot be downloaded")
 
+    # TODO Check conflict resolution
     if len(hydrobasin_bundles) > 0:
         if not config_bundles[hydrobasin_bundles[0]]["tutorial"]:
             logger.info("Merging regional hydrobasins files into a global shapefile")
@@ -1131,14 +1133,12 @@ if __name__ == "__main__":
     # load databundle configuration
     config_bundles = load_databundle_config(snakemake.config["databundles"])
     disable_progress = not config_enable["progress_bar"]
-    hydrobasins_level = snakemake.params["hydrobasins_level"]
 
     bundles_to_download = snakemake.params["bundles_to_download"]
 
     retrieve_databundle(
         bundles_to_download,
         config_bundles,
-        hydrobasins_level,
         rootpath=rootpath,
         disable_progress=disable_progress,
         output_path=snakemake.output[0],

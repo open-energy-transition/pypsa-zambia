@@ -357,3 +357,7 @@ This section provides a step-by-step guide on how to set up and use Docker conta
     - Wait for the container to build and open the repository in the container.
 
 The environment will be ready for use. You can now run PyPSA-Earth in the container.
+
+## Installing the PyPSA APP
+
+We also have the PyPSA APP installers, which provide an alternative way to run PyPSA workflows through the use of a user friendly graphical user interface. Currently there is support for [Windows](https://drive.google.com/file/d/1EEin8vZ9AxPRT73N9bMFJlDz79CovfkA/view?usp=drive_link) Operating system, which can be identified by the `.exe` extension and as well as MacOS for the [arm](https://drive.google.com/file/d/16BOcpUnl2k_AX4zT49vhGen6mHXPUbjl/view?usp=drive_link) architecture and the [x86/64 bit](https://drive.google.com/file/d/1_LX2QpFCFJCiLxQpw8cULbWubABHrNyD/view?usp=drive_link) architecture. To run effectively, `git` and `pixi` must be installed on your local machine. You can find information on how to install them above.
