@@ -71,7 +71,7 @@ First, the upstream changes must be fetched and placed into a dedicated local br
 $ git fetch upstream --filter=blob:none
 $ 
 $ git checkout upstream/main
-# remove an old branch if needed
+# remove an old branch if needed (assuming the old branch is upstream_local_branch)
 $ git branch -d upstream_local_branch
 $ git checkout -b upstream_local_branch
 ```
