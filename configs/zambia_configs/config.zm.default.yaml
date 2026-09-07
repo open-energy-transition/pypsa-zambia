@@ -184,6 +184,18 @@ plotting:
       reference_data:   # generation data, imports and exports data are available from ERB Zambia (https://www.erb.org.zm/).
       - generation
 
+    osm_update_2023:
+      scenario_filter:
+      - "validation_dispatch_2023_osm"
+      - "validation_dispatch_zambia_2023"
+      label_map:
+        validation_dispatch_2023_osm: "Post-OSM Update"
+        validation_dispatch_zambia_2023: "Pre-OSM Update"
+      exclude_carriers:
+      - "load shedding"
+      reference_data:
+      - generation
+
 
 validation:
   # TODO Get back once #243 is fixed
