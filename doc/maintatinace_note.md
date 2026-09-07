@@ -59,6 +59,11 @@ $ git push origin -u new_upstream_merge  # Push the branch to PyPSA-Zambia remot
 2. Version 2
 Follows up OET soft-fork guide. A detailed original soft-fork maintainance methodology is available in [this document](https://docs.google.com/document/d/1q5Ro2yVpK5lBG2JTIuVAWm5UjnC1-6Tb_SOEVAyruVI/edit?usp=sharing). To use it in this project, we have added a few modifications which are highlighted bellow.
 
+!!! note
+The original line (`git push --set-upstream origin upstream`) is a bit risky as it can lead to pushing into upstream and could be modified into
+
+First, the upstream changes must be fetched and placed into a dedicated local branch `upstream_local_branch`. In contrast to the original soft-fork methodology, a name of this local branch allows for a clear distinction between `upstream` as a remote name and a name of a branch which is synchronised with the upstream.
+
 ```
 ### fetch latest changes
 $ git fetch upstream --filter=blob:none
@@ -77,8 +82,6 @@ The original line (`git push --set-upstream origin upstream`) looks a bit risky 
 ```
 git push --set-upstream origin upstream_local_branch 
 ```
-
-A detailed general methodology is available in [this document](https://docs.google.com/document/d/1q5Ro2yVpK5lBG2JTIuVAWm5UjnC1-6Tb_SOEVAyruVI/edit?usp=sharing)
 
 ## Linter
 Use the following command to apply pre-commit changes locally:
