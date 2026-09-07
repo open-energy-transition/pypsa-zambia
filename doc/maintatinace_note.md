@@ -44,7 +44,7 @@ upstream        git@github.com:pypsa-meets-earth/pypsa-earth.git (push)
 ```
 
 1. Version 1
-Our successful [experience]((https://github.com/open-energy-transition/pypsa-zambia/pull/109)):
+Based on our successful [experience]((https://github.com/open-energy-transition/pypsa-zambia/pull/109)) in this project:
 ```
 $ git checkout upstream/main  # DETACHED HEAD STATE
 $ git switch -c upstream_main  # Create a new local branch following upstream main
@@ -57,7 +57,7 @@ $ git merge upstream_main  # Merges the branch tracking upstream/main into new_u
 $ git push origin -u new_upstream_merge  # Push the branch to PyPSA-Zambia remote and open PR
 ```
 2. Version 2
-Soft-fork guide
+Follows up OET soft-fork guide. A detailed original soft-fork maintainance methodology is available in [this document](https://docs.google.com/document/d/1q5Ro2yVpK5lBG2JTIuVAWm5UjnC1-6Tb_SOEVAyruVI/edit?usp=sharing). To use it in this project, we have added a few modifications which are highlighted bellow.
 
 ```
 ### fetch latest changes
