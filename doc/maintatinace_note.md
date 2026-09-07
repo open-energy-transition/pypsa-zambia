@@ -76,10 +76,7 @@ $ git branch -d upstream_local_branch
 $ git checkout -b upstream_local_branch
 ```
 
-Check first where the origin repo is located
-`git remote show origin`
-
-The original line (`git push --set-upstream origin upstream`) looks a bit risky as it can lead to pushing into upstream and could be modified into
+Everything is now ready to be pushed. To be on a safe side, check first where the origin repo is located with `git remote show origin`. Once confindent, push the changes.
 
 ```
 git push --set-upstream origin upstream_local_branch 
