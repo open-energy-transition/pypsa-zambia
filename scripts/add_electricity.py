@@ -1332,7 +1332,6 @@ if __name__ == "__main__":
         snakemake.params.battery_techs,
         snakemake.params.electricity["max_hours"]["battery"],
     )
-    attach_existing_batteries(n, costs, ppl)
 
     if snakemake.params.electricity.get("biomass_potential"):
         _add_missing_carriers_from_costs(n, costs, ["biomass"])

@@ -29,7 +29,8 @@ from retrieve_databundle_light import (
     datafiles_retrivedatabundle,
     get_best_bundles_in_snakemake,
 )
-#TODO-MERGE check conflict resolution
+
+# TODO-MERGE check conflict resolution
 from scripts.utility_custom_features import load_mining_data, build_mining_raster
 from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
 from pathlib import Path
@@ -791,6 +792,7 @@ rule build_powerplants:
 
 
 if config["validation"].get("biomass"):
+
     # TODO-MERGE check conflicts resolution
     rule add_electricity:
         params:
@@ -847,7 +849,7 @@ if config["validation"].get("biomass"):
 
 else:
 
-    # TODO Check conflicts resolution
+    # TODO-MERGE Check conflicts resolution
     rule add_electricity:
         params:
             countries=config["countries"],
@@ -859,6 +861,7 @@ else:
             renewable=config["renewable"],
             length_factor=config["lines"]["length_factor"],
             existing_capacities=config["existing_capacities"],
+            battery_techs=config["storage_techs"]["battery"],
         input:
             **{
                 f"profile_{tech}": (
