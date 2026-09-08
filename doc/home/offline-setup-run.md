@@ -64,7 +64,7 @@ snakemake -j 1 solve_all_networks
 ## If something goes wrong
 
 !!! tip "Error mentioning \"DLL load failed\""
-    This kind of error is usually caused by other software already on your computer conflicting with the model's environment. Offline packages normally include an automatic fix for this that runs whenever you activate the environment (Step 3), so you should not need to do anything extra. If you still see this error after activating, let whoever gave you the package know exactly what the error said — the fix can usually be extended to cover it.
+    This kind of error is usually caused by other software already on your computer conflicting with the model's environment. Offline packages normally include an automatic fix for this that runs whenever you activate the environment (Step 3), so you should not need to do anything extra. If you still see this error after activating, let whoever gave you the package know exactly what the error said. The fix can be adjusted to cover also other issues.
 
 !!! tip "The dry run wants to download something"
     This means some data the model needs was not included in the package you were given. You will need an internet connection for that specific step, or ask whoever prepared the package to include the missing data.
