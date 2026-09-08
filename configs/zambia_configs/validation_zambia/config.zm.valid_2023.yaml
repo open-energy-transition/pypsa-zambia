@@ -1,14 +1,14 @@
 # SPDX-FileCopyrightText: Contributors to PyPSA-Earth
 # SPDX-FileCopyrightText: Open Energy Transition gGmbH
 # SPDX-License-Identifier: CC0-1.0
-# Scenario diff — 2021 planning horizon
+# Scenario diff — 2023 planning horizon
 # Merges with: configs/cap_exp_zambia_base.yaml
 
 run:
-  name: validation_2021_final_glofas_calibr1.0_v4
+  name: config.zm.valid_2023
 snapshots:
-  start: '2021-01-01'
-  end: '2022-01-01'
+  start: '2023-01-01'
+  end: '2024-01-01'
   inclusive: left   # end is not inclusive
 countries: [ZM]
 
@@ -17,13 +17,14 @@ scenario:
   ll: [v1.0]
   clusters: ['10']
   opts: [Co2L-3h]
+
 atlite:
   nprocesses: 4
-  default: zm-2021-era5
-  hydro: hydro/zm-2021-glofas.nc
+  default: zm-2023-era5
+  hydro: hydro/zm-2023-glofas.nc
 
 electricity:
-  powerplants_filter: (DateOut >= 2021 or DateOut != DateOut) and (DateIn <= 2021
+  powerplants_filter: (DateOut >= 2023 or DateOut != DateOut) and (DateIn <= 2023
     or DateIn != DateIn)
   extendable_carriers:
     Generator: []
@@ -37,19 +38,12 @@ renewable:
   hydro:
     source: custom
     # TODO Harmonize across different scenarios
-    #multiplier: 1.0
-    #multiplier: 0.5 optimistic scenario
-    #multiplier: 0.01 # extreme scenario
-    #multiplier: 0.1 # a bit too low
-    #multiplier: 0.25 # too high
-    #multiplier: 0.15 # almost there
     multiplier: 0.175
 
 load_options:
   source: demcast
-  weather_year: 2021
-  #scale: 1.04  # IRP Table 3 2026 demand 22,915 GWh / DemandCast base 15,909 GWh
-  scale: 1.26  # IRP Table 3 2026 demand 22,915 GWh / DemandCast base 15,909 GWh
+  weather_year: 2023
+  scale: 1.25  # IRP Table 3 2026 demand 22,915 GWh / DemandCast base 15,909 GWh
 
 # TODO Reconcile the learning rates with custom costs definitions
 costs:

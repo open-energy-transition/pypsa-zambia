@@ -5,7 +5,7 @@
 # Merges with: configs/cap_exp_zambia_base.yaml
 
 run:
-  name: validation_2022_final_glofas_calibr1.0_v4
+  name: config.zm.valid_2022
 snapshots:
   start: '2022-01-01'
   end: '2023-01-01'
@@ -31,13 +31,10 @@ electricity:
 
 lines:
   s_max_pu: 0.70
-#  ac_types:
-#    330.: ACSR Zebra 2-bundle 330.0    # SAPP standard 330 kV expansion conductor    
 
 renewable:
   hydro:
     source: custom
-    # TODO Harmonize across different scenarios
     multiplier: 0.175
 
 load_options:
