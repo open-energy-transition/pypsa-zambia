@@ -13,7 +13,7 @@ This page is for whoever is **preparing** a portable, offline copy of a pixi-bas
 
 PyPSA-Earth and related country models (such as PyPSA-Zambia) relay on a number of software dependencies. The most handy option to manage those dependencies is [pixi](https://pixi.prefix.dev/latest/), which installs Python and every package a model needs into one self-contained environment. This page explains how to package a pixi environment together with a model's input data, so that someone without an internet connection can install it and run the model on their own computer.
 
-The steps below apply to any pixi-based PyPSA model; PyPSA-Zambia is used as the running example.
+The steps below have been developed for PyPSA-Zambia is used as the running example but they generally apply to any pixi-based PyPSA model; .
 
 !!! note
     This page assumes you have already read [Installation with pixi](installation.md#installation-with-pixi-alternative). The steps here build on top of a normal pixi installation to make it portable.
