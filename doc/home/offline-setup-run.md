@@ -15,9 +15,9 @@ This page is for anyone who has been given an offline package of a PyPSA model �
 
 Three items, usually together in one folder or on a USB drive:
 
-- **The model project folder** — the code, the input data it needs, and usually one finished result you can compare your own run against
-- **A setup file** — this is the one you will run
-- **A second, larger file** used automatically by the setup file — it needs to stay in the same folder as the setup file, but you never run it yourself
+- **The model project folder** containing the code, the input data it needs, and usually one finished result you can compare your own run against
+- **A setup file** is the file you will run to install a modelling environment
+- **A second, larger file** used automatically by the setup file which needs to stay in the same folder as the setup file, but you never run it yourself
 
 If you are missing any of these, check with whoever gave you the package.
 
