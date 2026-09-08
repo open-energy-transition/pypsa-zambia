@@ -6,7 +6,6 @@
 # distribution of the inflow using available reference data for 2023
 run:
   name: validation_dispatch_zambia_2023
-  shared_cutouts: true
 
 scenario:
   simpl: ['']
@@ -21,7 +20,6 @@ snapshots:
 countries: [ZM]
 
 atlite:
-  nprocesses: 4
   default: cutout-2023-era5
 
 renewable:

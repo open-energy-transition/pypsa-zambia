@@ -133,11 +133,11 @@ def transform_to_xr(inflow_df: pd.DataFrame) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
+    if "snakemake" not in globals():
+        # TODO Avoid excessive import
+        from _helpers import mock_snakemake
 
-    # TODO Avoid excessive import
-    from _helpers import mock_snakemake
-
-    snakemake = mock_snakemake("build_glofas_profile")
+        snakemake = mock_snakemake("build_glofas_profile")
     configure_logging(snakemake)
 
     # Inflow to energy units: pho_water * g & W -> MW

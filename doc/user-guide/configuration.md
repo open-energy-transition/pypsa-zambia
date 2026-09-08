@@ -599,11 +599,57 @@ Options under the **PLOTTING** banner in ``config.default.yaml``: map layout, pl
 
 # From PyPSA-Earth to PyPSA-ZM
 
-Zambia-specific default config file:
+Zambia-specific configuration lives under `configs/zambia_configs/`, layered on
+top of PyPSA-Earth's own `config.default.yaml` the same way `config.yaml`
+normally would: each file only states what *differs* from the layer beneath
+it, and Snakemake merges the layers in order
 
-- `configs/validation_dispatch_zambia.yaml` - the ZM-specific default configuration that
-  overrides PyPSA-Earth's `config.default.yaml` with Zambia cost data, voltage
-  levels, and feature flags
+## Config layering
+ - `config.default.yaml` (PyPSA-Earth's own generic defaults)
+ - `config.zm.default.yaml` (Zambia-wide defaults applied at every run)
+ - `config.zm.validation_dispatch.yaml` (dispatch-mode overrides)
+ - `config.zm.cap_exp_base.yaml` (capacity-expansion overrides)
+ - `scenarios_zambia/config.zm.cap_exp_{year}.yaml` (per-year diff)
+
+`config.zm.default.yaml` is loaded unconditionally by the Snakefile, it's the
+one file every Zambia run shares, whether dispatch or capacity expansion. It
+should only hold values that are genuinely the same for both modes (data
+source versions, line types, country selection, base costs). Anything
+specific to one mode belongs in that mode's own file instead, even if it
+means restating a key. A value that quietly falls back to a setting tuned
+for a different mode is a common source of unexpectedly surprising results.
+
+`config.zm.validation_dispatch.yaml` and `config.zm.cap_exp_base.yaml` sit on
+top of the shared default and are pulled in explicitly, not automatically:
+
+```bash
+# dispatch validation
+snakemake -j 1 solve_all_networks --configfile configs/zambia_configs/config.zm.validation_dispatch.yaml
+
+
+# capacity expansion (all four planning years)
+snakemake -j 1 run_all_scenarios
+```
+
+Capacity-expansion scenarios add one more layer: each
+scenarios_zambia/config.zm.cap_exp_{year}.yaml file is a diff against
+config.zm.cap_exp_base.yaml (declared via its own run.base_config key),
+merged at run time by rule run_scenario. A scenario diff should only
+contain what's different for that year,  powerplants_filter, demand
+scale, costs.year, and similar not a restatement of anything the base
+config already provides.
+
+## Naming Convention
+Every Zambia-specific config file follows `config.zm.<name>.yaml`, mirroring
+PyPSA-Earth's own `config.<name>.yaml` pattern (e.g. `config.tutorial.yaml`)
+while making it unambiguous at a glance which files are Zambia-specific. All
+of them live under `configs/zambia_configs/`
+
+Before adding a key to any of these files, check whether it already resolves
+correctly by inheritance. The exception is a small number of settings such as non-extendable
+transmission and generation in dispatch mode, for instance, which are worth
+restating explicitly even though they're technically inherited, because the
+cost of forgetting them is high and the cost of the duplication is one line
 
 ## Hydro Modelling
 
@@ -634,7 +680,7 @@ a GloFAS dataset (`cutouts/zm-{year}-glofas.nc`) and extracts discharge
 time-series at the location of each hydro plant.
 
 Pre-built GloFAS datasets for multiple years are available via the `inflow-glofas`
-databundle entry in `configs/validation_dispatch_zambia.yaml`:
+databundle entry in `configs/zambia_configs/config.zm.validation_dispatch.yaml`:
 
 ```yaml
   inflow-glofas:
@@ -792,21 +838,20 @@ capacity the solver chooses to build is not affected.
 
 ## Future Scenarios
 
-Four planning horizon configurations are provided in `configs/scenarios_zambia/`:
+Four planning horizon configurations are provided in `configs/zambia_configs/scenarios_zambia/`:
 
 | Config file | Horizon | Demand scale | Fleet |
 |---|---|---|---|
-| `config.cap_exp_zambia_2025.yaml` | 2025 | 1.0× (base) | Plants with `DateIn <= 2025` |
-| `config.cap_exp_zambia_2030.yaml` | 2030 | 2.64× | Plants with `DateIn <= 2030` |
-| `config.cap_exp_zambia_2040.yaml` | 2040 | 3.75× | Plants with `DateIn <= 2040` |
-| `config.cap_exp_zambia_2050.yaml` | 2050 | 4.76× | Plants with `DateIn <= 2050` |
+| `config.zm.cap_exp_2025.yaml` | 2025 | 1.44× (base) | Plants with `DateIn <= 2025` |
+| `config.zm.cap_exp_2030.yaml` | 2030 | 2.64× | Plants with `DateIn <= 2030` |
+| `config.zm.cap_exp_2040.yaml` | 2040 | 3.75× | Plants with `DateIn <= 2040` |
+| `config.zm.cap_exp_2050.yaml` | 2050 | 4.76× | Plants with `DateIn <= 2050` |
 
 Demand scale factors are derived from Zambia's Integrated Resource Plan (IRP)
 projected national demand divided by the DemandCast base year value of 15,909 GWh.
 
-All four capacity expansion configs (`config.cap_exp_zambia_{year}.yaml`) inherit shared settings from `configs/cap_exp_zambia_base.yaml` (ERA5
-2023 cutout, 22 clusters, 3-hour temporal resolution, costs from Zambia's IRP).
-Each scenario diff only overrides `powerplants_filter`, `extendable_carriers`,
+All four capacity expansion configs (`config.zm.cap_exp_{year}.yaml`) inherit shared settings from `configs/zambia_configs/config.zm.cap_exp_base.yaml`.
+Each scenario diff only overrides some parameters including `powerplants_filter`, `extendable_carriers`,
 `load_options.scale`, and `costs.year`.
 
 To run all four scenarios in sequence:

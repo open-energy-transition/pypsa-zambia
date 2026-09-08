@@ -39,10 +39,10 @@ This mode is used to reproduce a historical year's operation. All `extendable_ca
 solver only determines how to schedule existing plants to minimise
 operating cost.
 
-The key config in carrying out this operation is the: `config.zm.validation_dispatch.yaml`
+The key config in carrying out this operation is the: `configs/zambia_configs/config.zm.validation_dispatch.yaml`
 
 ```bash
-snakemake -j 1 solve_all_networks --configfile configs/zambia_configs/config.zm.validation_dispatch.yaml
+snakemake -j 1 solve_all_networks configfile configs/zambia_configs/config.zm.validation_dispatch.yaml
 ```
 
 ### Capacity expansion
@@ -53,7 +53,7 @@ existing coal and oil plants to always dispatch, reflecting their
 sunk-cost status in forward-looking runs.
 
 The base config is: `configs/zambia_configs/config.zm.cap_exp_base.yaml` + year-specific overrides in
-`configs/zambia_configs/scenarios_zambia/config.zm.cap_exp_2025.yaml`
+`configs/zambia_configs/scenarios_zambia/`
 
 ```bash
 snakemake -j 1 run_all_scenarios
@@ -145,7 +145,7 @@ To build a regional cutout, you can use pre-compiled configuration files:
 To use them, you need to go through the following steps:
 1. Comment-out a line in Snakemake which fetches a default configuration
 `configfile: "configs/zambia_configs/config.zm.default.yaml"`
-2. Add a name of a suitable cutout-building configuration file to Smakemake under `#configfile: "configs/zambia_configs/config.zm.validation_dispatch.yaml"`, e.g. `configfile: "configs/zambia_configs/config.zm.build_cutout.yaml"`
+2. Add a name of a suitable cutout-building configuration file to Smakemake under `#configfile: "configs/zambia_configs/config.zm.default.yaml"`, e.g. `configfile: "configs/zambia_configs/config.zm.build_cutout.yaml"`
 3. Set-up Copernicus API
 4. run `build_cutout` rule
 
