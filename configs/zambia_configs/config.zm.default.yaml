@@ -11,7 +11,7 @@ scenario:
   simpl: ['']
   ll: [v1.0]
   clusters: ['10']
-  opts: [Co2L-3h]
+  opts: [3h]
 
 snapshots:
   start: '2013-01-01'
