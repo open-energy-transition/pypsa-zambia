@@ -119,6 +119,8 @@ Three things go into the final package (for example, onto a USB drive):
 
 Once this is ready, hand it to the end user together with the [Running from an Offline Package](offline-setup-run.md) page.
 
+A PyPSA-Zambia package built this way is available on Zenodo: [sandbox.zenodo.org/records/596240](https://sandbox.zenodo.org/records/596240).
+
 ## Other things worth knowing
 
 - Install the environment somewhere the user's account can always write to (their own user folder), rather than a system-wide location — this way it also works on computers with restricted permissions.
