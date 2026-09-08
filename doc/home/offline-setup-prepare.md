@@ -9,7 +9,7 @@ SPDX-License-Identifier: CC-BY-4.0
 This page is for whoever is **preparing** a portable, offline copy of a pixi-based PyPSA model, for example ahead of a workshop, field visit, or any setting where participants cannot rely on downloading packages and data on the spot.
 
 !!! note
-    If you have already been handed a finished offline package and just want to install and run it, see [Running from an Offline Package](offline-setup-run.md) instead — this page is about building that package in the first place.
+    If you have already been handed a finished offline package and just want to install and run it, see [Running from an Offline Package](offline-setup-run.md) instead. This page is focused on building that package in the first place.
 
 PyPSA-Earth and related country models (such as PyPSA-Zambia) are increasingly managed with [pixi](https://pixi.prefix.dev/latest/), which installs Python and every package a model needs into one self-contained environment. This page explains how to package a pixi environment, together with a model's input data, so that someone without an internet connection can install it and run the model on their own computer.
 
