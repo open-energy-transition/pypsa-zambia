@@ -55,7 +55,7 @@ cd project-folder
 snakemake -j 1 solve_all_networks -n
 ```
 
-If the dry run does not try to download or retrieve any data, run the model for real:
+To avoid rewriting your local data, it is important to make sure that the workflow won't try to download data. If the dry run does not try to download or retrieve any data, run the model for real:
 
 ```
 snakemake -j 1 solve_all_networks
