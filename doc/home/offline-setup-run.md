@@ -27,7 +27,7 @@ Copy the project folder and both setup files onto your own computer's hard disk.
 
 ## Step 2: Run the setup file
 
-On Windows, this needs the `-ExecutionPolicy Bypass` option, because Windows often blocks running setup files it does not recognise. This does not change any settings permanently — it only applies to this one command.
+On Windows, this needs the `-ExecutionPolicy Bypass` option, because Windows often blocks running setup files it does not recognise. This does not change any settings permanently and only applies to this one command.
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File "setup.ps1" -o "install-folder"
