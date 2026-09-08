@@ -6,6 +6,8 @@
 
 run:
   name: config.zm.valid_2023
+  base_config: configs/zambia_configs/config.zm.validation_dispatch.yaml
+
 snapshots:
   start: '2023-01-01'
   end: '2024-01-01'
@@ -24,28 +26,23 @@ atlite:
   hydro: hydro/zm-2023-glofas.nc
 
 electricity:
-  powerplants_filter: (DateOut >= 2023 or DateOut != DateOut) and (DateIn <= 2023
-    or DateIn != DateIn)
+  powerplants_filter: (DateOut >= 2023 or DateOut != DateOut) and (DateIn <= 2023 or DateIn != DateIn)
   extendable_carriers:
     Generator: []
 
 lines:
   s_max_pu: 0.70
-#  ac_types:
-#    330.: ACSR Zebra 2-bundle 330.0    # SAPP standard 330 kV expansion conductor    
 
 renewable:
   hydro:
     source: custom
-    # TODO Harmonize across different scenarios
     multiplier: 0.175
 
 load_options:
   source: demcast
   weather_year: 2023
-  scale: 1.25  # IRP Table 3 2026 demand 22,915 GWh / DemandCast base 15,909 GWh
+  scale: 1.25
 
-# TODO Reconcile the learning rates with custom costs definitions
 costs:
   year: 2020
 

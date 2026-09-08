@@ -6,6 +6,8 @@
 
 run:
   name: config.zm.valid_2021
+  base_config: configs/zambia_configs/config.zm.validation_dispatch.yaml
+
 snapshots:
   start: '2021-01-01'
   end: '2022-01-01'
@@ -22,8 +24,7 @@ atlite:
   hydro: hydro/zm-2021-glofas.nc
 
 electricity:
-  powerplants_filter: (DateOut >= 2021 or DateOut != DateOut) and (DateIn <= 2021
-    or DateIn != DateIn)
+  powerplants_filter: (DateOut >= 2021 or DateOut != DateOut) and (DateIn <= 2021 or DateIn != DateIn)
   extendable_carriers:
     Generator: []
 
@@ -38,10 +39,8 @@ renewable:
 load_options:
   source: demcast
   weather_year: 2021
-  #scale: 1.04  # IRP Table 3 2026 demand 22,915 GWh / DemandCast base 15,909 GWh
-  scale: 1.26  # IRP Table 3 2026 demand 22,915 GWh / DemandCast base 15,909 GWh
+  scale: 1.26
 
-# TODO Reconcile the learning rates with custom costs definitions
 costs:
   year: 2020
 
