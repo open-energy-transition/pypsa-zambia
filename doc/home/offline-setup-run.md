@@ -23,7 +23,7 @@ If you are missing any of these, check with whoever gave you the package.
 
 ## Step 1: Copy everything to your computer
 
-Copy the project folder and both setup files onto your own computer's hard disk. Do not run them directly from a USB drive — USB drives are slow, and the installation step needs a permanent location to work with.
+Copy the project folder and both setup files onto your own computer's hard disk. Do not run them directly from a USB drive. USB drives are slow, and the installation step needs a permanent location to work with.
 
 ## Step 2: Run the setup file
 
