@@ -20,6 +20,8 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Updated docs to reflect new configs management methodolody [PR #356](https://github.com/open-energy-transition/pypsa-zambia/pull/356)
 
+* Add CO2 values tailored on Zambia [PR #394](https://github.com/open-energy-transition/pypsa-zambia/pull/394)
+
 
 ### Minor Changes and bug-fixing
 
