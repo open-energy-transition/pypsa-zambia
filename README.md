@@ -98,7 +98,7 @@ snakemake -j 1 run_all_scenarios
       .../pypsa-zambia % conda env create -f envs/win-64.lock.yaml
      ```
 
-   If the above takes longer than 30 min, you might want to try mamba for faster installation:
+If the above takes longer than 30 min, you might want to try mamba for faster installation:
 
    ```bash
    (base) conda install -c conda-forge mamba
@@ -106,7 +106,7 @@ snakemake -j 1 run_all_scenarios
    .../pypsa-zambia % mamba env create -f envs/{{your operating system}}64.lock.yaml
    ```
 
-   Alternatively, you can use [pixi](https://pixi.prefix.dev/latest/) for faster and simpler dependency management (no separate lock files per OS):
+Alternatively, you can use [pixi](https://pixi.prefix.dev/latest/) for faster and simpler dependency management (no separate lock files per OS):
 
    ```bash
    # install pixi: https://pixi.prefix.dev/latest/#installation
@@ -151,19 +151,15 @@ To use them, you need to go through the following steps:
 
 ## Validation
 
-A set of notebooks which provides ingights on outputs of the model and ways to analyse them are available in [zambia-dev-notebooks](https://github.com/open-energy-transition/zambia-dev-notebooks) repo.
+A set of notebooks which provides insights on outputs of the model and ways to analyse them are available in [zambia-dev-notebooks](https://github.com/open-energy-transition/zambia-dev-notebooks) repo.
 
 ## Test run on tutorial
 
-- In the folder open a terminal/command window to be located at this path `~/pypsa-earth/`
+- In the folder open a terminal/command window to be located at this path `~/pypsa-zambia/`
 - Activate the environment `conda activate pypsa-earth`
-- Rename config.tutorial.yaml to config.yaml. For instance in Linux:
-  ```bash
-  mv config.tutorial.yaml config.yaml
-  ```
 - Run a dryrun of the Snakemake workflow by typing simply in the terminal:
   ```bash
-  snakemake -j 1 solve_all_networks -n
+  snakemake -j 1 solve_all_networks --configfile config.zm.tutorial.yaml test/config.zm.dispatch.yaml -n
   ```
 
   Remove the -n to do a real run. Follow the tutorial of PyPSA-Eur 1 and 2 on [YouTube](https://www.youtube.com/watch?v=ty47YU1_eeQ) to continue with an analysis.
