@@ -22,6 +22,8 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Add CO2 values tailored on Zambia [PR #394](https://github.com/open-energy-transition/pypsa-zambia/pull/394)
 
+* Amend a set of validation run configs [PR #418](https://github.com/open-energy-transition/pypsa-zambia/pull/418)
+
 
 ### Minor Changes and bug-fixing
 
