@@ -96,7 +96,7 @@ pixi-pack path/to/project -e default -p win-64 --create-executable -o setup-envi
 ```
 
 !!! danger "Always include `--create-executable`"
-    Without it, `pixi-pack` produces a bundle of raw package files that still needs a separate `pixi-unpack` tool to assemble into a working environment — and that tool would not be available on a computer with no internet, which defeats the purpose. With `--create-executable`, everything needed is combined into a single file that installs itself when run. This is the single most important setting in the whole process.
+    Without it, `pixi-pack` produces a bundle of raw package files that still needs a separate `pixi-unpack` tool to assemble into a working environment. That tool would not be available on a computer with no internet, which defeats the purpose. With `--create-executable`, everything needed is combined into a single file that installs itself when run. This is the single most important setting in the whole process.
 
 Adjust `-p` to the target platform (`win-64`, `linux-64`, `osx-64`, `osx-arm64`).
 
