@@ -121,9 +121,9 @@ The environment on its own is not enough. The model also needs its input data, w
 
 Three things go into the final portable package to be shared for installation (for example, on a USB drive):
 
-- **The model project folder** — code, input data, and one reference result
-- **The wrapper setup file** (from Step 7) — this is the one people will actually run
-- **The self-installing environment file** (from Step 6) — used automatically by the wrapper; it needs to stay in the same folder, but is not run directly
+- **The model project folder** containing code, input data, and one reference result
+- **The wrapper setup file** (from Step 7) which is the one people will actually run
+- **The self-installing environment file** (from Step 6) used automatically by the wrapper; it needs to stay in the same folder, but is not run directly
 
 Once this is ready, hand it to the end user together with the [Running from an Offline Package](offline-setup-run.md) page.
 
