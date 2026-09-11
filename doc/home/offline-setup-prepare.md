@@ -109,7 +109,7 @@ To prevent emerging the DLL conflict, wrap the setup file from Step 6 inside a s
 
 Running this procedure will eliminate the DLL conflict. This means the person running the model later does not need to know anything about DLL conflicts. It is handled for them, automatically, every time.
 
-## Step 8: Package the model's data, not just the software
+## Step 8: Package the model's data
 
 The environment on its own is not enough — the model also needs its input data, which it would normally download the first time it runs. To prepare this:
 
