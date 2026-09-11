@@ -111,7 +111,7 @@ Running this procedure will eliminate the DLL conflict. This means the person ru
 
 ## Step 8: Package the model's data
 
-The environment on its own is not enough — the model also needs its input data, which it would normally download the first time it runs. To prepare this:
+The environment on its own is not enough. The model also needs its input data, which it would normally download the first time it runs. To prepare this:
 
 1. Run the model once normally, with an internet connection, so it downloads everything it needs and produces a finished result.
 2. Remove the folders the model creates and rebuilds automatically as it runs (for example `resources/`, `networks/`, `benchmarks/`, `logs/`, `.snakemake/`). These are working files, not original data — the model will recreate them by itself.
