@@ -4,7 +4,7 @@ SPDX-FileCopyrightText:  PyPSA-Earth and PyPSA-Eur Authors
 SPDX-License-Identifier: CC-BY-4.0
 -->
 
-# Preparing Offline Package 
+# Preparing Offline Package
 
 This page is for whoever is **preparing** a portable, offline copy of a pixi-based PyPSA model, for example ahead of a workshop, field visit, or any setting where participants cannot rely on downloading packages and data on the spot.
 
@@ -20,10 +20,10 @@ The steps below have been developed for PyPSA-Zambia is used as the running exam
 
 ## What you end up with
 
-A folder (or USB drive) containing three things: 
+A folder (or USB drive) containing three things:
 - the model's code and data
 - a single setup file that installs the software
-- one small helper file that the setup file needs alongside it. 
+- one small helper file that the setup file needs alongside it.
 Someone can copy this to their computer and be running the model within a few minutes, without needing to download anything.
 
 Pre-compiled installation kit is available via https://sandbox.zenodo.org/records/596240.
