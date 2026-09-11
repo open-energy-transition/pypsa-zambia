@@ -102,7 +102,7 @@ Adjust `-p` to the target platform (`win-64`, `linux-64`, `osx-64`, `osx-arm64`)
 
 ## Step 7: Build in a fix for the Windows DLL conflict
 
-Rather than relying on each person to notice and fix the DLL conflict from Step 4 themselves, wrap the setup file from Step 6 inside a small extra script that does two things automatically:
+To prevent emerging the DLL conflict, wrap the setup file from Step 6 inside a small extra script that does two things automatically:
 
 1. Runs the real setup file from Step 6, to install the environment.
 2. Adds a short check to the environment's own startup file, so that every time someone activates the environment, it automatically looks for the specific files known to cause conflicts and ignores any other program's copy of them.
