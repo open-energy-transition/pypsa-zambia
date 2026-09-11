@@ -233,8 +233,9 @@ rule download_interconnection_data:
 rule download_line_types:
     input:
         url=HTTP.remote(
-            "https://sandbox.zenodo.org/records/473405/files/pypsa_line_types%20%281%29.csv",
+            "sandbox.zenodo.org/records/473405/files/pypsa_line_types (1).csv",
             keep_local=True,
+            additional_request_string="?download=1",
         ),
     output:
         "data/line_types.csv",
@@ -247,12 +248,12 @@ rule download_line_types:
 rule retrieve_mining_data:
     input:
         provincial_demand=HTTP.remote(
-            "https://sandbox.zenodo.org/records/495635/files/zambia_provincial_mining_demand.csv",
+            "sandbox.zenodo.org/records/495635/files/zambia_provincial_mining_demand.csv",
             keep_local=True,
             additional_request_string="?download=1",
         ),
         mining_polygons=HTTP.remote(
-            "https://sandbox.zenodo.org/records/495635/files/zambia_pangaea_mining_polygons.csv",
+            "sandbox.zenodo.org/records/495635/files/zambia_pangaea_mining_polygons.csv",
             keep_local=True,
             additional_request_string="?download=1",
         ),
@@ -461,3 +462,82 @@ if (INFLOW_GLOFAS := dataset_version("inflow-glofas", config))["source"] in [
             f"benchmarks/{RDIR}retrieve_inflow_glofas"
         run:
             copy2(str(input[0]), output[0])
+
+
+if (BUNDLE_DATA := dataset_version("bundle_data", config))["source"] in [
+    "primary",
+    "tutorial",
+]:
+    """
+      bundle_data_earth:
+    countries: [Earth]
+    category: common
+    destination: "data"
+    urls:
+      zenodo: https://sandbox.zenodo.org/records/323567/files/bundle_data_earth.zip?download=1
+      gdrive: https://drive.google.com/file/d/1P4uMY464lgcp--8fAEYIJbKeNmHdg1Re/view?usp=drive_link
+    output:
+    - data/eez/eez_v11.gpkg
+    - data/gebco/GEBCO_2025_sub_ice.nc
+    - data/copernicus/PROBAV_LC100_global_v3.0.1_2019-nrt_Discrete-Classification-map_EPSG-4326.tif
+    - data/ssp2-2.6/2030/era5_2013/Africa.nc
+    - data/ssp2-2.6/2030/era5_2013/Asia.nc
+    - data/ssp2-2.6/2030/era5_2013/Europe.nc
+    - data/ssp2-2.6/2030/era5_2013/NorthAmerica.nc
+    - data/ssp2-2.6/2030/era5_2013/SouthAmerica.nc
+    - data/ssp2-2.6/2030/era5_2013/Oceania.nc
+    """
+
+    rule retrieve_bundle_data:
+        message:
+            f"Retrieving bundle data"
+        input:
+            bundle=HTTP.remote(
+                BUNDLE_DATA["url"],
+                keep_local=True,
+                additional_request_string="?download=1",
+            ),
+        output:
+            "data/eez/eez_v11.gpkg",
+            "data/gebco/GEBCO_2025_sub_ice.nc",
+            "data/copernicus/PROBAV_LC100_global_v3.0.1_2019-nrt_Discrete-Classification-map_EPSG-4326.tif",
+            "data/ssp2-2.6/2030/era5_2013/Africa.nc",
+            "data/ssp2-2.6/2030/era5_2013/Asia.nc",
+            "data/ssp2-2.6/2030/era5_2013/Europe.nc",
+            "data/ssp2-2.6/2030/era5_2013/NorthAmerica.nc",
+            "data/ssp2-2.6/2030/era5_2013/SouthAmerica.nc",
+            "data/ssp2-2.6/2030/era5_2013/Oceania.nc",
+        run:
+            unpack_archive(str(input["bundle"]), str(f"data"))
+
+
+if (DEMAND_CAST := dataset_version("demand_cast", config))["source"] in [
+    "primary",
+    "tutorial",
+]:
+    """
+    demandcast_full:
+        countries: [Earth]
+        tutorial: false
+        category: el_demand
+        destination: "data/demand"
+        urls:
+        direct: "https://zenodo.org/records/18374352/files/forecasts_on_historical_period.parquet"
+        unzip: false
+        output:
+        - data/demand/forecasts_on_historical_period.parquet
+    """
+
+    rule retrieve_demand_cast:
+        message:
+            f"Retrieving demand cast data"
+        input:
+            bundle=HTTP.remote(
+                DEMAND_CAST["url"],
+                keep_local=True,
+                additional_request_string="?download=1",
+            ),
+        output:
+            f"data/demand/forecasts_on_historical_period.parquet",
+        run:
+            copy2(str(input["bundle"]), str(output[0]))
