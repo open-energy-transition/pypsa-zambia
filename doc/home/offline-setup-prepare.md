@@ -119,7 +119,7 @@ The environment on its own is not enough. The model also needs its input data, w
 
 ## Step 9: Put it all together
 
-Three things go into the final package (for example, onto a USB drive):
+Three things go into the final portable package to be shared for installation (for example, on a USB drive):
 
 - **The model project folder** — code, input data, and one reference result
 - **The wrapper setup file** (from Step 7) — this is the one people will actually run
