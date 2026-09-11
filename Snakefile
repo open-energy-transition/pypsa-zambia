@@ -160,7 +160,9 @@ rule plot_all_summaries:
         ),
 
 
-if config["enable"].get("retrieve_databundle", True):
+if config["enable"].get("retrieve_databundle", True) and (
+    config["countries"][0] != "ZM"
+):
 
     # Exclude categories which are implemented in retrieve rules (retrieve.smk)
     bundles_to_download = get_best_bundles_in_snakemake(
@@ -525,7 +527,7 @@ if config["enable"].get("build_cutout", False):
             "scripts/build_cutout.py"
 
 
-if config["enable"].get("retrieve_cutout", False):
+if config["enable"].get("retrieve_cutout", False) and (config["countries"][0] != "ZM"):
 
     cutout_to_download = get_best_bundles_in_snakemake(
         config, include_categories=["cutouts"]

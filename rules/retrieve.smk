@@ -467,7 +467,7 @@ if (INFLOW_GLOFAS := dataset_version("inflow-glofas", config))["source"] in [
 if (BUNDLE_DATA := dataset_version("bundle_data", config))["source"] in [
     "primary",
     "tutorial",
-]:
+] and (config["countries"][0] == "ZM"):
     """
       bundle_data_earth:
     countries: [Earth]
@@ -514,7 +514,7 @@ if (BUNDLE_DATA := dataset_version("bundle_data", config))["source"] in [
 if (DEMAND_CAST := dataset_version("demand_cast", config))["source"] in [
     "primary",
     "tutorial",
-]:
+] and (config["countries"][0] == "ZM"):
     """
     demandcast_full:
         countries: [Earth]
