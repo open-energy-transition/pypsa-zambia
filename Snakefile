@@ -188,11 +188,7 @@ if config["enable"].get("retrieve_databundle", True) and (
             "scripts/retrieve_databundle_light.py"
 
 
-if (
-    config["enable"].get("retrieve_databundle", True)
-    and config["tutorial"]
-    and (config["countries"][0] != "ZM")
-):
+if config["enable"].get("retrieve_databundle", True) and config["tutorial"]:
 
     hydrobasins_to_download = get_best_bundles_in_snakemake(
         config, include_categories=["hydrobasins"]
