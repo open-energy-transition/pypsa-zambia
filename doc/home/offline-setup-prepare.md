@@ -68,7 +68,7 @@ From inside the project folder:
 pixi install
 ```
 
-This downloads and installs everything the model needs — Python itself, and every package the model depends on, all pinned to the exact versions the project expects.
+This downloads and installs everything the model needs, such as Python itself, and every package the model depends on, all pinned to the exact versions the project expects.
 
 ## Step 4: Check it actually works
 
