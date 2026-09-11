@@ -125,7 +125,7 @@ Three things go into the final portable package to be shared for installation (f
 - **The wrapper setup file** (from Step 7) which is the one people will actually run
 - **The self-installing environment file** (from Step 6) used automatically by the wrapper; it needs to stay in the same folder, but is not run directly
 
-Once this is ready, hand it to the end user together with the [Running from an Offline Package](offline-setup-run.md) page.
+Once this is ready, hand it to the end user, and point out [Running from an Offline Package](offline-setup-run.md) page for detailed instructions on installation.
 
 A PyPSA-Zambia package built this way is available on Zenodo: [sandbox.zenodo.org/records/596240](https://sandbox.zenodo.org/records/596240).
 
