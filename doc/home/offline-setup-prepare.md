@@ -4,7 +4,7 @@ SPDX-FileCopyrightText:  PyPSA-Earth and PyPSA-Eur Authors
 SPDX-License-Identifier: CC-BY-4.0
 -->
 
-# Preparing an Offline Package (For Developers and Instructors)
+# Preparing Offline Package 
 
 This page is for whoever is **preparing** a portable, offline copy of a pixi-based PyPSA model, for example ahead of a workshop, field visit, or any setting where participants cannot rely on downloading packages and data on the spot.
 
