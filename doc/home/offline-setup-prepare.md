@@ -20,7 +20,13 @@ The steps below have been developed for PyPSA-Zambia is used as the running exam
 
 ## What you end up with
 
-A folder (or USB drive) containing three things: the model's code and data, a single setup file that installs the software, and one small helper file that the setup file needs alongside it. Someone can copy this to their computer and be running the model within a few minutes, without needing to download anything.
+A folder (or USB drive) containing three things: 
+- the model's code and data
+- a single setup file that installs the software
+- one small helper file that the setup file needs alongside it. 
+Someone can copy this to their computer and be running the model within a few minutes, without needing to download anything.
+
+Pre-compiled installation kit is available via https://sandbox.zenodo.org/records/596240.
 
 ## What you need before starting
 
