@@ -107,7 +107,7 @@ To prevent emerging the DLL conflict, wrap the setup file from Step 6 inside a s
 1. Runs the real setup file from Step 6, to install the environment.
 2. Adds a short check to the environment's own startup file, so that every time someone activates the environment, it automatically looks for the specific files known to cause conflicts and ignores any other program's copy of them.
 
-This means the person running the model later does not need to know anything about DLL conflicts — it is handled for them, automatically, every time.
+Running this procedure will eliminate the DLL conflict. This means the person running the model later does not need to know anything about DLL conflicts. It is handled for them, automatically, every time.
 
 ## Step 8: Package the model's data, not just the software
 
