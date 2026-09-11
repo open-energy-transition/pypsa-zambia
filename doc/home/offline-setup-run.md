@@ -6,7 +6,7 @@ SPDX-License-Identifier: CC-BY-4.0
 
 # Running from an Offline Package (For End Users)
 
-This page is for anyone who has been given an offline package of a PyPSA model — for example on a USB drive at a workshop — and wants to install and run it on their own computer, with no internet connection required.
+This page is for anyone who has been given an offline package of a PyPSA-ZM model prepared according to the methodology described in [Running from an Offline Package](offline-setup-run.md) section, for example on a USB drive at a workshop. This section describes how to install and run it on their own computer, with no internet connection required.
 
 !!! note
     If you are the one preparing such a package for others, see [Preparing an Offline Package](offline-setup-prepare.md) instead.
