@@ -48,7 +48,7 @@ On the preparation computer:
     powershell -ExecutionPolicy Bypass -c "irm -useb https://pixi.sh/install.ps1 | iex"
     ```
 
-This step, and the ones that follow, need an internet connection — the goal is to prepare something that someone else can later use without one.
+This step, and the ones that follow, need an internet connection with the goal to prepare something that someone else can later use without one.
 
 ## Step 2: Make sure the project is set up for pixi
 
