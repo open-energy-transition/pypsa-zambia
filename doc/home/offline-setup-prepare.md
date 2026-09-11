@@ -72,7 +72,7 @@ This downloads and installs everything the model needs, such as Python itself, a
 
 ## Step 4: Check it actually works
 
-Before packaging anything, test that the environment works, especially the packages that handle maps and geographic data (`rasterio`, `fiona`, `pyproj`) — these are the ones most likely to run into trouble on Windows:
+Before packaging anything, test that the environment works, especially the packages that handle maps and geographic data (`rasterio`, `fiona`, `pyproj`) which are the ones most likely to run into trouble on Windows:
 
 ```bash
 pixi run python -c "import rasterio, fiona, pyproj; print(rasterio.__version__)"
