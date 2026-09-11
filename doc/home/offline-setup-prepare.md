@@ -30,7 +30,7 @@ Pre-compiled installation kit is available via https://sandbox.zenodo.org/record
 
 ## What you need before starting
 
-A computer with an internet connection, where you will prepare the package. This is referred to below as the **preparation computer** — it is not the computer the model will eventually run on.
+A computer with an internet connection, where you will prepare the package. This is referred to below as the **preparation computer** in contrast to a computer the model will eventually run on.
 
 ## Step 1: Install pixi
 
