@@ -52,7 +52,9 @@ This step, and the ones that follow, need an internet connection with the goal t
 
 ## Step 2: Make sure the project is set up for pixi
 
-A pixi-based project has two files describing its software requirements: `pixi.toml` (what is needed) and `pixi.lock` (the exact versions to use, so everyone gets the same setup). If a project only has an older-style conda `environment.yaml` instead, pixi can convert it:
+A pixi-based project has two files describing its software requirements: `pixi.toml` (the list of packages needed) and `pixi.lock` (the exact versions to use so they work smoothly together).
+
+!!! note If you prefer to relay on conda `environment.yaml` instead, pixi can convert it:
 
 ```bash
 pixi init --import envs/environment.yaml .
