@@ -1060,8 +1060,16 @@ def convert_country_codes(
         ("SN-GM", "ISO3"): "SEN-GMB",
     }
 
-    if isinstance(country_codes, (pd.Series, list)):
-        unique_codes = set(country_codes)
+    unique_codes = (
+        set(country_codes)
+        if isinstance(country_codes, list)
+        else set(country_codes.unique())
+    )
+
+    if isinstance(country_codes, pd.Series):
+        unique_codes = list(set(country_codes))
+    elif isinstance(country_codes, list):
+        unique_codes = list(set(country_codes))
     else:
         raise ValueError(
             "Input must be a pandas Series or list containing country codes."
