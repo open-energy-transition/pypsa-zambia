@@ -516,7 +516,3 @@ databundles:
     output: [cutouts/cutout-2013-era5.nc]
     disable_by_opt:
       build_cutout: [all]
-
-  bundle_natura_earth_tutorial:
-    countries: [Earth]
-    urls:
