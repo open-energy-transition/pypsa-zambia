@@ -76,9 +76,7 @@ from _helpers import (
 )
 from add_electricity import update_transmission_costs
 from utility_custom_features import (
-    add_custom_line_types,
     add_interconnectors,
-    load_custom_line_types,
     load_interconnector_data,
 )
 
@@ -364,9 +362,6 @@ if __name__ == "__main__":
     n = pypsa.Network(snakemake.input[0])
     Nyears = n.snapshot_weightings.objective.sum() / 8760.0
     costs = pd.read_csv(snakemake.input.tech_costs, index_col=0)
-    # TODO Remove adding custom line types once they will be incorporated into a currently used PyPSA version
-    custom_line_types = load_custom_line_types(snakemake.input.line_types)
-    n = add_custom_line_types(n, custom_line_types)
     s_max_pu = snakemake.params.lines["s_max_pu"]
 
     set_line_s_max_pu(n, s_max_pu)
