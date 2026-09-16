@@ -20,8 +20,14 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Updated docs to reflect new configs management methodolody [PR #356](https://github.com/open-energy-transition/pypsa-zambia/pull/356)
 
+* Add CO2 values tailored on Zambia [PR #394](https://github.com/open-energy-transition/pypsa-zambia/pull/394)
+
+* Amend a set of validation run configs [PR #418](https://github.com/open-energy-transition/pypsa-zambia/pull/418)
+
 
 ### Minor Changes and bug-fixing
+
+* Fix typos and improve the README [PR #392](https://github.com/open-energy-transition/pypsa-zambia/pull/392)
 
 * Correct SAPP cross-border trade values to match ERB Energy Sector Report data. The `sapp_countries.csv` is now filtered by snapshot year automatically[PR #320](https://github.com/open-energy-transition/pypsa-zambia/pull/320)
 
@@ -30,6 +36,8 @@ This part of documentation collects descriptive release notes to capture the mai
 * Fixed bug whereby docs page was not included into nav tree of readthedocs [PR #328](https://github.com/open-energy-transition/pypsa-zambia/pull/328)
 
 * Added key energy sector metrics from ERB Annual Statistics Bulletin [PR #323](https://github.com/open-energy-transition/pypsa-zambia/pull/350)
+
+* Added documentation for preparing and running offline (no internet access required) packages of pixi-based models, split into a developer/instructor guide and an end-user guide [PR #399](https://github.com/open-energy-transition/pypsa-zambia/pull/399)
 
 
 # PyPSA-Zambia v0.4
