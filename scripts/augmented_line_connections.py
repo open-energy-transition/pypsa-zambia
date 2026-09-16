@@ -148,7 +148,6 @@ if __name__ == "__main__":
 
     #  add new lines to the network
     lines_config = snakemake.params.lines
-    countries = snakemake.config["countries"]
 
     ac_linetypes = lines_config["ac_types"]
     dc_linetypes = lines_config["dc_types"]
