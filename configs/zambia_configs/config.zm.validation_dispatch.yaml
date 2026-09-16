@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: CC0-1.0
 
 run:
-  name: validation_dispatch_zambia_2023
+  name: validation_dispatch_10_2023
 
 snapshots:
   start: '2023-01-01'
@@ -17,7 +17,7 @@ atlite:
 load_options:
   source: "demcast"
   weather_year: 2023
-  scale: 0.9 #0.85  # scaled the model demand by a factor of 14.4/19.34 to match the national value
+  scale: 1.25 #0.85  # scaled the model demand by a factor of 14.4/19.34 to match the national value
 
 electricity:
   extendable_carriers:

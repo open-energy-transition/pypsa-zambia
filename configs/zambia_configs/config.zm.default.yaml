@@ -70,7 +70,7 @@ electricity:
   voltages: [66., 88., 132., 220., 330.]
 
   # ----------------- Existing powerplants -------------------
-  powerplants_filter: (DateOut >= 2024 or DateOut != DateOut) and (DateIn <= 2024 or DateIn != DateIn)
+  powerplants_filter: (DateOut >= 2023 or DateOut != DateOut) and (DateIn <= 2023 or DateIn != DateIn)
   custom_powerplants: replace # set to "merge" or "replace" if you have a custom_powerplants.csv for Zambia
   disaggregate_powerplants: false # to enable disaggregation also in simplify_network, a set of excluded carries must be specified
 
@@ -101,7 +101,7 @@ renewable:
     normalization:
       method: irena
       year: 2013
-    multiplier: 10 # has different meaning for custom and era5 sources
+    multiplier: 0.175 # has different meaning for custom and era5 sources
 
 # ------------------- Costs & emissions -------------------
 costs:
@@ -179,10 +179,9 @@ plotting:
 
     dispatch_validation:
       scenario_filter:
-      - "validation_dispatch_zambia_2023"
-      - "validation_dispatch_zambia_2024"
+      - "validation_dispatch_10_2023"
+      - "validation_dispatch_22_2023"
       exclude_carriers:
-      - "load shedding"
       reference_data:   # generation data, imports and exports data are available from ERB Zambia (https://www.erb.org.zm/).
       - generation
 
