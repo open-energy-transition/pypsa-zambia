@@ -5,9 +5,9 @@
 
 # -*- coding: utf-8 -*-
 """
-Lifts electrical transmission network to a single 380 kV voltage layer, removes
-dead-ends of the network, and reduces multi-hop HVDC connections to a single
-link.
+Lifts the electrical transmission network to configured voltage layers,
+removes dead ends of the network, and reduces multi-hop HVDC connections to a
+single link.
 
 Relevant Settings
 -----------------
@@ -20,6 +20,9 @@ Relevant Settings
 
     costs:
         output_currency:
+
+    electricity:
+        base_voltage:
 
     lines:
         length_factor:
@@ -68,15 +71,14 @@ Description
 
 The rule :mod:`simplify_network` does up to four things:
 
-1. Create an equivalent transmission network in which all voltage levels are mapped to the 380 kV level by the function ``simplify_network(...)``.
+1. Create an equivalent transmission network in which voltage levels are mapped to the configured country-specific base-voltage layers by ``simplify_network_to_base_voltage(...)``. Countries without an explicit override use the default base voltage. Country-specific AC and DC line-type mappings are used when enabled and available for the corresponding country; otherwise, the respective default mapping is used.
 
 2. DC only sub-networks that are connected at only two buses to the AC network are reduced to a single representative link in the function ``simplify_links(...)``. The components attached to buses in between are moved to the nearest endpoint. The grid connection cost of offshore wind generators are added to the capital costs of the generator.
 
-3. Stub lines and links, i.e. dead-ends of the network, are sequentially removed from the network in the function ``remove_stubs(...)``. Components are moved along.
+3. Stub lines and links, i.e. dead ends of the network, are sequentially removed from the network in the function ``remove_stubs(...)``. Components are moved along.
 
 4. Optionally, if an integer were provided for the wildcard ``{simpl}`` (e.g. ``networks/elec_s500.nc``), the network is clustered to this number of clusters with the routines from the ``cluster_network`` rule with the function ``cluster_network.cluster(...)``. This step is usually skipped!
 """
-import os
 import sys
 from functools import reduce
 
@@ -89,6 +91,7 @@ from _helpers import (
     add_year_suffix_to_carriers,
     configure_logging,
     create_logger,
+    get_linetype_by_voltage_and_country,
     nearest_shape,
     restore_base_carrier_names,
     update_config_dictionary,
@@ -113,29 +116,134 @@ sys.settrace
 logger = create_logger(__name__)
 
 
-def simplify_network_to_base_voltage(n, linetype, base_voltage):
+def simplify_network_to_base_voltage(
+    n,
+    ac_types,
+    dc_types,
+    base_voltage,
+    use_country_specific_ac_types,
+    use_country_specific_dc_types,
+):
     """
-    Fix all lines to a voltage level of base voltage level and remove all
-    transformers.
+    Map all lines to configured base voltages and country-specific line types.
 
-    The function preserves the transmission capacity for each line while
-    updating its voltage level, line type and number of parallel bundles
-    (num_parallel). Transformers are removed and connected components
-    are moved from their starting bus to their ending bus. The
-    corresponding starting buses are removed as well.
+    Each bus is assigned the base voltage configured for its country.
+    Countries without an explicit override use the default value. Each line
+    is assigned the closest available AC or DC line type for the country of
+    its first bus. Transmission capacity is preserved by recalculating the
+    number of parallel bundles after updating the voltage and line type.
+    Transformers are removed and connected components are moved from their
+    starting bus to their ending bus.
+
+    Parameters
+    ----------
+    n : pypsa.Network
+        Network to simplify.
+    ac_types : dict
+        AC line-type mappings by country and nominal voltage.
+    dc_types : dict
+        DC line-type mappings by country and nominal voltage.
+    base_voltage : dict
+        Default base voltage and optional country-specific overrides.
+    use_country_specific_ac_types : bool
+        Whether to use country-specific AC mappings.
+    use_country_specific_dc_types : bool
+        Whether to use country-specific DC mappings.
+
+    Returns
+    -------
+    tuple
+        Simplified network and transformer bus mapping.
     """
+    if not isinstance(base_voltage, dict) or "default" not in base_voltage:
+        raise ValueError(
+            "'electricity.base_voltage' must contain a 'default' value "
+            "and may contain country-specific overrides."
+        )
 
-    logger.info(f"Mapping all network lines onto a single {int(base_voltage)}kV layer")
-    n.buses["v_nom"] = base_voltage
-    n.lines["type"] = linetype
-    n.lines["v_nom"] = base_voltage
-    n.lines["i_nom"] = n.line_types.i_nom[linetype]
+    default_base_voltage = base_voltage["default"]
+
+    bus_base_voltages = n.buses["country"].map(
+        lambda country: base_voltage.get(country, default_base_voltage)
+    )
+
+    logger.info(
+        "Mapping network lines onto country-specific base-voltage layers: %s",
+        {
+            country: base_voltage.get(country, default_base_voltage)
+            for country in n.buses["country"].dropna().unique()
+        },
+    )
+
+    n.buses["v_nom"] = bus_base_voltages
+
+    line_countries = n.lines["bus0"].map(n.buses["country"])
+    line_base_voltages = line_countries.map(
+        lambda country: base_voltage.get(country, default_base_voltage)
+    )
+    line_bus1_base_voltages = n.lines["bus1"].map(bus_base_voltages)
+
+    ac_line_mask = n.lines["carrier"] == "AC"
+    dc_line_mask = n.lines["carrier"] == "DC"
+
+    mismatched_ac_lines = ac_line_mask & (line_base_voltages != line_bus1_base_voltages)
+
+    if mismatched_ac_lines.any():
+        mismatched_lines = n.lines.loc[
+            mismatched_ac_lines,
+            ["bus0", "bus1"],
+        ].copy()
+
+        mismatched_lines["bus0_v_nom"] = line_base_voltages.loc[mismatched_ac_lines]
+        mismatched_lines["bus1_v_nom"] = line_bus1_base_voltages.loc[
+            mismatched_ac_lines
+        ]
+
+        raise ValueError(
+            "Country-specific base voltages assign different nominal "
+            "voltages to the endpoints of the following AC lines:\n"
+            f"{mismatched_lines.to_string()}"
+        )
+
+    n.lines.loc[ac_line_mask, "type"] = pd.Series(
+        [
+            get_linetype_by_voltage_and_country(
+                voltage,
+                country,
+                ac_types,
+                use_country_specific_ac_types,
+            )
+            for voltage, country in zip(
+                line_base_voltages.loc[ac_line_mask],
+                line_countries.loc[ac_line_mask],
+            )
+        ],
+        index=n.lines.index[ac_line_mask],
+    )
+
+    n.lines.loc[dc_line_mask, "type"] = pd.Series(
+        [
+            get_linetype_by_voltage_and_country(
+                voltage,
+                country,
+                dc_types,
+                use_country_specific_dc_types,
+            )
+            for voltage, country in zip(
+                line_base_voltages.loc[dc_line_mask],
+                line_countries.loc[dc_line_mask],
+            )
+        ],
+        index=n.lines.index[dc_line_mask],
+    )
+
+    n.lines["v_nom"] = line_base_voltages
+    n.lines["i_nom"] = n.lines["type"].map(n.line_types["i_nom"])
     # Note: s_nom is set in base_network
     n.lines["num_parallel"] = n.lines.eval("s_nom / (sqrt(3) * v_nom * i_nom)")
 
     # Re-define s_nom for DC lines
-    is_dc_carrier = n.lines["carrier"] == "DC"
-    n.lines.loc[is_dc_carrier, "num_parallel"] = n.lines.loc[is_dc_carrier].eval(
+    n.lines.loc[dc_line_mask, "num_parallel"] = n.lines.loc[dc_line_mask].eval(
         "s_nom / (v_nom * i_nom)"
     )
 
@@ -1068,12 +1176,24 @@ if __name__ == "__main__":
     configure_logging(snakemake)
 
     n = pypsa.Network(snakemake.input.network)
+    source_line_types = n.line_types.copy()
 
     # Add year suffix to carrier names for clustering
     add_year_suffix_to_carriers(n)
 
     base_voltage = snakemake.params.electricity["base_voltage"]
-    linetype = snakemake.params.config_lines["ac_types"][base_voltage]
+    lines_config = snakemake.params.config_lines
+
+    use_country_specific_types = lines_config.get(
+        "use_country_specific_types",
+        False,
+    )
+
+    ac_types = lines_config["ac_types"]
+    dc_types = lines_config["dc_types"]
+
+    use_country_specific_ac_types = use_country_specific_types
+    use_country_specific_dc_types = use_country_specific_types
     exclude_carriers = snakemake.params.clustering["simplify_network"].get(
         "exclude_carriers", []
     )
@@ -1098,7 +1218,14 @@ if __name__ == "__main__":
         },
     )
 
-    n, trafo_map = simplify_network_to_base_voltage(n, linetype, base_voltage)
+    n, trafo_map = simplify_network_to_base_voltage(
+        n,
+        ac_types,
+        dc_types,
+        base_voltage,
+        use_country_specific_ac_types,
+        use_country_specific_dc_types,
+    )
 
     Nyears = n.snapshot_weightings.objective.sum() / 8760
 
@@ -1253,6 +1380,32 @@ if __name__ == "__main__":
 
     # Restore base carrier names (remove year suffixes) before saving
     restore_base_carrier_names(n)
+
+    # Restore line types lost when clustering creates a new network.
+    used_line_types = pd.Index(
+        n.lines["type"].dropna().loc[lambda values: values != ""].unique()
+    )
+    missing_line_types = used_line_types.difference(n.line_types.index)
+
+    unavailable_line_types = missing_line_types.difference(source_line_types.index)
+    if not unavailable_line_types.empty:
+        raise ValueError(
+            "The following line types are used by lines but are unavailable in "
+            f"the source network: {unavailable_line_types.tolist()}"
+        )
+
+    for line_type in missing_line_types:
+        n.add(
+            "LineType",
+            line_type,
+            **source_line_types.loc[line_type].dropna().to_dict(),
+        )
+
+    if not missing_line_types.empty:
+        logger.info(
+            "Restored line types removed during network clustering: %s",
+            missing_line_types.tolist(),
+        )
 
     n.meta = dict(snakemake.config, **dict(wildcards=dict(snakemake.wildcards)))
     n.export_to_netcdf(snakemake.output.network)
