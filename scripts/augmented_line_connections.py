@@ -32,9 +32,9 @@ Outputs
 Description
 -----------
 
-New HVAC connections use country-specific line-type mappings only when enabled
-and when mappings are available for every configured country. Otherwise,
-the complete default mapping is used. Availability is evaluated separately
+New transmission connections use country-specific line-type mappings when
+enabled and when a mapping is available for the corresponding country.
+Otherwise, the default mapping is used. Availability is evaluated separately
 for AC and DC mappings.
 """
 

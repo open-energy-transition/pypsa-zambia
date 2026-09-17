@@ -5,7 +5,7 @@
 
 # -*- coding: utf-8 -*-
 """
-Lifts the electrical transmission network to a single configured voltage layer,
+Lifts the electrical transmission network to configured voltage layers,
 removes dead ends of the network, and reduces multi-hop HVDC connections to a
 single link.
 
@@ -71,7 +71,7 @@ Description
 
 The rule :mod:`simplify_network` does up to four things:
 
-1. Create an equivalent transmission network in which all voltage levels are mapped to the configured base-voltage layer by ``simplify_network_to_base_voltage(...)``. Country-specific line-type mappings are used only when enabled and when mappings are available for every configured country. Otherwise, the complete default mapping is used. AC and DC mappings are evaluated separately.
+1. Create an equivalent transmission network in which voltage levels are mapped to the configured country-specific base-voltage layers by ``simplify_network_to_base_voltage(...)``. Countries without an explicit override use the default base voltage. Country-specific AC and DC line-type mappings are used when enabled and available for the corresponding country; otherwise, the respective default mapping is used.
 
 2. DC only sub-networks that are connected at only two buses to the AC network are reduced to a single representative link in the function ``simplify_links(...)``. The components attached to buses in between are moved to the nearest endpoint. The grid connection cost of offshore wind generators are added to the capital costs of the generator.
 
@@ -125,9 +125,11 @@ def simplify_network_to_base_voltage(
     use_country_specific_dc_types,
 ):
     """
-    Map all lines to a common voltage while preserving country-specific types.
+    Map all lines to configured base voltages and country-specific line types.
 
-    Each line is assigned the closest available line type for the country of
+    Each bus is assigned the base voltage configured for its country.
+    Countries without an explicit override use the default value. Each line
+    is assigned the closest available AC or DC line type for the country of
     its first bus. Transmission capacity is preserved by recalculating the
     number of parallel bundles after updating the voltage and line type.
     Transformers are removed and connected components are moved from their
@@ -141,8 +143,8 @@ def simplify_network_to_base_voltage(
         AC line-type mappings by country and nominal voltage.
     dc_types : dict
         DC line-type mappings by country and nominal voltage.
-    base_voltage : float
-        Common nominal voltage assigned to buses and lines.
+    base_voltage : dict
+        Default base voltage and optional country-specific overrides.
     use_country_specific_ac_types : bool
         Whether to use country-specific AC mappings.
     use_country_specific_dc_types : bool
@@ -153,34 +155,89 @@ def simplify_network_to_base_voltage(
     tuple
         Simplified network and transformer bus mapping.
     """
+    if not isinstance(base_voltage, dict) or "default" not in base_voltage:
+        raise ValueError(
+            "'electricity.base_voltage' must contain a 'default' value "
+            "and may contain country-specific overrides."
+        )
 
-    logger.info(f"Mapping all network lines onto a single {int(base_voltage)}kV layer")
-    n.buses["v_nom"] = base_voltage
+    default_base_voltage = base_voltage["default"]
+
+    bus_base_voltages = n.buses["country"].map(
+        lambda country: base_voltage.get(country, default_base_voltage)
+    )
+
+    logger.info(
+        "Mapping network lines onto country-specific base-voltage layers: %s",
+        {
+            country: base_voltage.get(country, default_base_voltage)
+            for country in n.buses["country"].dropna().unique()
+        },
+    )
+
+    n.buses["v_nom"] = bus_base_voltages
 
     line_countries = n.lines["bus0"].map(n.buses["country"])
+    line_base_voltages = line_countries.map(
+        lambda country: base_voltage.get(country, default_base_voltage)
+    )
+    line_bus1_base_voltages = n.lines["bus1"].map(bus_base_voltages)
 
     ac_line_mask = n.lines["carrier"] == "AC"
     dc_line_mask = n.lines["carrier"] == "DC"
 
-    n.lines.loc[ac_line_mask, "type"] = line_countries.loc[ac_line_mask].map(
-        lambda country: get_linetype_by_voltage_and_country(
-            base_voltage,
-            country,
-            ac_types,
-            use_country_specific_ac_types,
+    mismatched_ac_lines = ac_line_mask & (line_base_voltages != line_bus1_base_voltages)
+
+    if mismatched_ac_lines.any():
+        mismatched_lines = n.lines.loc[
+            mismatched_ac_lines,
+            ["bus0", "bus1"],
+        ].copy()
+
+        mismatched_lines["bus0_v_nom"] = line_base_voltages.loc[mismatched_ac_lines]
+        mismatched_lines["bus1_v_nom"] = line_bus1_base_voltages.loc[
+            mismatched_ac_lines
+        ]
+
+        raise ValueError(
+            "Country-specific base voltages assign different nominal "
+            "voltages to the endpoints of the following AC lines:\n"
+            f"{mismatched_lines.to_string()}"
         )
+
+    n.lines.loc[ac_line_mask, "type"] = pd.Series(
+        [
+            get_linetype_by_voltage_and_country(
+                voltage,
+                country,
+                ac_types,
+                use_country_specific_ac_types,
+            )
+            for voltage, country in zip(
+                line_base_voltages.loc[ac_line_mask],
+                line_countries.loc[ac_line_mask],
+            )
+        ],
+        index=n.lines.index[ac_line_mask],
     )
 
-    n.lines.loc[dc_line_mask, "type"] = line_countries.loc[dc_line_mask].map(
-        lambda country: get_linetype_by_voltage_and_country(
-            base_voltage,
-            country,
-            dc_types,
-            use_country_specific_dc_types,
-        )
+    n.lines.loc[dc_line_mask, "type"] = pd.Series(
+        [
+            get_linetype_by_voltage_and_country(
+                voltage,
+                country,
+                dc_types,
+                use_country_specific_dc_types,
+            )
+            for voltage, country in zip(
+                line_base_voltages.loc[dc_line_mask],
+                line_countries.loc[dc_line_mask],
+            )
+        ],
+        index=n.lines.index[dc_line_mask],
     )
 
-    n.lines["v_nom"] = base_voltage
+    n.lines["v_nom"] = line_base_voltages
     n.lines["i_nom"] = n.lines["type"].map(n.line_types["i_nom"])
     # Note: s_nom is set in base_network
     n.lines["num_parallel"] = n.lines.eval("s_nom / (sqrt(3) * v_nom * i_nom)")
@@ -1126,7 +1183,6 @@ if __name__ == "__main__":
 
     base_voltage = snakemake.params.electricity["base_voltage"]
     lines_config = snakemake.params.config_lines
-    countries = snakemake.config["countries"]
 
     use_country_specific_types = lines_config.get(
         "use_country_specific_types",
@@ -1136,13 +1192,8 @@ if __name__ == "__main__":
     ac_types = lines_config["ac_types"]
     dc_types = lines_config["dc_types"]
 
-    use_country_specific_ac_types = use_country_specific_types and all(
-        country in ac_types for country in countries
-    )
-
-    use_country_specific_dc_types = use_country_specific_types and all(
-        country in dc_types for country in countries
-    )
+    use_country_specific_ac_types = use_country_specific_types
+    use_country_specific_dc_types = use_country_specific_types
     exclude_carriers = snakemake.params.clustering["simplify_network"].get(
         "exclude_carriers", []
     )
