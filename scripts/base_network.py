@@ -535,9 +535,10 @@ def base_network(
     )
     n.lines.drop(columns="under_construction", inplace=True, errors="ignore")
 
-    # TODO Remove adding custom line types once they will be incorporated into a currently used PyPSA version
+    # TODO Remove adding custom line types once reginonal linetypes management
+    # will be harmonised according the approach alaborated in pypsa-earth#1933
     custom_line_types = load_custom_line_types(inputs.line_types)
-    n = add_custom_line_types(n, custom_line_types)
+    n = add_custom_line_types(n, custom_line_types) 
 
     _set_lines_s_nom_from_linetypes(n)
 
