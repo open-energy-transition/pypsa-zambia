@@ -71,7 +71,10 @@ electricity:
 
   # ----------------- Existing powerplants -------------------
   powerplants_filter: (DateOut >= 2024 or DateOut != DateOut) and (DateIn <= 2024 or DateIn != DateIn)
-  custom_powerplants: replace # set to "merge" or "replace" if you have a custom_powerplants.csv for Zambia
+  custom_powerplants:
+    filepaths:  # list of custom powerplant files used in "merge" and "replace" options
+    - data/custom_powerplants.csv
+    method: replace  # "false" use only powerplantmatching (ppm) data, "merge" combines ppm and custom powerplants, "replace" use only custom powerplants
   disaggregate_powerplants: false # to enable disaggregation also in simplify_network, a set of excluded carries must be specified
 
   estimate_renewable_capacities:
