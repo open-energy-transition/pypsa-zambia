@@ -19,5 +19,3 @@ Scripts for preparing renewable resources, power plants, and demand profiles.
 ::: scripts.build_powerplants
 
 ::: scripts.build_demand_profiles
-
-::: scripts.build_co2_emissions
