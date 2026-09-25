@@ -37,7 +37,8 @@ electricity:
     stats: irena
     year: 2020
   custom_powerplants: replace
-  base_voltage: 500
+  base_voltage:
+    default: 500
   voltages: [110, 220, 500]
 
 lines:
