@@ -12,6 +12,7 @@ This will automatically close the referenced issue when this PR is merged -->
 <--This checklist must be filled in. If the item is not applicable, tick anyway.-->
 
 - [ ] I consent to the release of this PR's code under the AGPLv3 license and non-code contributions under CC0-1.0 and CC-BY-4.0.
+- [ ] There are no changes to the objective function, or any changes are justified by the improvements introduced in the workflow.
 - [ ] License scan is done for the data source.
 - [ ] A dataset is uploaded to [PyPSA-Zambia](https://zenodo.org/uploads/new?community=pypsa-zambia)
       Zenodo community including specifying its' metadata.

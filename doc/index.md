@@ -78,10 +78,10 @@ There are multiple ways to get involved and learn more about our work:
 
 ### Tutorials
 
-- [Electricity Model](tutorials/electricity-model.md) - Build an electricity-only model
-- [Sector-Coupled Model](tutorials/sector-coupled-model.md) - Create a multi-sector model
-- [Model Customization](user-guide/model-customization.md) - General Modeling Guidelines
-- [Examples](tutorials/examples.md) - Jupyter notebooks and use cases
+- [Tutorials](tutorials/tutorial-overview.md) - Overview of learning paths
+    - [Use-case: baseline model](tutorials/use-cases/1-baseline-model.md) - Build and calibrate a country model
+    - [Electricity model](tutorials/generic-examples/electricity-model.md) - Quick electricity-only tutorial
+    - [Sector-coupled model](tutorials/generic-examples/sector-coupled-model.md) - Sector-coupled model including heat, transport, industry, hydrogen, and more.
 
 ### User Guide
 
@@ -94,6 +94,7 @@ There are multiple ways to get involved and learn more about our work:
 - [Data Versioning](data_sources.md) - Manage different versions of data
 - [Rules Overview](user-guide/rules-overview.md) - Snakemake rules explained
 - [Rules Reference](user-guide/rules-reference/download-and-filter/index.md) - Detailed rule descriptions
+- [Repo Maintenance](maintatinace_note.md) - Manage different versions of data
 
 ### Educational Materials
 
@@ -108,9 +109,15 @@ There are multiple ways to get involved and learn more about our work:
 - [Contributing](community/contributing.md) - How to contribute to the project
 - [Project Structure](community/project-structure.md) - Credits and architecture
 - [Users List](community/users-list.md) - Who's using PyPSA-Earth
-- [Talks & Papers](community/talks-and-papers.md) - Publications and presentations
-- [Learning Materials](community/learning-materials.md) - Additional resources
-- [Software Hints](community/software-hints.md) - Tips and troubleshooting
+- [Talks & Papers](community/talks-and-papers.md) containing publications and presentations
+- [Learning Materials](community/learning-materials.md) with additional resources
+- [Software Hints](community/software-hints.md) providing tips and troubleshooting
+- [FAQ](community/faq.md) listing common run errors and fixes
+
+### Releases
+
+- [Release Notes](releases/release-notes.md) - List of new features and changes for each release of PyPSA-Earth model
+- [Maintenance](releases/maintenance-notes.md) - Technical notes of code and data maintenance
 
 ### API Reference
 

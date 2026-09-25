@@ -51,3 +51,16 @@ Use the following command to apply pre-commit changes locally:
 ```
 run pre-commit --all
 ```
+
+## Backward compatibility
+We are following the PyPSA-Earth methodology to verify the effect of the changes introduced into the model. The core idea of this methodology is based on using the objective value for test cases. The objective is sensitive to any changes in the model including both modelling and data-related changes, and keeping its value constant provides a good indication of the modelling workflow remains unchanged.
+
+Technically, tracking the objective function is implemented using reference values of the objective function collected in `utils/obj_ref.csv` for all the test cases. Before merging any contribution, a check must be performed to ensure that the objective values have not undergone any unintended changes.
+
+### Updating objective references
+The objective function can change in an expected way in some cases. That includes, for example, updating input datasets or enhancement to the modelling methods. If that is the case, the reference objective values must be updated in `test/utils/obj_ref.csv`. This updating work can be done by following the steps below.
+
+1. Complete the implementation of the changes and run the continius integration (CI) workflow. Currently, we are using GitHub Actions infrastructure for that.
+2. In the output of CI, locate the `Summary` tab, scroll down to the `Artifacts` section and download `ref_objectives-ubuntu`.
+3. Unzip the downloaded `ref_objectives-ubuntu.zip` file and copy and paste the objective values from it into `test/utils/obj_ref.csv`.
+4. Create a feature branch, commit the changes, push to the remote repo and open a PR.

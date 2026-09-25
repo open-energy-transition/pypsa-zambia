@@ -230,20 +230,23 @@ rule download_interconnection_data:
         copyfile(str(input["countries"]), output["countries"])
 
 
-rule download_line_types:
-    input:
-        url=HTTP.remote(
-            "https://sandbox.zenodo.org/records/473405/files/pypsa_line_types%20%281%29.csv",
-            keep_local=True,
-        ),
-    output:
-        "data/line_types.csv",
-    log:
-        "logs/download_line_types.log",
-    run:
-        copyfile(str(input["url"]), output[0])
-
-
+# Legacy placeholder for retrieving custom line types from an external source.
+# Kept for reference until configurable external custom LineType sources are supported.
+#
+# rule download_line_types:
+#     input:
+#         url=HTTP.remote(
+#             "https://sandbox.zenodo.org/records/473405/files/pypsa_line_types%20%281%29.csv",
+#             keep_local=True,
+#         ),
+#     output:
+#         "data/line_types.csv",
+#     log:
+#         "logs/download_line_types.log",
+#     run:
+#         copyfile(str(input["url"]), output[0])
+#
+#
 rule retrieve_mining_data:
     input:
         provincial_demand=HTTP.remote(

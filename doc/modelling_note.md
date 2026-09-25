@@ -12,6 +12,10 @@ The workflow is configured using configuration files. To ensure reproducibility,
 
 The following yaml configuration files are available for different types of modelling runs. The folder `configs` stores definitions of the configuration files used in the workflow, and `pypsa-zambia` contains `config.default.yaml` and `config.tutorial.yaml`.
 
+`pypsa-zambia` specific configs are housed neatly inside `configs/zambia_configs` and can be identified easily because their names begin with `config.zm.{config name}.yaml`. This is done to harmonize with the naming conventions used in the upstream as well as to reduce the risk of overriding unnecessarily the wrong config file and potentially introducing merge conflicts or unintended behavior in the model.
+
+These regional specific config files created for `pypsa-zambia` are designed quite simply to make use of snakemake's layering capability during workflow runs. Regional configs will merge with upstream default config files and where necessary even override certain parameters that are the same across config files but have different values.
+
 ### Service configurations
 
 A number of files in `configs` are service files used in each run:
@@ -35,13 +39,13 @@ The following universal files are available directly in `pypsa-zambia` folder:
 `configs/scenarios` folder contains an example definition of a configuration file (not directly relevant for the project).
 
 Specific configuration files are available to build regional-specific cutouts for the country:
-- `build_cutout_zambia_config.yaml` contains parameters used to build a full-scale cutout;
-- `build_cutout_tutorial_zambia_config.yaml` contains parameters user to build a tutorial cutout.
+- `config.zm.build_cutout.yaml` contains parameters used to build a full-scale cutout;
+- `config.zm.build_cutout_tutorial.yaml` contains parameters user to build a tutorial cutout.
 
 `Customisation` section in the project README describes how to use those configurations when building a cutout for a year of interest.
 
 To run a modeling scenario, a scenario-specific configuration file should be applied on top of the service configurations and `config.default.yaml`. Currently, the following configuration files are available:
-- `validation_dispatch_zambia.yaml` defines a dispatch modelling run which aims to reproduce a national power system in a specific year in the past and is intended to be used for validation
+- `config.zm.validation_dispatch.yaml` defines a dispatch modelling run which aims to reproduce a national power system in a specific year in the past and is intended to be used for validation
 
 ## Validation
 
@@ -59,14 +63,14 @@ For now, the weather year is taken for a default `2013` year (NB can require adj
 
 ### Validation runs
 
-A configuration file `validation_dispatch_zambia.yaml` contains definitions for a dispatch run reproducing behavior of the national power system in a reference year from the past. To get modelling outputs for the validation scenario, the following commands as used:
+A configuration file `config.zm.validation_dispatch.yaml` contains definitions for a dispatch run reproducing behavior of the national power system in a reference year from the past. To get modelling outputs for the validation scenario, the following commands as used, notice that we use the `--configfile` to specify the regional config file to use during the snakemake run:
 
 ```
-# good to use a dry-run to make sure that
-# retrieve rules are not triggered accidentally
-snakemake -j 1 solve_all_networks -n
+# good to use a dry-run to make sure that retrieve rules are not triggered accidentally
+snakemake -j 1 solve_all_networks --configfile configs/zambia_configs/config.zm.validation_dispatch.yaml -n
+
 # actual modelling run
-snakemake -j 1 solve_all_networks
+snakemake -j 1 solve_all_networks --configfile configs/zambia_configs/config.zm.validation_dispatch.yaml
 ```
 
 The validation run doesn't include capacity expansion which allows to run it locally.
@@ -104,7 +108,7 @@ Comparison is done for IRP scenarios corresponding to the following four horizon
 Solar and wind siting is currently based on general land-cover suitability across the whole country, with no per-region cap and no restriction to specific sites. The IRP instead limits wind to a set of measured candidate sites and caps additions at 1,000 MW per region per planning period.
 
 
-**Four independent planning-year snapshots.** `configs/scenarios_zambia/config.cap_exp_zambia_{2025,2030,2040,2050}.yaml` each merge on top of the shared `cap_exp_zambia_base.yaml` and are solved as an overnight optimisation. A generator built in the 2040 run has no bearing on 2050 and each year obtains its own fixed fleet, demand level, and solar/wind buildout from scratch. This means that capacity trajectories between horizons are not meant to be monotonic.
+**Four independent planning-year snapshots.** `configs/zambia_configs/scenarios_zambia/config.zm.cap_exp_{2025,2030,2040,2050}.yaml` each merge on top of the shared `config.zm.cap_exp_base.yaml` and are solved as an overnight optimisation. A generator built in the 2040 run has no bearing on 2050 and each year obtains its own fixed fleet, demand level, and solar/wind buildout from scratch. This means that capacity trajectories between horizons are not meant to be monotonic.
 
 **Weather and hydro conditions.** All four planning years are solved against the same single weather year using ERA5-originated weather archive `cutout-{year}-era5` in hourly resolution.
 

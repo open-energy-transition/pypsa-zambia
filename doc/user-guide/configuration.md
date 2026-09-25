@@ -18,7 +18,7 @@ confer installation instructions at [installation](../home/installation.md).
 
 PyPSA-Earth loads ``config.default.yaml`` first and then merges your ``config.yaml`` on top (see the ``configfile`` entries in the Snakefile). You therefore only need to list settings in ``config.yaml`` that differ from the defaults—a small override file is enough for most studies.
 
-When you upgrade to a new version, open the updated ``config.default.yaml`` and check what changed: new keys, renamed paths, or reorganised sections. Compare it with your ``config.yaml`` and copy across any new defaults you want to use, or move keys you still override to their new locations. The [release notes](../release-notes.md) summarise breaking config changes per release.
+When you upgrade to a new version, open the updated ``config.default.yaml`` and check what changed: new keys, renamed paths, or reorganised sections. Compare it with your ``config.yaml`` and copy across any new defaults you want to use, or move keys you still override to their new locations. The [release notes](../releases/release-notes.md) summarise breaking config changes per release.
 
 Some deprecated key names are migrated automatically when the workflow starts; if Snakemake prints a ``FutureWarning`` about an old path, update your ``config.yaml`` to the new key and remove the obsolete one. See [Renamed keys](#renamed-keys) for the full mapping. For study-specific settings you can also pass extra files with ``snakemake --configfile my_study.yaml`` instead of growing a single ``config.yaml``.
 
@@ -44,9 +44,10 @@ The table below lists all keys that have been renamed or moved. The old keys sti
 | `clean_osm_data_options` | `osm.clean_osm_data` |
 | `build_osm_network` | `osm.build_osm_network` |
 | `cluster_options` | `clustering` |
-| `fossil_reserves.{carrier}` | `sector.{carrier}.reserves` |
+| `scenario.demand` *(list/string wildcard)* | `demand_data.scenario` *(single string; lists with more than one value error)* |
+| `export.h2export` *(list)* | `export.h2export` *(single scalar TWh/year; multi-value lists error)* |
 
-`{carrier}` is the fuel name (e.g. `oil`, `coal`, `gas`, `lignite`, `biomass`). Migrations run automatically via ``migrate_config`` in ``scripts/_helpers.py``; see also the [release notes](../release-notes.md) when upgrading.
+Migrations run automatically via ``migrate_config`` in ``scripts/_helpers.py``; see also the [release notes](../releases/release-notes.md) when upgrading.
 
 ## Top-level configuration
 
@@ -393,6 +394,38 @@ Specifies the options to obtain renewable potentials in every cutout. These are 
 
 {{ read_csv('configtables/csp.csv') }}
 
+### storage technologies
+
+Specifies storage technologies mapping. Specifies storage technologies mapping. Each storage carrier can either be defined either as Stores or StorageUnit as shown in `electricity: extendable_carriers:`
+
+!!! note
+    When those carrier are defined as Store:
+
+    - The storage component is represented by a dedicated storage component with its own bus, as well as separate charging and discharging links. Each component has its own costs and efficiencies.
+    - Charging and discharging capacities are optimized independently from the storage energy capacity (except for the default `battery` configuration).
+    - The optimized storage capacity is expressed in MWh.
+    - A Store is best suited for technologies where charging and discharging power can be sized independently of the storage energy capacity.
+
+    When those carrier are defined as StorageUnit:
+
+    - The storage component is represented as a single component, with charging, discharging, and storage costs combined.
+    - Charging and discharging capacities are tied to the storage capacity through the `max_hours` parameter.
+    - The optimized capacity is expressed in MW. To obtain the corresponding energy capacity in MWh, multiply the optimized capacity by `max_hours`.
+    - A StorageUnit is best suited for technologies where charging and discharging power have a fixed relationship to the storage energy capacity.
+
+!!! warning
+    In order to define storages as StorageUnit, define it's `max_hours` in `electricity: max_hours:`
+
+The following storage technologies are available for implementation in the model. Users may also define additional storage technologies, provided that the necessary technology cost data is included:
+
+{{ read_csv('configtables/storage_techs_abb.csv') }}
+
+```yaml
+--8<-- "configtables/snippets/storage_techs.yaml"
+```
+
+{{ read_csv('configtables/storage_techs.csv') }}
+
 ### costs
 
 Specifies the cost assumptions of the technologies considered. Cost information is obtained from the config file and the file `data/costs.csv`, which can also be modified manually.
@@ -493,7 +526,7 @@ Specifies the options for sector coupling, i.e. the integration of the electrici
 
 #### top-level
 
-Carrier toggles, fossil-fuel supply settings (`gas`, `coal`, `lignite`, `oil`), hydrogen, and ammonia. Fossil fuel reserves are set per carrier as `sector.{carrier}.reserves` [TWh/bus] (e.g. `sector.oil.reserves`, `sector.coal.reserves`). The value sets initial Store energy in `add_carrier_buses` for fuel carriers used in `sector.conventional_generation` (`gas`, `oil`, `coal`, `lignite`, `biomass`); it defaults to 0 if omitted. The former top-level ``fossil_reserves`` block is deprecated — see [Renamed keys](#renamed-keys).
+Carrier toggles, fossil-fuel supply settings (`gas`, `coal`, `lignite`, `oil`), hydrogen, and ammonia.
 
 ```yaml
 --8<-- "configtables/snippets/sector_toplevel.yaml"
@@ -569,7 +602,9 @@ Solar thermal collector settings live under ``sector.solar_thermal_collector`` (
 
 ## Solving
 
-Options under the **SOLVING** banner in ``config.default.yaml``: solver choice, linear formulation, load shedding, iteration settings, solver presets, and memory limit.
+Solving defaults are split across two files. The dedicated **`configs/solving.default.yaml`** holds optimization options (``solving.options``), the memory limit (``solving.mem``), and named solver presets (``solving.solver_options``). **`config.default.yaml`** keeps only the active solver choice under **SOLVING** (``solving.solver``: ``name`` and ``options``, for example ``gurobi-default``).
+
+Snakemake merges ``configfile:`` entries in order (see the Snakefile): ``config.default.yaml`` (``solving.solver`` only), then **`configs/solving.default.yaml`**, and finally your ``config.yaml``. Later files override earlier keys at the same path, so you can override any solving setting in ``config.yaml`` (or with ``snakemake --configfile …``).
 
 ### solver
 
@@ -587,9 +622,19 @@ Options under the **SOLVING** banner in ``config.default.yaml``: solver choice, 
 
 {{ read_csv('configtables/solving-options.csv') }}
 
+### solver_options
+
+Named presets used by ``solving.solver.options`` in ``configs/solving.default.yaml`` (for example ``gurobi-default`` or ``highs-default``). Override individual keys from ``config.yaml`` if needed.
+
+```yaml
+--8<-- "configtables/snippets/solving_solver_options.yaml"
+```
+
 ## Plotting
 
-Options under the **PLOTTING** banner in ``config.default.yaml``: map layout, plot thresholds, technology groupings, carrier colours, and display names.
+The dedicated **`configs/plotting.default.yaml`** holds all plotting defaults, including map layout, plot thresholds, technology groupings, carrier colours, and display names.
+
+Snakemake loads **`configs/plotting.default.yaml`** after ``config.default.yaml`` and before your ``config.yaml`` (see the Snakefile). Later files override earlier keys at the same path, so you can override any plotting setting under ``plotting`` in ``config.yaml`` (or with ``snakemake --configfile …``).
 
 ```yaml
 --8<-- "configtables/snippets/plotting.yaml"
@@ -599,11 +644,57 @@ Options under the **PLOTTING** banner in ``config.default.yaml``: map layout, pl
 
 # From PyPSA-Earth to PyPSA-ZM
 
-Zambia-specific default config file:
+Zambia-specific configuration lives under `configs/zambia_configs/`, layered on
+top of PyPSA-Earth's own `config.default.yaml` the same way `config.yaml`
+normally would: each file only states what *differs* from the layer beneath
+it, and Snakemake merges the layers in order
 
-- `configs/validation_dispatch_zambia.yaml` - the ZM-specific default configuration that
-  overrides PyPSA-Earth's `config.default.yaml` with Zambia cost data, voltage
-  levels, and feature flags
+## Config layering
+ - `config.default.yaml` (PyPSA-Earth's own generic defaults)
+ - `config.zm.default.yaml` (Zambia-wide defaults applied at every run)
+ - `config.zm.validation_dispatch.yaml` (dispatch-mode overrides)
+ - `config.zm.cap_exp_base.yaml` (capacity-expansion overrides)
+ - `scenarios_zambia/config.zm.cap_exp_{year}.yaml` (per-year diff)
+
+`config.zm.default.yaml` is loaded unconditionally by the Snakefile, it's the
+one file every Zambia run shares, whether dispatch or capacity expansion. It
+should only hold values that are genuinely the same for both modes (data
+source versions, line types, country selection, base costs). Anything
+specific to one mode belongs in that mode's own file instead, even if it
+means restating a key. A value that quietly falls back to a setting tuned
+for a different mode is a common source of unexpectedly surprising results.
+
+`config.zm.validation_dispatch.yaml` and `config.zm.cap_exp_base.yaml` sit on
+top of the shared default and are pulled in explicitly, not automatically:
+
+```bash
+# dispatch validation
+snakemake -j 1 solve_all_networks --configfile configs/zambia_configs/config.zm.validation_dispatch.yaml
+
+
+# capacity expansion (all four planning years)
+snakemake -j 1 run_all_scenarios
+```
+
+Capacity-expansion scenarios add one more layer: each
+scenarios_zambia/config.zm.cap_exp_{year}.yaml file is a diff against
+config.zm.cap_exp_base.yaml (declared via its own run.base_config key),
+merged at run time by rule run_scenario. A scenario diff should only
+contain what's different for that year,  powerplants_filter, demand
+scale, costs.year, and similar not a restatement of anything the base
+config already provides.
+
+## Naming Convention
+Every Zambia-specific config file follows `config.zm.<name>.yaml`, mirroring
+PyPSA-Earth's own `config.<name>.yaml` pattern (e.g. `config.tutorial.yaml`)
+while making it unambiguous at a glance which files are Zambia-specific. All
+of them live under `configs/zambia_configs/`
+
+Before adding a key to any of these files, check whether it already resolves
+correctly by inheritance. The exception is a small number of settings such as non-extendable
+transmission and generation in dispatch mode, for instance, which are worth
+restating explicitly even though they're technically inherited, because the
+cost of forgetting them is high and the cost of the duplication is one line
 
 ## Hydro Modelling
 
@@ -634,7 +725,7 @@ a GloFAS dataset (`cutouts/zm-{year}-glofas.nc`) and extracts discharge
 time-series at the location of each hydro plant.
 
 Pre-built GloFAS datasets for multiple years are available via the `inflow-glofas`
-databundle entry in `configs/validation_dispatch_zambia.yaml`:
+databundle entry in `configs/zambia_configs/config.zm.validation_dispatch.yaml`:
 
 ```yaml
   inflow-glofas:
@@ -792,21 +883,20 @@ capacity the solver chooses to build is not affected.
 
 ## Future Scenarios
 
-Four planning horizon configurations are provided in `configs/scenarios_zambia/`:
+Four planning horizon configurations are provided in `configs/zambia_configs/scenarios_zambia/`:
 
 | Config file | Horizon | Demand scale | Fleet |
 |---|---|---|---|
-| `config.cap_exp_zambia_2025.yaml` | 2025 | 1.0× (base) | Plants with `DateIn <= 2025` |
-| `config.cap_exp_zambia_2030.yaml` | 2030 | 2.64× | Plants with `DateIn <= 2030` |
-| `config.cap_exp_zambia_2040.yaml` | 2040 | 3.75× | Plants with `DateIn <= 2040` |
-| `config.cap_exp_zambia_2050.yaml` | 2050 | 4.76× | Plants with `DateIn <= 2050` |
+| `config.zm.cap_exp_2025.yaml` | 2025 | 1.44× (base) | Plants with `DateIn <= 2025` |
+| `config.zm.cap_exp_2030.yaml` | 2030 | 2.64× | Plants with `DateIn <= 2030` |
+| `config.zm.cap_exp_2040.yaml` | 2040 | 3.75× | Plants with `DateIn <= 2040` |
+| `config.zm.cap_exp_2050.yaml` | 2050 | 4.76× | Plants with `DateIn <= 2050` |
 
 Demand scale factors are derived from Zambia's Integrated Resource Plan (IRP)
 projected national demand divided by the DemandCast base year value of 15,909 GWh.
 
-All four capacity expansion configs (`config.cap_exp_zambia_{year}.yaml`) inherit shared settings from `configs/cap_exp_zambia_base.yaml` (ERA5
-2023 cutout, 22 clusters, 3-hour temporal resolution, costs from Zambia's IRP).
-Each scenario diff only overrides `powerplants_filter`, `extendable_carriers`,
+All four capacity expansion configs (`config.zm.cap_exp_{year}.yaml`) inherit shared settings from `configs/zambia_configs/config.zm.cap_exp_base.yaml`.
+Each scenario diff only overrides some parameters including `powerplants_filter`, `extendable_carriers`,
 `load_options.scale`, and `costs.year`.
 
 To run all four scenarios in sequence:

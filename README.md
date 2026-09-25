@@ -39,10 +39,10 @@ This mode is used to reproduce a historical year's operation. All `extendable_ca
 solver only determines how to schedule existing plants to minimise
 operating cost.
 
-The key config in carrying out this operation is the: `configs/validation_dispatch_zambia.yaml`
+The key config in carrying out this operation is the: `configs/zambia_configs/config.zm.validation_dispatch.yaml`
 
 ```bash
-snakemake -j 1 solve_all_networks configfile configs/validation_dispatch_zambia.yaml
+snakemake -j 1 solve_all_networks configfile configs/zambia_configs/config.zm.validation_dispatch.yaml
 ```
 
 ### Capacity expansion
@@ -52,8 +52,8 @@ investment and dispatch jointly. The `existing_thermal_dispatch` feature forces
 existing coal and oil plants to always dispatch, reflecting their
 sunk-cost status in forward-looking runs.
 
-The base config is: `configs/cap_exp_zambia.yaml` (base) + year-specific overrides in
-`configs/scenarios_zambia/`
+The base config is: `configs/zambia_configs/config.zm.cap_exp_base.yaml` + year-specific overrides in
+`configs/zambia_configs/scenarios_zambia/`
 
 ```bash
 snakemake -j 1 run_all_scenarios
@@ -98,7 +98,7 @@ snakemake -j 1 run_all_scenarios
       .../pypsa-zambia % conda env create -f envs/win-64.lock.yaml
      ```
 
-   If the above takes longer than 30 min, you might want to try mamba for faster installation:
+If the above takes longer than 30 min, you might want to try mamba for faster installation:
 
    ```bash
    (base) conda install -c conda-forge mamba
@@ -106,7 +106,7 @@ snakemake -j 1 run_all_scenarios
    .../pypsa-zambia % mamba env create -f envs/{{your operating system}}64.lock.yaml
    ```
 
-   Alternatively, you can use [pixi](https://pixi.prefix.dev/latest/) for faster and simpler dependency management (no separate lock files per OS):
+Alternatively, you can use [pixi](https://pixi.prefix.dev/latest/) for faster and simpler dependency management (no separate lock files per OS):
 
    ```bash
    # install pixi: https://pixi.prefix.dev/latest/#installation
@@ -139,31 +139,27 @@ snakemake -j 1 run_all_scenarios
 ## Customisation
 
 To build a regional cutout, you can use pre-compiled configuration files:
-- "configs/build_cutout_tutorial_zambia_config.yaml" for a smaller tutorial-styled cutout (good for testing)
-- "configs/build_cutout_zambia_config.yaml" for a full-scale cutout
+- "configs/zambia_configs/config.zm.build_cutout_tutorial.yaml" for a smaller tutorial-styled cutout (good for testing)
+- "configs/zambia_configs/config.zm.build_cutout.yaml" for a full-scale cutout
 
 To use them, you need to go through the following steps:
 1. Comment-out a line in Snakemake which fetches a default configuration
-`configfile: "configs/validation_dispatch_zambia.yaml"``
-2. Add a name of a suitable cutout-building configuration file to Smakemake under `#configfile: "configs/validation_dispatch_zambia.yaml"`, e.g. `configfile: "configs/build_cutout_zambia_config.yaml"`
+`configfile: "configs/zambia_configs/config.zm.default.yaml"`
+2. Add a name of a suitable cutout-building configuration file to Smakemake under `#configfile: "configs/zambia_configs/config.zm.default.yaml"`, e.g. `configfile: "configs/zambia_configs/config.zm.build_cutout.yaml"`
 3. Set-up Copernicus API
 4. run `build_cutout` rule
 
 ## Validation
 
-A set of notebooks which provides ingights on outputs of the model and ways to analyse them are available in [zambia-dev-notebooks](https://github.com/open-energy-transition/zambia-dev-notebooks) repo.
+A set of notebooks which provides insights on outputs of the model and ways to analyse them are available in [zambia-dev-notebooks](https://github.com/open-energy-transition/zambia-dev-notebooks) repo.
 
 ## Test run on tutorial
 
-- In the folder open a terminal/command window to be located at this path `~/pypsa-earth/`
+- In the folder open a terminal/command window to be located at this path `~/pypsa-zambia/`
 - Activate the environment `conda activate pypsa-earth`
-- Rename config.tutorial.yaml to config.yaml. For instance in Linux:
-  ```bash
-  mv config.tutorial.yaml config.yaml
-  ```
 - Run a dryrun of the Snakemake workflow by typing simply in the terminal:
   ```bash
-  snakemake -j 1 solve_all_networks -n
+  snakemake -j 1 solve_all_networks --configfile config.zm.tutorial.yaml test/config.zm.dispatch.yaml -n
   ```
 
   Remove the -n to do a real run. Follow the tutorial of PyPSA-Eur 1 and 2 on [YouTube](https://www.youtube.com/watch?v=ty47YU1_eeQ) to continue with an analysis.
@@ -368,17 +364,17 @@ Specific documentation for PyPSA-Zambia is under development [here](https://pyps
                 </a>
             </td>
             <td align="center">
-                <a href="https://github.com/drifter089">
-                    <img src="https://avatars.githubusercontent.com/u/93286254?v=4" width="100;" alt="drifter089"/>
-                    <br />
-                    <sub><b>drifter089</b></sub>
-                </a>
-            </td>
-            <td align="center">
                 <a href="https://github.com/GridGrapher">
                     <img src="https://avatars.githubusercontent.com/u/127969728?v=4" width="100;" alt="GridGrapher"/>
                     <br />
                     <sub><b>GridGrapher</b></sub>
+                </a>
+            </td>
+            <td align="center">
+                <a href="https://github.com/drifter089">
+                    <img src="https://avatars.githubusercontent.com/u/93286254?v=4" width="100;" alt="drifter089"/>
+                    <br />
+                    <sub><b>drifter089</b></sub>
                 </a>
             </td>
             <td align="center">
@@ -470,6 +466,13 @@ Specific documentation for PyPSA-Zambia is under development [here](https://pyps
                 </a>
             </td>
             <td align="center">
+                <a href="https://github.com/cpschau">
+                    <img src="https://avatars.githubusercontent.com/u/124347782?v=4" width="100;" alt="cpschau"/>
+                    <br />
+                    <sub><b>cpschau</b></sub>
+                </a>
+            </td>
+            <td align="center">
                 <a href="https://github.com/wingerter">
                     <img src="https://avatars.githubusercontent.com/u/6619839?v=4" width="100;" alt="wingerter"/>
                     <br />
@@ -481,13 +484,6 @@ Specific documentation for PyPSA-Zambia is under development [here](https://pyps
                     <img src="https://avatars.githubusercontent.com/u/103258059?v=4" width="100;" alt="carlosfv92"/>
                     <br />
                     <sub><b>carlosfv92</b></sub>
-                </a>
-            </td>
-            <td align="center">
-                <a href="https://github.com/cpschau">
-                    <img src="https://avatars.githubusercontent.com/u/124347782?v=4" width="100;" alt="cpschau"/>
-                    <br />
-                    <sub><b>cpschau</b></sub>
                 </a>
             </td>
 		</tr>
@@ -544,10 +540,10 @@ Specific documentation for PyPSA-Zambia is under development [here](https://pyps
                 </a>
             </td>
             <td align="center">
-                <a href="https://github.com/darmis007">
-                    <img src="https://avatars.githubusercontent.com/u/51883443?v=4" width="100;" alt="darmis007"/>
+                <a href="https://github.com/darsh-mishr">
+                    <img src="https://avatars.githubusercontent.com/u/51883443?v=4" width="100;" alt="darsh-mishr"/>
                     <br />
-                    <sub><b>darmis007</b></sub>
+                    <sub><b>darsh-mishr</b></sub>
                 </a>
             </td>
             <td align="center">
@@ -602,12 +598,28 @@ Specific documentation for PyPSA-Zambia is under development [here](https://pyps
                 </a>
             </td>
             <td align="center">
+                <a href="https://github.com/yehorcallmedai-maker">
+                    <img src="https://avatars.githubusercontent.com/u/283192726?v=4" width="100;" alt="yehorcallmedai-maker"/>
+                    <br />
+                    <sub><b>yehorcallmedai-maker</b></sub>
+                </a>
+            </td>
+            <td align="center">
+                <a href="https://github.com/zeel2104">
+                    <img src="https://avatars.githubusercontent.com/u/72783325?v=4" width="100;" alt="zeel2104"/>
+                    <br />
+                    <sub><b>zeel2104</b></sub>
+                </a>
+            </td>
+            <td align="center">
                 <a href="https://github.com/juli-a-ko">
                     <img src="https://avatars.githubusercontent.com/u/126512394?v=4" width="100;" alt="juli-a-ko"/>
                     <br />
                     <sub><b>juli-a-ko</b></sub>
                 </a>
             </td>
+		</tr>
+		<tr>
             <td align="center">
                 <a href="https://github.com/ollie-bell">
                     <img src="https://avatars.githubusercontent.com/u/56110893?v=4" width="100;" alt="ollie-bell"/>
@@ -622,8 +634,6 @@ Specific documentation for PyPSA-Zambia is under development [here](https://pyps
                     <sub><b>rsparks3</b></sub>
                 </a>
             </td>
-		</tr>
-		<tr>
             <td align="center">
                 <a href="https://github.com/saikumarvasa100-hash">
                     <img src="https://avatars.githubusercontent.com/u/228767710?v=4" width="100;" alt="saikumarvasa100-hash"/>
@@ -646,6 +656,15 @@ Specific documentation for PyPSA-Zambia is under development [here](https://pyps
                 </a>
             </td>
             <td align="center">
+                <a href="https://github.com/juliusmeier">
+                    <img src="https://avatars.githubusercontent.com/u/66074166?v=4" width="100;" alt="juliusmeier"/>
+                    <br />
+                    <sub><b>juliusmeier</b></sub>
+                </a>
+            </td>
+		</tr>
+		<tr>
+            <td align="center">
                 <a href="https://github.com/jome1">
                     <img src="https://avatars.githubusercontent.com/u/49280197?v=4" width="100;" alt="jome1"/>
                     <br />
@@ -666,8 +685,6 @@ Specific documentation for PyPSA-Zambia is under development [here](https://pyps
                     <sub><b>jarry7</b></sub>
                 </a>
             </td>
-		</tr>
-		<tr>
             <td align="center">
                 <a href="https://github.com/JanTautorus">
                     <img src="https://avatars.githubusercontent.com/u/157734880?v=4" width="100;" alt="JanTautorus"/>
@@ -689,6 +706,8 @@ Specific documentation for PyPSA-Zambia is under development [here](https://pyps
                     <sub><b>HanaElattar</b></sub>
                 </a>
             </td>
+		</tr>
+		<tr>
             <td align="center">
                 <a href="https://github.com/Vamsipriya22">
                     <img src="https://avatars.githubusercontent.com/u/188459113?v=4" width="100;" alt="Vamsipriya22"/>
@@ -710,8 +729,6 @@ Specific documentation for PyPSA-Zambia is under development [here](https://pyps
                     <sub><b>EmreYorat</b></sub>
                 </a>
             </td>
-		</tr>
-		<tr>
             <td align="center">
                 <a href="https://github.com/AndreCNF">
                     <img src="https://avatars.githubusercontent.com/u/19359510?v=4" width="100;" alt="AndreCNF"/>
