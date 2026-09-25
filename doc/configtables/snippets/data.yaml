@@ -1,6 +1,13 @@
 data:
+  bundle_data:
+    source: primary
+    version: v1
+  demand_cast:
+    source: primary
+    version: v1
   custom-powerplants:
     source: primary
+    # parameters of powerplants correspond to the real state of the national power system
     version: v4
   zm-biomass:
     source: primary
@@ -8,6 +15,7 @@ data:
   cutout-era5:
     source: primary
     version: v1.0
+    # NB Must be adjusted according to the weather year
     year: 2013
   hydrobasins:
     source: build
@@ -24,10 +32,5 @@ data:
   inflow-glofas:
     source: primary
     version: v1.0
+    # NB Must be adjusted according to the weather year
     year: 2013
-  bundle_data:
-    source: primary
-    version: v1
-  demand_cast:
-    source: primary
-    version: v1
