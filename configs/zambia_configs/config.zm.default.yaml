@@ -71,7 +71,10 @@ electricity:
 
   # ----------------- Existing powerplants -------------------
   powerplants_filter: (DateOut >= 2024 or DateOut != DateOut) and (DateIn <= 2024 or DateIn != DateIn)
-  custom_powerplants: replace # set to "merge" or "replace" if you have a custom_powerplants.csv for Zambia
+  custom_powerplants:
+    filepaths:  # list of custom powerplant files used in "merge" and "replace" options
+    - data/custom_powerplants.csv
+    method: replace  # "false" use only powerplantmatching (ppm) data, "merge" combines ppm and custom powerplants, "replace" use only custom powerplants
   disaggregate_powerplants: false # to enable disaggregation also in simplify_network, a set of excluded carries must be specified
 
   estimate_renewable_capacities:
@@ -80,11 +83,14 @@ electricity:
     activate: false
 
 lines:
+  use_country_specific_types: true
   ac_types:
-    66.: ACSR Wolf 66.0
-    132.: ACSR Panther 132.0
-    220.: ACSR Zebra 220.0
-    330.: ACSR Bison 330.0
+    ZM:
+      66.: ZM_66kV_wolf
+      88.: ZM_88kV_wolf
+      132.: ZM_132kV_wolf
+      220.: ZM_220kV_bison
+      330.: ZM_330kV_bison_2bundle
   s_max_pu: 0.7
   s_nom_extendable: false
 
