@@ -52,7 +52,8 @@ electricity:
     carriers: [coal, oil]
 
   # ----------------- Grid topology -------------------
-  base_voltage: 380.
+  base_voltage:
+    default: 380.
   voltages: [132., 220., 300., 380., 500., 750.]
   hvdc_as_lines: false # false: HVDC as Link; true: HVDC as Line
 
