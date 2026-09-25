@@ -835,40 +835,40 @@ def base_network(
     """Build the base PyPSA network from OSM-derived component tables.
 
     Loads buses, lines, transformers, and converters from CSV files, assigns
-    electrical parameters, imports all components into a new
-    :class:`pypsa.Network`, and returns it ready for further processing.
+    electrical parameters and country-specific line types, imports all
+    components into a new :class:`pypsa.Network`, and returns the assembled
+    network.
 
-    When *hvdc_as_lines_config* is ``True``, DC lines are imported as PyPSA
+    When ``hvdc_as_lines_config`` is ``True``, DC lines are imported as PyPSA
     ``Line`` components; otherwise they are modelled as ``Link`` components.
 
     Parameters
     ----------
     inputs : snakemake.io.Namedlist
-        Snakemake input paths: ``osm_buses``, ``osm_lines``,
-        ``osm_transformers``, ``osm_converters``, ``country_shapes``,
-        ``offshore_shapes``.
+        Snakemake input paths, including OSM network tables, country and
+        offshore shapes, and custom line-type definitions.
     base_network_config : dict
-        ``base_network`` section of ``config.yaml``.
+        ``base_network`` configuration.
     countries_config : list
-        List of ISO 3166-1 alpha-2 country codes to include.
+        ISO 3166-1 alpha-2 country codes to include.
     hvdc_as_lines_config : bool
-        If ``True``, treat HVDC lines as PyPSA Line components.
+        Whether HVDC branches are represented as ``Line`` components.
     lines_config : dict
-        ``lines`` section of ``config.yaml``.
+        Line configuration, including default and country-specific line-type
+        mappings.
     links_config : dict
-        ``links`` section of ``config.yaml``.
+        Link configuration.
     snapshots_config : dict
-        ``snapshots`` section passed to :meth:`pypsa.Network.set_snapshots`.
+        Snapshot configuration passed to ``pandas.date_range``.
     transformers_config : dict
-        ``transformers`` section of ``config.yaml``.
+        Transformer configuration.
     voltages_config : list
-        Nominal voltages (kV) to retain.
+        Voltage configuration retained by the base-network interface.
 
     Returns
     -------
     pypsa.Network
-        Fully assembled base network with buses, lines, links, transformers,
-        converters, country assignments, and underwater fractions.
+        Assembled base network.
     """
     buses = _load_buses_from_osm(inputs.osm_buses)
     lines = _load_lines_from_osm(inputs.osm_lines).reset_index(drop=True)
@@ -939,8 +939,6 @@ def base_network(
         ~n.lines["under_construction"], 0.0
     )
     n.lines.drop(columns="under_construction", inplace=True, errors="ignore")
-
-    # TODO Remove adding custom line types once they will be incorporated into a currently used PyPSA version
 
     _set_lines_s_nom_from_linetypes(n)
 

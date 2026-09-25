@@ -71,7 +71,7 @@ Description
 
 The rule :mod:`simplify_network` does up to four things:
 
-1. Create an equivalent transmission network in which voltage levels are mapped to the configured country-specific base-voltage layers by ``simplify_network_to_base_voltage(...)``. Countries without an explicit override use the default base voltage. Country-specific AC and DC line-type mappings are used when enabled and available for the corresponding country; otherwise, the respective default mapping is used.
+1. Create an equivalent transmission network in which voltage levels are mapped to the configured country-specific base-voltage layers by ``simplify_network_to_base_voltage(...)``. Countries without an explicit override use the default base voltage. Country-specific AC and DC line-type mappings are used when enabled and available for every configured country; otherwise, the respective default mapping is used.
 
 2. DC only sub-networks that are connected at only two buses to the AC network are reduced to a single representative link in the function ``simplify_links(...)``. The components attached to buses in between are moved to the nearest endpoint. The grid connection cost of offshore wind generators are added to the capital costs of the generator.
 
@@ -1183,6 +1183,7 @@ if __name__ == "__main__":
 
     base_voltage = snakemake.params.electricity["base_voltage"]
     lines_config = snakemake.params.config_lines
+    countries = snakemake.config["countries"]
 
     use_country_specific_types = lines_config.get(
         "use_country_specific_types",
@@ -1192,8 +1193,13 @@ if __name__ == "__main__":
     ac_types = lines_config["ac_types"]
     dc_types = lines_config["dc_types"]
 
-    use_country_specific_ac_types = use_country_specific_types
-    use_country_specific_dc_types = use_country_specific_types
+    use_country_specific_ac_types = use_country_specific_types and all(
+        country in ac_types for country in countries
+    )
+
+    use_country_specific_dc_types = use_country_specific_types and all(
+        country in dc_types for country in countries
+    )
     exclude_carriers = snakemake.params.clustering["simplify_network"].get(
         "exclude_carriers", []
     )

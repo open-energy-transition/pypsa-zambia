@@ -66,9 +66,7 @@ electricity:
   renewable_carriers: [solar, onwind, hydro]
 
   # ----------------- Grid topology -------------------
-  base_voltage:
-    default: 380.
-    ZM: 330.
+  base_voltage: 330.
   voltages: [66., 88., 132., 220., 330.]
 
   # ----------------- Existing powerplants -------------------
@@ -88,11 +86,11 @@ lines:
   use_country_specific_types: true
   ac_types:
     ZM:
-      66.: ZM_66kV
-      88.: ZM_88kV
-      132.: ZM_132kV
-      220.: ZM_220kV
-      330.: ZM_330kV
+      66.: ZM_66kV_wolf
+      88.: ZM_88kV_wolf
+      132.: ZM_132kV_wolf
+      220.: ZM_220kV_bison
+      330.: ZM_330kV_bison_2bundle
   s_max_pu: 0.7
   s_nom_extendable: false
 
