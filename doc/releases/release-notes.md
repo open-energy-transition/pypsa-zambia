@@ -12,6 +12,10 @@ This part of documentation collects descriptive release notes to capture the mai
 
 ### New Features and Major Changes
 
+* Increase stability of data retrieval by moving demandcast and data bundle to retrieve smk rule #411
+ [PR #411](https://github.com/open-energy-transition/pypsa-zambia/pull/411) and #423
+ [PR #423](https://github.com/open-energy-transition/pypsa-zambia/pull/423)
+
 * Add Zambia-specific transmission line types [PR #433](https://github.com/open-energy-transition/pypsa-zambia/pull/433)
 
 * Add thermal plant factors for existing coal and oil generators based on IRP data, constraining dispatch via `electricity.existing_thermal_dispatch.plant_factors` in the config [PR #332](https://github.com/open-energy-transition/pypsa-zambia/pull/332)
@@ -28,6 +32,10 @@ This part of documentation collects descriptive release notes to capture the mai
 
 
 ### Minor Changes and bug-fixing
+
+* Amend missed release notes and update reference objectives #447 [PR #447](https://github.com/open-energy-transition/pypsa-zambia/pull/447)
+
+* Restore git history after squash merge #443 [PR #443](https://github.com/open-energy-transition/pypsa-zambia/pull/443)
 
 * Fix typos and improve the README [PR #392](https://github.com/open-energy-transition/pypsa-zambia/pull/392)
 
