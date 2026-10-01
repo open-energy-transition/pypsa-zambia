@@ -6,7 +6,6 @@ from __future__ import annotations
 
 import ast
 import math
-import warnings
 
 import pandas as pd
 import pypsa
@@ -148,11 +147,8 @@ def _qualified_project_ids(value) -> set[str]:
             if identifier is None:
                 continue
 
-            try:
-                if pd.isna(identifier):
-                    continue
-            except (TypeError, ValueError):
-                pass
+            if pd.api.types.is_scalar(identifier) and pd.isna(identifier):
+                continue
 
             identifier = str(identifier).strip()
 
