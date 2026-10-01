@@ -12,6 +12,8 @@ This part of documentation collects descriptive release notes to capture the mai
 
 ### New Features and Major Changes
 
+* Add support for cascading hydropower with explicit reservoir routing, travel-time delays, and local catchment inflows.
+
 * Increase stability of data retrieval by moving demandcast and data bundle to retrieve smk rule #411
  [PR #411](https://github.com/open-energy-transition/pypsa-zambia/pull/411) and #423
  [PR #423](https://github.com/open-energy-transition/pypsa-zambia/pull/423)

@@ -101,6 +101,11 @@ from utility_custom_features import (
 
 idx = pd.IndexSlice
 
+from hydro_cascade import (
+    resolve_cascade_plants,
+    validate_cascade_topology,
+)
+
 logger = create_logger(__name__)
 
 
@@ -876,12 +881,29 @@ def apply_nuclear_p_max_pu(n, nuclear_p_max_pu):
 
 
 def attach_hydro(
-    n,
-    costs,
-    ppl,
-    hydro_min_inflow_pu=1,
-    disaggregate_flag=False,
-):
+    n: pypsa.Network,
+    costs: pd.DataFrame,
+    ppl: pd.DataFrame,
+    hydro_min_inflow_pu: float = 1.0,
+    cascade_plant_ids: set[str] | None = None,
+    disaggregate_flag: bool = False,
+) -> None:
+    """
+    Add existing hydro powerplants to the network as Hydro Storage units, Run-Of-River generators, and Pumped Hydro storage units.
+
+    Parameters
+    ----------
+    n : pypsa.Network
+        The PyPSA network to modify.
+    costs : pd.DataFrame
+        DataFrame containing technology costs.
+    ppl : pd.DataFrame
+        Power plant DataFrame.
+
+    Returns
+    -------
+    None
+    """
     if "hydro" not in snakemake.params.renewable:
         return
     c = snakemake.params.renewable["hydro"]
@@ -912,40 +934,78 @@ def attach_hydro(
     }
     ppl["carrier"] = ppl["technology"].map(tech_to_carrier)
 
-    # Aggregate by (bus, carrier, grouping_year)
-    ppl_grouped = aggregate_ppl_by_bus_carrier_year(ppl)
+    # Reservoirs with a stable plant_id are kept individual so that they can
+    # later be converted to explicit cascade components after clustering.
+    if "plant_id" in ppl.columns:
+        plant_ids = ppl["plant_id"].fillna("").astype(str).str.strip()
+    else:
+        plant_ids = pd.Series("", index=ppl.index)
 
-    ror = ppl_grouped[ppl_grouped["carrier"] == "ror"]
-    phs = ppl_grouped[ppl_grouped["carrier"] == "PHS"]
-    hydro = ppl_grouped[ppl_grouped["carrier"] == "hydro"]
-    tbd = ppl[ppl.technology.isna()]  # To be determined technologies
+    ppl["plant_id"] = plant_ids
+    cascade_plant_ids = set() if cascade_plant_ids is None else set(cascade_plant_ids)
 
-    inflow_idx = ror.index.union(hydro.index).union(tbd.index)
-    if not inflow_idx.empty:
+    available_plant_ids = set(plant_ids[plant_ids.ne("")])
+    missing_cascade_ids = cascade_plant_ids - available_plant_ids
+    if missing_cascade_ids:
+        raise ValueError(
+            "Cascade topology references unknown plant_id values: "
+            + ", ".join(sorted(missing_cascade_ids))
+        )
+
+    cascade_mask = plant_ids.isin(cascade_plant_ids)
+
+    # plant_id acts as the cascade marker in downstream workflow steps.
+    ppl.loc[~cascade_mask, "plant_id"] = ""
+
+    invalid_cascade = ppl.loc[cascade_mask & ppl["carrier"].ne("hydro")]
+    if not invalid_cascade.empty:
+        raise ValueError(
+            "plant_id is currently supported only for reservoir hydro plants. "
+            f"Invalid plants: {', '.join(invalid_cascade.index.astype(str))}"
+        )
+
+    duplicate_ids = plant_ids[cascade_mask & plant_ids.duplicated(keep=False)]
+    if not duplicate_ids.empty:
+        raise ValueError(
+            "Cascade plant_id values must be unique. Duplicates: "
+            + ", ".join(sorted(duplicate_ids.unique()))
+        )
+
+    # Pumped hydro does not require natural inflow profiles.
+    phs_raw = ppl[ppl["carrier"] == "PHS"]
+    phs = (
+        aggregate_ppl_by_bus_carrier_year(phs_raw)
+        if not phs_raw.empty
+        else pd.DataFrame()
+    )
+
+    inflow_required = ppl[
+        ppl["carrier"].isin(["ror", "hydro"]) | ppl["technology"].isna()
+    ].copy()
+
+    inflow_t = pd.DataFrame(index=n.snapshots)
+    available_ppl = inflow_required.iloc[0:0].copy()
+
+    if not inflow_required.empty:
         with xr.open_dataarray(snakemake.input.profile_hydro) as inflow:
-            found_plants = ppl.ppl_id[ppl.ppl_id.isin(inflow.indexes["plant"])]
-            missing_plants_idxs = ppl.index.difference(found_plants.index)
+            found_plants = inflow_required.ppl_id[
+                inflow_required.ppl_id.isin(inflow.indexes["plant"])
+            ]
+            missing_plants = inflow_required.index.difference(found_plants.index)
 
-            # if missing time series are found, notify the user and exclude missing hydro plants
-            if not missing_plants_idxs.empty:
-                # original total p_nom
-                total_p_nom = ror.p_nom.sum() + hydro.p_nom.sum() + tbd.p_nom.sum()
-
-                ror = ror.loc[ror.index.intersection(found_plants.index)]
-                hydro = hydro.loc[hydro.index.intersection(found_plants.index)]
-                tbd = tbd.loc[tbd.index.intersection(found_plants.index)]
-
-                # loss of p_nom
-                loss_p_nom = (
-                    ror.p_nom.sum() + hydro.p_nom.sum() + tbd.p_nom.sum() - total_p_nom
-                )
-
+            if not missing_plants.empty:
+                total_p_nom = inflow_required.p_nom.sum()
+                loss_p_nom = inflow_required.loc[missing_plants, "p_nom"].sum()
                 logger.warning(
-                    f"'{snakemake.input.profile_hydro}' is missing inflow time-series for at least one bus: {', '.join(missing_plants_idxs)}."
-                    f"Corresponding hydro plants are dropped, corresponding to a total loss of {loss_p_nom:.2f}MW out of {total_p_nom:.2f}MW."
+                    f"'{snakemake.input.profile_hydro}' is missing inflow "
+                    f"time-series for {len(missing_plants)} hydro plants. "
+                    f"Corresponding plants are dropped, corresponding to a "
+                    f"total loss of {loss_p_nom:.2f} MW out of "
+                    f"{total_p_nom:.2f} MW."
                 )
 
-            # if there are any plants for which runoff data are available
+            available_ppl = inflow_required.loc[found_plants.index].copy()
+
             if not found_plants.empty:
                 inflow_t = (
                     inflow.sel(plant=found_plants.values)
@@ -955,62 +1015,123 @@ def attach_hydro(
                     .to_pandas()
                 )
 
-                # Aggregate inflow by (bus, carrier, grouping_year)
-                inflow_agg = aggregate_inflow_by_group(ppl, ppl_grouped, inflow_t)
+    available_cascade_mask = available_ppl["plant_id"].isin(cascade_plant_ids)
+
+    regular_known = available_ppl[
+        ~available_cascade_mask & available_ppl["carrier"].isin(["ror", "hydro"])
+    ].copy()
+
+    if not regular_known.empty:
+        ppl_grouped = aggregate_ppl_by_bus_carrier_year(regular_known)
+        ror = ppl_grouped[ppl_grouped["carrier"] == "ror"]
+        hydro = ppl_grouped[ppl_grouped["carrier"] == "hydro"]
+        inflow_agg = aggregate_inflow_by_group(
+            regular_known,
+            ppl_grouped,
+            inflow_t,
+        )
+    else:
+        ror = pd.DataFrame()
+        hydro = pd.DataFrame()
+        inflow_agg = pd.DataFrame(index=inflow_t.index)
+
+    cascade_hydro = available_ppl[
+        available_cascade_mask & available_ppl["carrier"].eq("hydro")
+    ].copy()
+
+    if not cascade_hydro.empty:
+        cascade_hydro["profile_name"] = cascade_hydro.index
+        cascade_hydro["build_year"] = cascade_hydro["datein"].astype(int)
+        cascade_hydro["lifetime"] = (
+            cascade_hydro["dateout"] - cascade_hydro["datein"]
+        ).fillna(np.inf)
+        cascade_hydro = cascade_hydro.set_index("plant_id", drop=False)
+
+        inflow_cascade = inflow_t[cascade_hydro["profile_name"].tolist()].copy()
+        inflow_cascade.columns = cascade_hydro.index
+    else:
+        inflow_cascade = pd.DataFrame(index=inflow_t.index)
+
+    tbd = available_ppl[available_ppl.technology.isna()]
 
     # Heuristics for missing hydro technologies
     if not tbd.empty:
-        inflow_pu_limit = inflow_t[tbd.index].mean() / tbd["p_nom"]  # Average MWh/MW
+        inflow_pu_limit = inflow_t[tbd.index].mean() / tbd["p_nom"]
         mask_reservoir = inflow_pu_limit >= hydro_min_inflow_pu
         mask_ror = ~mask_reservoir
         to_be_hydro = tbd[mask_reservoir].copy()
         to_be_ror = tbd[mask_ror].copy()
 
-        # Aggregate to_be_ror and to_be_hydro by (bus, carrier, grouping_year)
         to_be_hydro.loc[:, "carrier"] = "hydro"
         to_be_ror.loc[:, "carrier"] = "ror"
+
         to_be_ror_grouped = aggregate_ppl_by_bus_carrier_year(to_be_ror)
         to_be_hydro_grouped = aggregate_ppl_by_bus_carrier_year(to_be_hydro)
+
         inflow_agg_ror = aggregate_inflow_by_group(
-            to_be_ror, to_be_ror_grouped, inflow_t
+            to_be_ror,
+            to_be_ror_grouped,
+            inflow_t,
         )
         inflow_agg_hydro = aggregate_inflow_by_group(
-            to_be_hydro, to_be_hydro_grouped, inflow_t
+            to_be_hydro,
+            to_be_hydro_grouped,
+            inflow_t,
         )
 
-        # Concatenate to existing ror and hydro dataframes and re-aggregate
-        # to correctly merge any duplicate (bus, carrier_gy) groups
-        ror = aggregate_ppl_by_bus_carrier_year(
-            pd.concat(
-                [
-                    ppl[ppl["carrier"] == "ror"],  # original ungrouped ror plants
-                    to_be_ror,  # ungrouped tbd reclassified as ror
-                ]
-            )
+        regular_ror = pd.concat(
+            [
+                regular_known[regular_known["carrier"] == "ror"],
+                to_be_ror,
+            ]
         )
-        hydro = aggregate_ppl_by_bus_carrier_year(
-            pd.concat(
-                [
-                    ppl[ppl["carrier"] == "hydro"],  # original ungrouped hydro plants
-                    to_be_hydro,  # ungrouped tbd reclassified as hydro
-                ]
-            )
+        regular_hydro = pd.concat(
+            [
+                regular_known[regular_known["carrier"] == "hydro"],
+                to_be_hydro,
+            ]
         )
 
-        # Merge inflow: sum overlapping columns, add new ones
+        ror = (
+            aggregate_ppl_by_bus_carrier_year(regular_ror)
+            if not regular_ror.empty
+            else pd.DataFrame()
+        )
+        hydro = (
+            aggregate_ppl_by_bus_carrier_year(regular_hydro)
+            if not regular_hydro.empty
+            else pd.DataFrame()
+        )
+
         inflow_agg = (
-            pd.concat([inflow_agg, inflow_agg_ror, inflow_agg_hydro], axis=1)
-            .groupby(level=0, axis=1)
+            pd.concat(
+                [inflow_agg, inflow_agg_ror, inflow_agg_hydro],
+                axis=1,
+            )
+            .T.groupby(level=0)
             .sum()
+            .T
         )
 
         logger.info(
             f"Identified {len(tbd)} hydro powerplants with unknown technology.\n"
-            f"Hydropower plants with energy-to-capacity ratio ≥ {hydro_min_inflow_pu} "
-            f"are classified as 'Reservoir'. The rest are 'Run-Of-River'.\n"
+            f"Hydropower plants with energy-to-capacity ratio "
+            f"≥ {hydro_min_inflow_pu} are classified as 'Reservoir'. "
+            f"The rest are 'Run-Of-River'.\n"
             f"Reservoir: {mask_reservoir.sum()} \n"
             f"Run-Of-River: {mask_ror.sum()}"
         )
+
+    if not cascade_hydro.empty:
+        collision = hydro.index.intersection(cascade_hydro.index)
+        if not collision.empty:
+            raise ValueError(
+                "Cascade plant_id collides with an aggregated hydro component: "
+                + ", ".join(collision.astype(str))
+            )
+
+        hydro = pd.concat([hydro, cascade_hydro], sort=False)
+        inflow_agg = pd.concat([inflow_agg, inflow_cascade], axis=1)
 
     if "ror" in carriers and not ror.empty:
         n.madd(
@@ -1125,6 +1246,12 @@ def attach_hydro(
             build_year=hydro["build_year"],
             lifetime=hydro["lifetime"],
         )
+
+        if "plant_id" in hydro.columns:
+            n.storage_units.loc[hydro.index, "plant_id"] = hydro["plant_id"].fillna("")
+
+        if "damheight_m" in hydro.columns:
+            n.storage_units.loc[hydro.index, "dam_height_m"] = hydro["damheight_m"]
 
         logger.info(
             f"Added {len(hydro)} hydro storage units with {hydro['p_nom'].sum() / 1e3:.2f} GW"
@@ -1317,11 +1444,39 @@ if __name__ == "__main__":
         extendable_carriers,
         snakemake.params.length_factor,
     )
+    cascade_plant_ids = set()
+    cascade_topology_path = getattr(
+        snakemake.input,
+        "hydro_cascade_topology",
+        None,
+    )
+    if cascade_topology_path:
+        cascade_topology = pd.read_csv(cascade_topology_path)
+        validate_cascade_topology(cascade_topology)
+
+        # Keep the original powerplant index so that the resolved stable
+        # cascade IDs can be propagated back to the full powerplant table.
+        resolution_input = ppl.assign(_cascade_source_index=ppl.index)
+
+        cascade_plants = resolve_cascade_plants(
+            cascade_topology,
+            resolution_input,
+        )
+
+        if "plant_id" not in ppl.columns:
+            ppl["plant_id"] = ""
+
+        for plant_id, plant in cascade_plants.iterrows():
+            ppl.loc[plant["_cascade_source_index"], "plant_id"] = plant_id
+
+        cascade_plant_ids = set(cascade_plants.index)
+
     attach_hydro(
         n,
         costs,
         ppl,
         snakemake.params.renewable["hydro"]["hydro_min_inflow_pu"],
+        cascade_plant_ids=cascade_plant_ids,
         disaggregate_flag=disaggregate_flag,
     )
 
