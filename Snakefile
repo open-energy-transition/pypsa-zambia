@@ -677,6 +677,17 @@ def inputs_hydro(w):
             "powerplants": "resources/" + RDIR + "powerplants.csv",
             "hydrobasins": config["renewable"]["hydro"]["resource"]["hydrobasins"],
         }
+
+        cascading = config["renewable"]["hydro"].get("cascading", {})
+        if cascading.get("enable", False):
+            topology = cascading.get("topology")
+            if not topology:
+                raise ValueError(
+                    "renewable.hydro.cascading.topology must be configured "
+                    "when cascading hydro is enabled."
+                )
+            HYDRO_PROFILES["hydro_cascade_topology"] = topology
+
         return HYDRO_PROFILES
     else:
         return {}
@@ -826,6 +837,17 @@ if config["validation"].get("biomass"):
                 for attr, fn in d.items()
                 if str(fn).startswith("data/")
             },
+            **(
+                {
+                    "hydro_cascade_topology": config["renewable"]["hydro"][
+                        "cascading"
+                    ]["topology"]
+                }
+                if config["renewable"]["hydro"]
+                .get("cascading", {})
+                .get("enable", False)
+                else {}
+            ),
             base_network="networks/" + RDIR + "base.nc",
             tech_costs="resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv",
             powerplants="resources/" + RDIR + "powerplants.csv",
@@ -882,6 +904,17 @@ else:
                 for attr, fn in d.items()
                 if str(fn).startswith("data/")
             },
+            **(
+                {
+                    "hydro_cascade_topology": config["renewable"]["hydro"][
+                        "cascading"
+                    ]["topology"]
+                }
+                if config["renewable"]["hydro"]
+                .get("cascading", {})
+                .get("enable", False)
+                else {}
+            ),
             base_network="networks/" + RDIR + "base.nc",
             tech_costs="resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv",
             powerplants="resources/" + RDIR + "powerplants.csv",
@@ -1103,6 +1136,15 @@ rule add_extra_components:
         electricity=config["electricity"],
         csp_model=config["renewable"]["csp"]["csp_model"],
     input:
+        **(
+            {
+                "hydro_cascade_topology": config["renewable"]["hydro"]["cascading"][
+                    "topology"
+                ]
+            }
+            if config["renewable"]["hydro"].get("cascading", {}).get("enable", False)
+            else {}
+        ),
         network="networks/" + RDIR + "elec_s{simpl}_{clusters}.nc",
         tech_costs="resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv",
     output:

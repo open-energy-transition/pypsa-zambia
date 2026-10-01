@@ -50,6 +50,7 @@ from _helpers import (
     set_length_based_efficiency,
 )
 from add_electricity import add_nice_carrier_names
+from hydro_cascade import materialize_cascade_storage_units
 
 idx = pd.IndexSlice
 
@@ -423,6 +424,18 @@ if __name__ == "__main__":
         electricity["max_hours"],
         storage_techs,
     )
+
+    cascade_topology_path = getattr(
+        snakemake.input,
+        "hydro_cascade_topology",
+        None,
+    )
+    if cascade_topology_path:
+        cascade_topology = pd.read_csv(cascade_topology_path)
+        materialize_cascade_storage_units(
+            n,
+            cascade_topology,
+        )
 
     if ("csp" in electricity["renewable_carriers"]) and (
         snakemake.params.csp_model == "advanced"

@@ -155,6 +155,11 @@ from shapely.geometry import Point
 
 idx = pd.IndexSlice
 
+from hydro_cascade import (
+    pop_cascade_storage_units,
+    restore_cascade_storage_units,
+)
+
 logger = create_logger(__name__)
 
 
@@ -565,6 +570,7 @@ def clustering_for_n_clusters(
     else:
         busmap = custom_busmap
 
+    cascade_static, cascade_dynamic = pop_cascade_storage_units(n)
     clustering = get_clustering_from_busmap(
         n,
         busmap,
@@ -577,6 +583,12 @@ def clustering_for_n_clusters(
         generator_strategies=generator_strategies,
         one_port_strategies=one_port_strategies,
         scale_link_capital_costs=False,
+    )
+    restore_cascade_storage_units(
+        clustering.network,
+        cascade_static,
+        cascade_dynamic,
+        busmap,
     )
 
     if not n.links.empty:
@@ -680,6 +692,9 @@ def groupby_bus_carrier(
     # Replace generators in network
     replace_components(network, "Generator", generators, generators_pnl)
 
+    # Keep cascade reservoirs separate from ordinary StorageUnit aggregation.
+    cascade_static, cascade_dynamic = pop_cascade_storage_units(network)
+
     # Group storage units
     storage_units, storage_units_pnl = aggregateoneport(
         network,
@@ -690,6 +705,13 @@ def groupby_bus_carrier(
 
     # Replace storage units in network
     replace_components(network, "StorageUnit", storage_units, storage_units_pnl)
+
+    restore_cascade_storage_units(
+        network,
+        cascade_static,
+        cascade_dynamic,
+        busmap,
+    )
 
 
 if __name__ == "__main__":
