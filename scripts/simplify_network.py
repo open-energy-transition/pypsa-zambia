@@ -179,16 +179,16 @@ def simplify_network_to_base_voltage(
 
     n.buses["v_nom"] = bus_base_voltages
 
+    # Use bus0 as the convention for assigning the line country and line type.
     line_countries = n.lines["bus0"].map(n.buses["country"])
-    line_base_voltages = line_countries.map(
-        lambda country: base_voltage.get(country, default_base_voltage)
-    )
-    line_bus1_base_voltages = n.lines["bus1"].map(bus_base_voltages)
+    bus0_base_voltages = n.lines["bus0"].map(bus_base_voltages)
+    bus1_base_voltages = n.lines["bus1"].map(bus_base_voltages)
 
     ac_line_mask = n.lines["carrier"] == "AC"
     dc_line_mask = n.lines["carrier"] == "DC"
 
-    mismatched_ac_lines = ac_line_mask & (line_base_voltages != line_bus1_base_voltages)
+    # AC lines must connect buses mapped to the same base-voltage layer.
+    mismatched_ac_lines = ac_line_mask & (bus0_base_voltages != bus1_base_voltages)
 
     if mismatched_ac_lines.any():
         mismatched_lines = n.lines.loc[
@@ -196,16 +196,17 @@ def simplify_network_to_base_voltage(
             ["bus0", "bus1"],
         ].copy()
 
-        mismatched_lines["bus0_v_nom"] = line_base_voltages.loc[mismatched_ac_lines]
-        mismatched_lines["bus1_v_nom"] = line_bus1_base_voltages.loc[
-            mismatched_ac_lines
-        ]
+        mismatched_lines["bus0_v_nom"] = bus0_base_voltages.loc[mismatched_ac_lines]
+        mismatched_lines["bus1_v_nom"] = bus1_base_voltages.loc[mismatched_ac_lines]
 
         raise ValueError(
             "Country-specific base voltages assign different nominal "
             "voltages to the endpoints of the following AC lines:\n"
             f"{mismatched_lines.to_string()}"
         )
+
+    # Use the bus0 target voltage as the line voltage after the AC consistency check.
+    line_base_voltages = bus0_base_voltages
 
     n.lines.loc[ac_line_mask, "type"] = pd.Series(
         [
