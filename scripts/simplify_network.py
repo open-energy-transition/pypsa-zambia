@@ -128,9 +128,11 @@ def simplify_network_to_base_voltage(
     Map all lines to configured base voltages and country-specific line types.
 
     Each bus is assigned the base voltage configured for its country.
-    Countries without an explicit override use the default value. Each line
-    is assigned the closest available AC or DC line type for the country of
-    its first bus. Transmission capacity is preserved by recalculating the
+    Countries without an explicit override use the default value. For each
+    line, the target base voltages of both endpoint buses are determined.
+    AC lines must connect endpoints mapped to the same base-voltage layer.
+    The country of ``bus0`` is used to select the closest available AC or DC
+    line type. Transmission capacity is preserved by recalculating the
     number of parallel bundles after updating the voltage and line type.
     Transformers are removed and connected components are moved from their
     starting bus to their ending bus.
@@ -168,7 +170,7 @@ def simplify_network_to_base_voltage(
     )
 
     logger.info(
-        "Mapping network lines onto country-specific base-voltage layers: %s",
+        "Mapping network buses onto country-specific base-voltage layers: %s",
         {
             country: base_voltage.get(country, default_base_voltage)
             for country in n.buses["country"].dropna().unique()
