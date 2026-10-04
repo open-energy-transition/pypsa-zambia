@@ -12,6 +12,13 @@ This part of documentation collects descriptive release notes to capture the mai
 
 ### New Features and Major Changes
 
+### Minor Changes and bug-fixing
+
+
+# PyPSA-Zambia v0.5
+
+### New Features and Major Changes
+
 * Increase stability of data retrieval by moving demandcast and data bundle to retrieve smk rule #411
  [PR #411](https://github.com/open-energy-transition/pypsa-zambia/pull/411) and #423
  [PR #423](https://github.com/open-energy-transition/pypsa-zambia/pull/423)
@@ -29,6 +36,8 @@ This part of documentation collects descriptive release notes to capture the mai
 * Add CO2 values tailored on Zambia [PR #394](https://github.com/open-energy-transition/pypsa-zambia/pull/394)
 
 * Amend a set of validation run configs [PR #418](https://github.com/open-energy-transition/pypsa-zambia/pull/418)
+
+* Merge upstream into Main [PR #414](https://github.com/open-energy-transition/pypsa-zambia/pull/414)
 
 
 ### Minor Changes and bug-fixing
