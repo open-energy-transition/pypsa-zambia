@@ -12,9 +12,14 @@ This part of documentation collects descriptive release notes to capture the mai
 
 ### New Features and Major Changes
 
-* Increase stability of data retrieval by moving demandcast and data bundle to retrieve smk rule #411
- [PR #411](https://github.com/open-energy-transition/pypsa-zambia/pull/411) and #423
- [PR #423](https://github.com/open-energy-transition/pypsa-zambia/pull/423)
+### Minor Changes and bug-fixing
+
+
+# PyPSA-Zambia v0.5
+
+### New Features and Major Changes
+
+* Increase stability of data retrieval by moving demandcast and data bundle to retrieve smk rule [PR #411](https://github.com/open-energy-transition/pypsa-zambia/pull/411) and [PR #423](https://github.com/open-energy-transition/pypsa-zambia/pull/423)
 
 * Add Zambia-specific transmission line types [PR #433](https://github.com/open-energy-transition/pypsa-zambia/pull/433)
 
@@ -30,12 +35,14 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Amend a set of validation run configs [PR #418](https://github.com/open-energy-transition/pypsa-zambia/pull/418)
 
+* Merge upstream into Main [PR #414](https://github.com/open-energy-transition/pypsa-zambia/pull/414)
+
 
 ### Minor Changes and bug-fixing
 
-* Amend missed release notes and update reference objectives #447 [PR #447](https://github.com/open-energy-transition/pypsa-zambia/pull/447)
+* Amend missed release notes and update reference objectives [PR #447](https://github.com/open-energy-transition/pypsa-zambia/pull/447)
 
-* Restore git history after squash merge #443 [PR #443](https://github.com/open-energy-transition/pypsa-zambia/pull/443)
+* Restore git history after squash merge [PR #443](https://github.com/open-energy-transition/pypsa-zambia/pull/443)
 
 * Fix typos and improve the README [PR #392](https://github.com/open-energy-transition/pypsa-zambia/pull/392)
 
