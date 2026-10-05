@@ -40,9 +40,9 @@ This part of documentation collects descriptive release notes to capture the mai
 
 ### Minor Changes and bug-fixing
 
-* Amend missed release notes and update reference objectives #447 [PR #447](https://github.com/open-energy-transition/pypsa-zambia/pull/447)
+* Amend missed release notes and update reference objectives [PR #447](https://github.com/open-energy-transition/pypsa-zambia/pull/447)
 
-* Restore git history after squash merge #443 [PR #443](https://github.com/open-energy-transition/pypsa-zambia/pull/443)
+* Restore git history after squash merge [PR #443](https://github.com/open-energy-transition/pypsa-zambia/pull/443)
 
 * Fix typos and improve the README [PR #392](https://github.com/open-energy-transition/pypsa-zambia/pull/392)
 
