@@ -19,9 +19,7 @@ This part of documentation collects descriptive release notes to capture the mai
 
 ### New Features and Major Changes
 
-* Increase stability of data retrieval by moving demandcast and data bundle to retrieve smk rule #411
- [PR #411](https://github.com/open-energy-transition/pypsa-zambia/pull/411) and #423
- [PR #423](https://github.com/open-energy-transition/pypsa-zambia/pull/423)
+* Increase stability of data retrieval by moving demandcast and data bundle to retrieve smk rule [PR #411](https://github.com/open-energy-transition/pypsa-zambia/pull/411) and [PR #423](https://github.com/open-energy-transition/pypsa-zambia/pull/423)
 
 * Add Zambia-specific transmission line types [PR #433](https://github.com/open-energy-transition/pypsa-zambia/pull/433)
 
