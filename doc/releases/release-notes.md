@@ -12,6 +12,17 @@ This part of documentation collects descriptive release notes to capture the mai
 
 ### New Features and Major Changes
 
+### Minor Changes and bug-fixing
+
+
+# PyPSA-Zambia v0.5
+
+### New Features and Major Changes
+
+* Increase stability of data retrieval by moving demandcast and data bundle to retrieve smk rule [PR #411](https://github.com/open-energy-transition/pypsa-zambia/pull/411) and [PR #423](https://github.com/open-energy-transition/pypsa-zambia/pull/423)
+
+* Add Zambia-specific transmission line types [PR #433](https://github.com/open-energy-transition/pypsa-zambia/pull/433)
+
 * Add thermal plant factors for existing coal and oil generators based on IRP data, constraining dispatch via `electricity.existing_thermal_dispatch.plant_factors` in the config [PR #332](https://github.com/open-energy-transition/pypsa-zambia/pull/332)
 
 * Use separate custom powerplants datasets for dispatch validation (ERB 2023-2025 data with KGL as reservoir) and capacity expansion (IRP and proposed plants), configured via `data.custom-powerplants` in the respective config files [PR #302](https://github.com/open-energy-transition/pypsa-zambia/pull/302)
@@ -24,8 +35,14 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Amend a set of validation run configs [PR #418](https://github.com/open-energy-transition/pypsa-zambia/pull/418)
 
+* Merge upstream into Main [PR #414](https://github.com/open-energy-transition/pypsa-zambia/pull/414)
+
 
 ### Minor Changes and bug-fixing
+
+* Amend missed release notes and update reference objectives [PR #447](https://github.com/open-energy-transition/pypsa-zambia/pull/447)
+
+* Restore git history after squash merge [PR #443](https://github.com/open-energy-transition/pypsa-zambia/pull/443)
 
 * Fix typos and improve the README [PR #392](https://github.com/open-energy-transition/pypsa-zambia/pull/392)
 
@@ -164,7 +181,13 @@ This part of documentation collects descriptive release notes to capture the mai
 
 **Minor Changes and bug-fixing**
 
+* Represent fixed sector emissions as time-dependent loads [PR #2027](https://github.com/pypsa-meets-earth/pypsa-earth/pull/2027)
+
+* Normalize OSM network indices before assigning line endpoints [PR #2038](https://github.com/pypsa-meets-earth/pypsa-earth/pull/2038)
+
 * Fix fallback to closest available CO2 emission year [PR #2018](https://github.com/pypsa-meets-earth/pypsa-earth/pull/2018)
+
+* Update guidance on creating a new release [PR #2002](https://github.com/pypsa-meets-earth/pypsa-earth/pull/2002)
 
 # PyPSA-Earth 0.9.0
 
@@ -1058,27 +1081,3 @@ This is the first release of PyPSA-Africa which heavily builds on [PyPSA-Eur](ht
 * Community moved to [Discord](https://discord.gg/AnuJBk23FU).
 
 * Most meeting and agenda's are [open](https://github.com/pypsa-meets-earth/pypsa-earth#get-involved).
-
-# Release Process
-
-* Checkout a new release branch [`git checkout -b release-v0.x.x`.
-
-* Finalise release notes at `doc/release_notes.rst`.
-
-* Make sure thah pinned versions of the environments `*-pinned.yaml` in `envs` folder are up-to-date.
-
-* Update version number in `doc/conf.py`, `default.config.yaml`, `tutorial.config.yaml` and `test/config.*.yaml`.
-
-* Open, review and merge pull request for branch `release-v0.x.x`.
-  Make sure to close issues and PRs or the release milestone with it (e.g. closes #X).
-  Run `pre-commit run --all`` locally and fix any issues.
-
-* Update and checkout your local `main` and tag a release with `git tag v0.x.x`, `git push`, `git push --tags`. Include release notes in the tag message using Github UI.
-
-* Upload code to `zenodo code repository](<https://doi.org>) with [GPLv3 license](https://www.gnu.org/licenses/gpl-3.0.en.html).
-
-* Create pre-built networks for [`config.default.yaml` by running `snakemake -j 1 extra_components_all_networks``.
-
-* Upload pre-built networks to `zenodo data repository](<https://doi.org/10.5281/zenodo.3601881>) with [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) license.
-
-* Send announcement on the [PyPSA-Earth Discord channel](https://discord.gg/AnuJBk23FU).

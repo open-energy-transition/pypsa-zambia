@@ -46,6 +46,7 @@ configfile: "config.default.yaml"
 configfile: "configs/plotting.default.yaml"
 configfile: "configs/solving.default.yaml"
 configfile: "configs/bundle_config.yaml"
+configfile: "configs/data_management.yaml"
 configfile: "configs/powerplantmatching_config.yaml"
 configfile: "configs/zambia_configs/config.zm.default.yaml"
 configfile: "config_current_scenario.yaml"
@@ -168,7 +169,9 @@ rule plot_all_summaries:
         ),
 
 
-if config["enable"].get("retrieve_databundle", True):
+if config["enable"].get("retrieve_databundle", True) and (
+    config["countries"][0] != "ZM"
+):
 
     # Exclude categories which are implemented in retrieve rules (retrieve.smk)
     bundles_to_download = get_best_bundles_in_snakemake(
@@ -447,7 +450,7 @@ rule base_network:
         + "base_network/all_transformers_build_network.csv",
         country_shapes="resources/" + RDIR + "shapes/country_shapes.geojson",
         offshore_shapes="resources/" + RDIR + "shapes/offshore_shapes.geojson",
-        line_types="data/line_types.csv",
+        custom_line_types="data/custom_line_types.csv",
     output:
         "networks/" + RDIR + "base.nc",
     log:
@@ -533,7 +536,7 @@ if config["enable"].get("build_cutout", False):
             "scripts/build_cutout.py"
 
 
-if config["enable"].get("retrieve_cutout", False):
+if config["enable"].get("retrieve_cutout", False) and (config["countries"][0] != "ZM"):
 
     cutout_to_download = get_best_bundles_in_snakemake(
         config, include_categories=["cutouts"]
@@ -1165,7 +1168,6 @@ rule prepare_network:
         power_pool_countries="data/sapp_countries.csv",
         power_pool_links="data/sapp_links.csv",
         substations="data/zm_substations.csv",
-        line_types="data/line_types.csv",
     output:
         "networks/" + RDIR + "elec_s{simpl}_{clusters}_ec_l{ll}_{opts}.nc",
     log:
