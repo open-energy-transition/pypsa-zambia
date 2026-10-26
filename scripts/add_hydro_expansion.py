@@ -21,6 +21,7 @@ Description
 
 The rule :mod:`add_hydro_expansion` adds expandable hydro generators at specified locations
 """
+
 import pandas as pd
 import pypsa
 import xarray as xr
