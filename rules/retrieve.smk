@@ -10,7 +10,6 @@ from shutil import move, unpack_archive, rmtree, copy2
 from zipfile import ZipFile
 from scripts._common import dataset_version
 
-
 country_data = config["costs"].get("country_specific_data", "")
 countries = config.get("countries", [])
 
@@ -76,8 +75,9 @@ if (HYDROBASINS_DATASET := dataset_version("hydrobasins", config))["source"] in 
         message:
             "Retrieving hydrobasins dataset for {wildcards.suffix}"
         input:
-            hydro_zip=HTTP.remote(
-                f"{HYDROBASINS_DATASET['url']}" + "/hybas_{suffix}_lev01-12_v1c.zip",
+            hydro_zip=storage.http(
+                f"https://{HYDROBASINS_DATASET['url'].removeprefix('https://').removeprefix('http://')}"
+                + "/hybas_{suffix}_lev01-12_v1c.zip",
                 keep_local=True,
             ),
         output:
@@ -128,7 +128,7 @@ if (IRENA_DATASET := dataset_version("irena", config))["source"] in ["primary"]:
         message:
             "Retrieving IRENA energy statistics dataset"
         input:
-            irena_xlsx=HTTP.remote(IRENA_DATASET["url"], keep_local=True),
+            irena_xlsx=storage.http(ensure_https(IRENA_DATASET["url"]), keep_local=True),
         output:
             irena_xlsx_local=f"data/IRENA_Statistics_Extract_2025H2.xlsx",
         run:
@@ -144,7 +144,9 @@ if (LANDCOVER_DATASET := dataset_version("landcover", config))["source"] in ["pr
         message:
             "Retrieving landcover dataset"
         input:
-            landcover_zip=HTTP.remote(LANDCOVER_DATASET["url"], keep_local=True),
+            landcover_zip=storage.http(
+                ensure_https(LANDCOVER_DATASET["url"]), keep_local=True
+            ),
         output:
             unzip=directory(f"{folder}"),
             zips=expand(
@@ -182,16 +184,15 @@ if (LANDCOVER_DATASET := dataset_version("landcover", config))["source"] in ["pr
 _custom_ppl_url = (
     dataset_version("custom-powerplants", config)["url"]
     if "custom-powerplants" in config.get("data", {})
-    else "sandbox.zenodo.org/records/514032/files/custom_powerplants.csv"
+    else "https://sandbox.zenodo.org/records/514032/files/custom_powerplants.csv"
 )
 
 
 rule download_custom_powerplants:
     input:
-        url=HTTP.remote(
-            _custom_ppl_url,
+        url=storage.cached_http(
+            ensure_https(_custom_ppl_url),
             keep_local=True,
-            additional_request_string="?download=1",
         ),
     output:
         "data/custom_powerplants.csv",
@@ -203,20 +204,17 @@ rule download_custom_powerplants:
 
 rule download_interconnection_data:
     input:
-        substations=HTTP.remote(
+        substations=storage.cached_http(
             "https://sandbox.zenodo.org/records/471583/files/zm_substations.csv",
             keep_local=True,
-            additional_request_string="?download=1",
         ),
-        links=HTTP.remote(
+        links=storage.cached_http(
             "https://sandbox.zenodo.org/records/471583/files/sapp_links.csv",
             keep_local=True,
-            additional_request_string="?download=1",
         ),
-        countries=HTTP.remote(
+        countries=storage.cached_http(
             "https://sandbox.zenodo.org/records/565480/files/sapp_countries.csv",
             keep_local=True,
-            additional_request_string="?download=1",
         ),
     output:
         substations="data/zm_substations.csv",
@@ -235,7 +233,7 @@ rule download_interconnection_data:
 #
 # rule download_line_types:
 #     input:
-#         url=HTTP.remote(
+#         url=storage.http(
 #             "https://sandbox.zenodo.org/records/473405/files/pypsa_line_types%20%281%29.csv",
 #             keep_local=True,
 #         ),
@@ -249,15 +247,13 @@ rule download_interconnection_data:
 #
 rule retrieve_mining_data:
     input:
-        provincial_demand=HTTP.remote(
-            "sandbox.zenodo.org/records/495635/files/zambia_provincial_mining_demand.csv",
+        provincial_demand=storage.cached_http(
+            "https://sandbox.zenodo.org/records/495635/files/zambia_provincial_mining_demand.csv",
             keep_local=True,
-            additional_request_string="?download=1",
         ),
-        mining_polygons=HTTP.remote(
-            "sandbox.zenodo.org/records/495635/files/zambia_pangaea_mining_polygons.csv",
+        mining_polygons=storage.cached_http(
+            "https://sandbox.zenodo.org/records/495635/files/zambia_pangaea_mining_polygons.csv",
             keep_local=True,
-            additional_request_string="?download=1",
         ),
     output:
         provincial_demand="data/mining/zambia_provincial_mining_demand.csv",
@@ -274,10 +270,9 @@ rule retrieve_mining_data:
 
 rule retrieve_ipp_generation:
     input:
-        url=HTTP.remote(
+        url=storage.cached_http(
             "https://sandbox.zenodo.org/records/573456/files/Electricity%20generation%20from%20independent%20power%20producers%20%28GWh%29%202013-2025.csv",
             keep_local=True,
-            additional_request_string="?download=1",
         ),
     output:
         "data/validation/ipp_generation.csv",
@@ -292,10 +287,9 @@ rule retrieve_ipp_generation:
 
 rule retrieve_zesco_diesel_generation:
     input:
-        url=HTTP.remote(
+        url=storage.cached_http(
             "https://sandbox.zenodo.org/records/573462/files/Electricity%20generation%20from%20ZESCO%27s%20Diesel%20power%20plants%20%28GWh%29%202013-2025.csv",
             keep_local=True,
-            additional_request_string="?download=1",
         ),
     output:
         "data/validation/zesco_diesel_generation.csv",
@@ -310,10 +304,9 @@ rule retrieve_zesco_diesel_generation:
 
 rule retrieve_zesco_large_hydro_generation:
     input:
-        url=HTTP.remote(
+        url=storage.cached_http(
             "https://sandbox.zenodo.org/records/573493/files/Electricity%20generation%20from%20ZESCO%27s%20large%20hydro%20power%20plants%20%28GWh%29%202013-2025.csv",
             keep_local=True,
-            additional_request_string="?download=1",
         ),
     output:
         "data/validation/zesco_large_hydro_generation.csv",
@@ -328,10 +321,9 @@ rule retrieve_zesco_large_hydro_generation:
 
 rule retrieve_zesco_mini_hydro_generation:
     input:
-        url=HTTP.remote(
+        url=storage.cached_http(
             "https://sandbox.zenodo.org/records/573503/files/Electricity%20generation%20from%20ZESCO%27s%20mini-%20hydro%20power%20plants%20%28GWh%29%202013-2025.csv",
             keep_local=True,
-            additional_request_string="?download=1",
         ),
     output:
         "data/validation/zesco_mini_hydro_generation.csv",
@@ -342,27 +334,6 @@ rule retrieve_zesco_mini_hydro_generation:
 
         os.makedirs("data/validation", exist_ok=True)
         copyfile(str(input["url"]), output[0])
-
-
-if config["enable"].get("retrieve_cost_data", True):
-
-    rule retrieve_cost_data:
-        params:
-            version=config["costs"]["technology_data_version"],
-        input:
-            HTTP.remote(
-                f"raw.githubusercontent.com/PyPSA/technology-data/{config['costs']['technology_data_version']}/outputs/{cost_directory}"
-                + "costs_{year}.csv",
-                keep_local=True,
-            ),
-        output:
-            "resources/" + RDIR + "costs_{year}.csv",
-        log:
-            "logs/" + RDIR + "retrieve_cost_data_{year}.log",
-        resources:
-            mem_mb=5000,
-        run:
-            move(input[0], output[0])
 
 
 if (NATURA_EARTH_DATASET := dataset_version("natura_earth", config))["source"] in [
@@ -377,10 +348,9 @@ if (NATURA_EARTH_DATASET := dataset_version("natura_earth", config))["source"] i
         message:
             "Retrieving Natura Earth dataset for {source}"
         input:
-            natura_zip=HTTP.remote(
+            natura_zip=http_storage(
                 NATURA_EARTH_DATASET["url"],
                 keep_local=True,
-                additional_request_string="?download=1",
             ),
         output:
             unzip=directory(f"data/natura_earth/{source}"),
@@ -405,10 +375,9 @@ if not (config["enable"].get("retrieve_cutout", False)) and (
         message:
             f"Retrieving ERA5 cutout for region {region} ({year})"
         input:
-            cutout=HTTP.remote(
+            cutout=http_storage(
                 ERA5_CUTOUT["url"],
                 keep_local=True,
-                additional_request_string="?download=1",
             ),
         output:
             f"cutouts/{CDIR}cutout-{year}-era5.nc",
@@ -427,10 +396,9 @@ if (ZM_BIOMASS := dataset_version("zm-biomass", config))["source"] in [
 
     rule download_biomass_data:
         input:
-            url=HTTP.remote(
+            url=storage.cached_http(
                 "https://sandbox.zenodo.org/records/505798/files/biomass.geojson",
                 keep_local=True,
-                additional_request_string="?download=1",
             ),
         output:
             "data/biomass.geojson",
@@ -451,10 +419,9 @@ if (INFLOW_GLOFAS := dataset_version("inflow-glofas", config))["source"] in [
         message:
             f"Retrieving GloFAS dataset for region {region} ({year})"
         input:
-            cutout=HTTP.remote(
+            cutout=http_storage(
                 INFLOW_GLOFAS["url"],
                 keep_local=True,
-                additional_request_string="?download=1",
             ),
         output:
             f"cutouts/hydro/{region}-{year}-glofas.nc",
@@ -494,10 +461,9 @@ if (BUNDLE_DATA := dataset_version("bundle_data", config))["source"] in [
         message:
             f"Retrieving bundle data"
         input:
-            bundle=HTTP.remote(
+            bundle=http_storage(
                 BUNDLE_DATA["url"],
                 keep_local=True,
-                additional_request_string="?download=1",
             ),
         output:
             "data/eez/eez_v11.gpkg",
@@ -534,10 +500,9 @@ if (DEMAND_CAST := dataset_version("demand_cast", config))["source"] in [
         message:
             f"Retrieving demand cast data"
         input:
-            bundle=HTTP.remote(
+            bundle=http_storage(
                 DEMAND_CAST["url"],
                 keep_local=True,
-                additional_request_string="?download=1",
             ),
         output:
             f"data/demand/forecasts_on_historical_period.parquet",
