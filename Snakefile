@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 import os
+import re
 import sys
 import warnings
 
@@ -11,11 +12,9 @@ sys.path.append("./scripts")
 from pathlib import Path
 from shutil import copyfile, move, unpack_archive
 
-from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
-
-from _helpers import branch  # Remove if Snakemake >= 8.3.0
 from _helpers import (
     BASE_DIR,
+    branch,
     check_config_version,
     content_retrieve,
     copy_default_files,
@@ -28,14 +27,9 @@ from build_demand_profiles import get_load_paths_gegis
 from retrieve_databundle_light import (
     datafiles_retrivedatabundle,
     get_best_bundles_in_snakemake,
+    get_databundle_categories,
 )
-
-# TODO-MERGE check conflict resolution
 from scripts.utility_custom_features import load_mining_data, build_mining_raster
-from snakemake.remote.HTTP import RemoteProvider as HTTPRemoteProvider
-from pathlib import Path
-
-HTTP = HTTPRemoteProvider()
 
 copy_default_files()
 
@@ -50,6 +44,10 @@ configfile: "configs/data_management.yaml"
 configfile: "configs/powerplantmatching_config.yaml"
 configfile: "configs/zambia_configs/config.zm.default.yaml"
 configfile: "config_current_scenario.yaml"
+
+
+storage:
+    provider="http",
 
 
 check_config_version(config=config)
@@ -104,25 +102,42 @@ wildcard_constraints:
     sopts=r"[-+a-zA-Z0-9\.\s]*",
     discountrate=r"[-+a-zA-Z0-9\.\s]*",
     planning_horizons="20[2-9][0-9]|2100",
+    demand=r"[-+a-zA-Z0-9\.\s]*",
+    h2export="[0-9]+m?|all",
+
+
+def ensure_https(url):
+    """Add HTTPS scheme to URLs that do not specify one."""
+    url = str(url)
+    if url.startswith(("https://", "http://")):
+        return url
+    return "https://" + url
+
+
+storage cached_http:
+    provider="cached-http",
+
+
+def http_storage(url, **kwargs):
+    """Select the appropriate HTTP storage provider."""
+    url = ensure_https(url)
+    if url.split("/")[2].lower() in {"zenodo.org", "sandbox.zenodo.org"}:
+        return storage.cached_http(url, **kwargs)
+    return storage.http(url, **kwargs)
 
 
 include: "rules/retrieve.smk"
 include: "rules/postprocessing.smk"
-
-
-if config["custom_rules"] is not []:
-    for rule in config["custom_rules"]:
-
-        include: rule
-
-
+# fmt: off
+for include_rule in config.get("custom_rules", []):
+    include: include_rule
+# fmt: on
 rule clean:
     run:
-        try:
-            shell("snakemake -j 1 solve_all_networks --delete-all-output")
-        except:
-            shell("snakemake -j 1 solve_all_networks_monte --delete-all-output")
-            pass
+        shell(
+            "snakemake -j 1 solve_all_networks --delete-all-output || "
+            "snakemake -j 1 solve_all_networks_monte --delete-all-output"
+        )
         shell("snakemake -j 1 run_all_scenarios --delete-all-output")
 
 
@@ -173,28 +188,48 @@ if config["enable"].get("retrieve_databundle", True) and (
     config["countries"][0] != "ZM"
 ):
 
-    # Exclude categories which are implemented in retrieve rules (retrieve.smk)
-    bundles_to_download = get_best_bundles_in_snakemake(
-        config, exclude_categories=["natura", "hydrobasins", "cutouts", "irena"]
+    # Collect all databundle categories, except cutouts that are treated separately
+    databundle_categories = get_databundle_categories(
+        config["databundles"],
+        exclude_categories=["natura", "hydrobasins", "cutouts", "irena"],
     )
+    # get the best bundles for each category
+    bundle_dict = {
+        category: get_best_bundles_in_snakemake(config, include_categories=[category])
+        for category in databundle_categories
+    }
 
-    rule retrieve_databundle_light:
-        params:
-            bundles_to_download=bundles_to_download,
-            # TODO fix legacy input
-            hydrobasins_level=config["renewable"]["hydro"]["hydrobasins_level"],
-        output:  #expand(directory('{file}') if isdir('{file}') else '{file}', file=datafiles)
-            expand(
-                "{file}", file=datafiles_retrivedatabundle(config, bundles_to_download)
-            ),
-            # TODO Get back once we'll have regional tutorial data for landcover
-            # directory("data/landcover"),
-        log:
-            "logs/" + RDIR + "retrieve_databundle.log",
-        benchmark:
-            "benchmarks/" + RDIR + "retrieve_databundle_light"
-        script:
-            "scripts/retrieve_databundle_light.py"
+    # List selected bundles for each category
+    print("\n====================================================")
+    print("Selected bundles for each category:")
+    for category, bundles in bundle_dict.items():
+        if len(bundles) >= 1:
+            print(f"\t{category}: {bundles}")
+    print("====================================================\n")
+
+    for category, bundles in bundle_dict.items():
+        output_files = datafiles_retrivedatabundle(config, bundles)
+        contains_landcover = any([f for f in output_files if "landcover" in f])
+
+        if not bundles:
+            continue
+
+        rule:
+            name:
+                f"retrieve_databundle_{category}"
+            params:
+                tutorial=config["tutorial"],
+                bundles_to_download=bundles,
+                hydrobasins_level=config["renewable"]["hydro"]["hydrobasins_level"],
+            output:
+                expand("{file}", file=output_files),
+                branch(contains_landcover, directory("data/landcover")),
+            log:
+                "logs/" + RDIR + f"retrieve_databundle_{category}.log",
+            benchmark:
+                "benchmarks/" + RDIR + f"retrieve_databundle_{category}"
+            script:
+                "scripts/retrieve_databundle_light.py"
 
 
 if config["enable"].get("retrieve_databundle", True) and config["tutorial"]:
@@ -536,14 +571,17 @@ if config["enable"].get("build_cutout", False):
             "scripts/build_cutout.py"
 
 
-if config["enable"].get("retrieve_cutout", False) and (config["countries"][0] != "ZM"):
+if config["enable"].get("retrieve_cutout", False):
 
     cutout_to_download = get_best_bundles_in_snakemake(
         config, include_categories=["cutouts"]
     )
 
+    print("Cutout to download: ", cutout_to_download)
+
     rule retrieve_cutout:
         params:
+            tutorial=config["tutorial"],
             bundles_to_download=cutout_to_download,
             hydrobasins_level=[],
         input:
@@ -610,6 +648,27 @@ elif country_data:
     )
 else:
     cost_directory = ""
+
+
+if config["enable"].get("retrieve_cost_data", True):
+
+    rule retrieve_cost_data:
+        params:
+            version=config["costs"]["technology_data_version"],
+        input:
+            storage.http(
+                f"https://raw.githubusercontent.com/PyPSA/technology-data/{config['costs']['technology_data_version']}/outputs/{cost_directory}"
+                + "costs_{year}.csv",
+                keep_local=True,
+            ),
+        output:
+            "resources/" + RDIR + "costs_{year}.csv",
+        log:
+            "logs/" + RDIR + "retrieve_cost_data_{year}.log",
+        resources:
+            mem_mb=5000,
+        run:
+            move(input[0], output[0])
 
 
 rule process_cost_data:
@@ -724,6 +783,10 @@ rule build_glofas_potential:
 
 
 rule build_renewable_profiles:
+    wildcard_constraints:
+        technology="(?:"
+        + "|".join(re.escape(tech) for tech in config["renewable"])
+        + ")",
     params:
         crs=config["crs"],
         renewable=config["renewable"],
@@ -1122,7 +1185,7 @@ if config["co2"]["automatic_emission"]["enable"]:
 
     rule retrieve_emissions:
         input:
-            HTTP.remote(
+            storage.http(
                 "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/EDGAR/datasets/v60_GHG/CO2_excl_short-cycle_org_C/v60_GHG_CO2_excl_short-cycle_org_C_1970_2018.zip",
                 keep_local=True,
             ),
@@ -1409,6 +1472,8 @@ rule prepare_airports:
 
 
 rule prepare_urban_percent:
+    input:
+        urban_percent_raw="data/urban_percent_raw.csv",
     output:
         urban_percent="resources/" + SECDIR + "urban_percent.csv",
     script:
@@ -1424,7 +1489,7 @@ rule prepare_transport_data_input:
 
 rule retrieve_potash_data:
     input:
-        potash_zip=HTTP.remote(
+        potash_zip=storage.http(
             "https://pubs.usgs.gov/sir/2010/5090/s/PotashGIS.zip",
             keep_local=True,
         ),
@@ -1633,6 +1698,7 @@ rule add_export:
         endogenous_price=config["export"]["endogenous_price"],
         snapshots=config["snapshots"],
         h2export=config["export"]["h2export"],
+        crs=config["crs"],
     input:
         export_ports="resources/" + SECDIR + "export_ports.csv",
         costs="resources/" + RDIR + "costs_{planning_horizons}_sec.csv",
@@ -2387,6 +2453,15 @@ rule retrieve_ammonia_dataset:
         "scripts/retrieve_ammonia_dataset.py"
 
 
+rule retrieve_urban_percent:
+    params:
+        url_urban_percent="https://zenodo.org/records/23242372/files/US_PopTotal.csv.7z?download=1",
+    output:
+        urban_percent_raw="data/urban_percent_raw.csv",
+    script:
+        "scripts/retrieve_urban_percent.py"
+
+
 rule build_ammonia_production:
     input:
         ammonia_plants="data/industry/ammonia_plants.csv",
@@ -2435,7 +2510,7 @@ rule build_existing_heating_distribution:
         + "logs/build_existing_heating_distribution_s{simpl}_{clusters}_{planning_horizons}.log",
     benchmark:
         RESDIR
-        +"benchmarks/build_existing_heating_distribution/s{simpl}_{clusters}_{planning_horizons}"
+        + "benchmarks/build_existing_heating_distribution/s{simpl}_{clusters}_{planning_horizons}"
     script:
         "scripts/build_existing_heating_distribution.py"
 
@@ -2489,7 +2564,7 @@ if config["foresight"] == "myopic":
             + "logs/add_existing_baseyear_elec_s{simpl}_{clusters}_ec_l{ll}_{opts}_{sopts}_{planning_horizons}_{discountrate}.log",
         benchmark:
             RESDIR
-            +"benchmarks/add_existing_baseyear/elec_s{simpl}_{clusters}_ec_l{ll}_{opts}_{sopts}_{planning_horizons}_{discountrate}"
+            + "benchmarks/add_existing_baseyear/elec_s{simpl}_{clusters}_ec_l{ll}_{opts}_{sopts}_{planning_horizons}_{discountrate}"
         script:
             "scripts/add_existing_baseyear.py"
 
@@ -2506,7 +2581,6 @@ if config["foresight"] == "myopic":
         planning_horizons = config["scenario"]["planning_horizons"]
         i = planning_horizons.index(int(w.planning_horizons))
         planning_horizon_p = str(planning_horizons[i - 1])
-
         return (
             RESDIR
             + "postnetworks/elec_s{simpl}_{clusters}_ec_l{ll}_{opts}_{sopts}_"
@@ -2625,7 +2699,6 @@ rule run_scenario:
         scenario_runner=1,  # ensures only one scenario runs at a time (shared config_current_scenario.yaml)
     run:
         from subprocess import run
-
         import yaml
         from build_test_configs import create_test_config
 
@@ -2637,7 +2710,6 @@ rule run_scenario:
                 # is a merge of config.default and validation_dispatch_zambia config
                 .get("base_config", "model_run_config.yaml")
             )
-
             # Ensure the scenario name matches the name of the configuration
         create_test_config(
             input.diff_config,
@@ -2661,7 +2733,6 @@ rule run_scenario:
         )
         os.makedirs(os.path.dirname(output.copyconfig), exist_ok=True)
         copyfile("config_current_scenario.yaml", output.copyconfig)
-
 
 
 rule run_all_scenarios:

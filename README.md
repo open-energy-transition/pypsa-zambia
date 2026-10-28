@@ -42,7 +42,7 @@ operating cost.
 The key config in carrying out this operation is the: `configs/zambia_configs/config.zm.validation_dispatch.yaml`
 
 ```bash
-snakemake -j 1 solve_all_networks configfile configs/zambia_configs/config.zm.validation_dispatch.yaml
+snakemake -j 1 solve_all_networks --configfile configs/zambia_configs/config.zm.validation_dispatch.yaml
 ```
 
 ### Capacity expansion
@@ -150,6 +150,18 @@ To use them, you need to go through the following steps:
 4. run `build_cutout` rule
 
 ## Validation
+## Compatibility with newer PyPSA-Earth versions
+
+Recent PyPSA-Earth updates introduce support for PyPSA 1.x and Snakemake 9,
+including changes to network APIs, dependency versions and workflow execution.
+
+PyPSA-Zambia incorporates these upstream changes while retaining its
+country-specific workflows and configurations.
+
+When using an older revision of PyPSA-Zambia, install the dependencies
+associated with that revision rather than assuming that an environment
+created for a newer revision is compatible.
+
 
 A set of notebooks which provides insights on outputs of the model and ways to analyse them are available in [zambia-dev-notebooks](https://github.com/open-energy-transition/zambia-dev-notebooks) repo.
 
@@ -364,17 +376,17 @@ Specific documentation for PyPSA-Zambia is under development [here](https://pyps
                 </a>
             </td>
             <td align="center">
-                <a href="https://github.com/GridGrapher">
-                    <img src="https://avatars.githubusercontent.com/u/127969728?v=4" width="100;" alt="GridGrapher"/>
-                    <br />
-                    <sub><b>GridGrapher</b></sub>
-                </a>
-            </td>
-            <td align="center">
                 <a href="https://github.com/drifter089">
                     <img src="https://avatars.githubusercontent.com/u/93286254?v=4" width="100;" alt="drifter089"/>
                     <br />
                     <sub><b>drifter089</b></sub>
+                </a>
+            </td>
+            <td align="center">
+                <a href="https://github.com/GridGrapher">
+                    <img src="https://avatars.githubusercontent.com/u/127969728?v=4" width="100;" alt="GridGrapher"/>
+                    <br />
+                    <sub><b>GridGrapher</b></sub>
                 </a>
             </td>
             <td align="center">
@@ -385,17 +397,17 @@ Specific documentation for PyPSA-Zambia is under development [here](https://pyps
                 </a>
             </td>
             <td align="center">
-                <a href="https://github.com/ljansen-iee">
-                    <img src="https://avatars.githubusercontent.com/u/47030274?v=4" width="100;" alt="ljansen-iee"/>
-                    <br />
-                    <sub><b>ljansen-iee</b></sub>
-                </a>
-            </td>
-            <td align="center">
                 <a href="https://github.com/Emre-Yorat89">
                     <img src="https://avatars.githubusercontent.com/u/62134151?v=4" width="100;" alt="Emre-Yorat89"/>
                     <br />
                     <sub><b>Emre-Yorat89</b></sub>
+                </a>
+            </td>
+            <td align="center">
+                <a href="https://github.com/ljansen-iee">
+                    <img src="https://avatars.githubusercontent.com/u/47030274?v=4" width="100;" alt="ljansen-iee"/>
+                    <br />
+                    <sub><b>ljansen-iee</b></sub>
                 </a>
             </td>
 		</tr>
