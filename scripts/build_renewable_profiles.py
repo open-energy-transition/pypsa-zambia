@@ -209,7 +209,15 @@ from _helpers import (
     read_csv_nafix,
 )
 from add_electricity import load_powerplants
+from atlite import hydro as hydrom
 from dask.distributed import Client
+from hydro_cascade import (
+    build_local_cascade_basins,
+    discharge_to_hydraulic_inflow,
+    resolve_cascade_plants,
+    runoff_to_discharge,
+    validate_cascade_topology,
+)
 from pypsa.geo import haversine
 from shapely.geometry import LineString, Point, box
 
@@ -645,6 +653,136 @@ if __name__ == "__main__":
             if "clip_min_inflow" in config:
                 inflow = inflow.where(inflow >= config["clip_min_inflow"], 0)
 
+            cascading = config.get("cascading", {})
+            cascade_hydraulic_inflow = None
+            cascade_profile_indices = {}
+
+            if cascading.get("enable", False):
+                topology = pd.read_csv(paths.hydro_cascade_topology)
+                topology["upstream"] = topology["upstream"].astype(str).str.strip()
+                topology["downstream"] = topology["downstream"].astype(str).str.strip()
+                validate_cascade_topology(topology)
+
+                if "damheight_m" not in hydro_ppls.columns:
+                    raise ValueError(
+                        "Cascade hydro requires power plant column: damheight_m"
+                    )
+
+                # Resolve topology nodes using either an explicit plant_id or
+                # source-qualified powerplantmatching project IDs.
+                resolution_input = hydro_ppls.assign(
+                    _cascade_profile_index=hydro_ppls.index
+                )
+
+                cascade_ppls = resolve_cascade_plants(
+                    topology,
+                    resolution_input,
+                )
+
+                cascade_profile_indices = cascade_ppls[
+                    "_cascade_profile_index"
+                ].to_dict()
+
+                # Reproduce atlite's hydro calculation so that the basin-level
+                # runoff remains available before aggregation to each plant.
+                show_progress = resource.get("show_progress", False)
+                flowspeed = resource.get("flowspeed", 1.0)
+                weight_with_height = resource.get("weight_with_height", False)
+
+                basins = hydrom.determine_basins(
+                    resource["plants"],
+                    resource["hydrobasins"],
+                    show_progress=show_progress,
+                )
+
+                matrix = cutout.indicatormatrix(basins.shapes)
+                matrix_normalized = np.nan_to_num(
+                    matrix / matrix.sum(axis=1),
+                    nan=0.0,
+                    posinf=0.0,
+                    neginf=0.0,
+                )
+
+                runoff_kwargs = {
+                    key: value
+                    for key, value in resource.items()
+                    if key
+                    not in {
+                        "plants",
+                        "hydrobasins",
+                        "flowspeed",
+                        "weight_with_height",
+                        "show_progress",
+                    }
+                }
+
+                basin_runoff = cutout.runoff(
+                    matrix=matrix_normalized,
+                    index=basins.shapes.index,
+                    weight_with_height=weight_with_height,
+                    show_progress=show_progress,
+                    capacity_factor=True,
+                    **runoff_kwargs,
+                )
+
+                # ERA5 runoff is stored as metres of water per timestep.
+                # Multiplication by basin area therefore yields m3/timestep.
+                basin_runoff *= xr.DataArray(
+                    basins.shapes.to_crs(dict(proj="cea")).area
+                )
+
+                local_basins = build_local_cascade_basins(
+                    basins,
+                    topology,
+                    cascade_profile_indices,
+                )
+
+                cascade_runoff = (
+                    correction_factor
+                    * hydrom.shift_and_aggregate_runoff_for_plants(
+                        local_basins,
+                        basin_runoff,
+                        flowspeed=flowspeed,
+                        show_progress=show_progress,
+                    )
+                )
+
+                if "clip_min_inflow" in config:
+                    cascade_runoff = cascade_runoff.where(
+                        cascade_runoff >= config["clip_min_inflow"],
+                        0,
+                    )
+
+                cascade_runoff = (
+                    cascade_runoff.transpose("time", "plant")
+                    .to_pandas()
+                    .rename(
+                        columns={
+                            profile_index: plant_id
+                            for plant_id, profile_index in cascade_profile_indices.items()
+                        }
+                    )
+                )
+
+                discharge = runoff_to_discharge(cascade_runoff)
+
+                dam_heights = pd.to_numeric(
+                    cascade_ppls["damheight_m"],
+                    errors="coerce",
+                )
+                invalid_heights = dam_heights[dam_heights.isna() | (dam_heights <= 0)]
+                if not invalid_heights.empty:
+                    raise ValueError(
+                        "Cascade plants require positive dam heights: "
+                        + ", ".join(invalid_heights.index)
+                    )
+
+                cascade_hydraulic_inflow = discharge_to_hydraulic_inflow(
+                    discharge,
+                    dam_heights,
+                    multiplier=config.get("multiplier", 1.0),
+                )
+
             # check if normalization field belongs to the settings and it is not false
             if normalization:
                 method = normalization["method"]
@@ -679,6 +817,14 @@ if __name__ == "__main__":
                 logger.info("No hydro normalization")
 
             inflow *= config.get("multiplier", 1.0)
+
+            if cascade_hydraulic_inflow is not None:
+                for plant_id, profile_index in cascade_profile_indices.items():
+                    inflow.loc[dict(plant=profile_index)] = xr.DataArray(
+                        cascade_hydraulic_inflow[plant_id].to_numpy(),
+                        dims=["time"],
+                        coords={"time": inflow.coords["time"]},
+                    )
 
             # add zero values for out of hydrobasins elements
             if len(bus_notin_hydrobasins) > 0:

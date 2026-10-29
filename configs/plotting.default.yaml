@@ -79,6 +79,7 @@ plotting:
     offshore wind (DC): "#74c6f2"
     wave: "#004444"
     hydro: "#08ad97"
+    water: "#08ad97"
     hydro+PHS: "#08ad97"
     PHS: "#08ad97"
     hydro reservoir: "#08ad97"
