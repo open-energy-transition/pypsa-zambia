@@ -66,7 +66,9 @@ electricity:
   renewable_carriers: [solar, onwind, hydro]
 
   # ----------------- Grid topology -------------------
-  base_voltage: 330.
+  base_voltage:
+    default: 380.
+    ZM: 330.
   voltages: [66., 88., 132., 220., 330.]
 
   # ----------------- Existing powerplants -------------------
