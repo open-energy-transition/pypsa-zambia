@@ -1,0 +1,22 @@
+file: cutouts/zm-2013-tutorial-era5.nc
+
+metadata:
+  title: "ERA5 Tutorial Cutout for Zambia (2013)"
+  description: ERA5-based meteorological cutout for Zambia, prepared for the PyPSA-Zambia tutorial.
+  publication_date: "2026-11-02"
+  resource_type:
+    id: dataset
+  creators:
+    - person_or_org:
+        name: "Open Energy Transition"
+        type: organizational
+  version: "1.0"
+  keywords:
+    - ERA5
+    - Zambia
+    - PyPSA
+    - Energy modelling
+
+access:
+  record: public
+  files: public
