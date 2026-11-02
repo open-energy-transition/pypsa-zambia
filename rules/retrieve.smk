@@ -371,6 +371,11 @@ if not (config["enable"].get("retrieve_cutout", False)) and (
     year = int(float(ERA5_CUTOUT["year"]))
     region = ERA5_CUTOUT["region"]
 
+    cutout_output_fl = (
+        f"{region}-{year}-tutorial-era5.nc"
+        if ERA5_CUTOUT["source"] == "tutorial"
+        else f"cutout-{year}-era5.nc"
+    )    
     rule retrieve_era5_cutout:
         message:
             f"Retrieving ERA5 cutout for region {region} ({year})"
@@ -380,7 +385,7 @@ if not (config["enable"].get("retrieve_cutout", False)) and (
                 keep_local=True,
             ),
         output:
-            f"cutouts/{CDIR}cutout-{year}-era5.nc",
+            f"cutouts/{CDIR}{cutout_output_fl}",
         log:
             f"logs/{RDIR}retrieve_era5_cutout.log",
         benchmark:

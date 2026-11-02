@@ -21,7 +21,6 @@ snapshots:
 countries: ["ZM"]
 
 enable:
-  retrieve_cutout: true # retrieve_era5_cutout rule handles this for ZM
   build_natura_raster: false # If 'true', then an exclusion raster will be build. Otherwise use pregenerated raster.
 
 atlite:

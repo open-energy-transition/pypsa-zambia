@@ -27,6 +27,9 @@ data:
   landcover:
     source: primary
     version: Mar2026
+  cutout-era5:
+    source: tutorial
+    version: latest       
 
 scenario:
   clusters: [6]
