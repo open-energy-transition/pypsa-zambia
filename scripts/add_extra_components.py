@@ -425,11 +425,7 @@ if __name__ == "__main__":
         storage_techs,
     )
 
-    cascade_topology_path = getattr(
-        snakemake.input,
-        "hydro_cascade_topology",
-        None,
-    )
+    cascade_topology_path = snakemake.input.get("hydro_cascade_topology")
     if cascade_topology_path:
         cascade_topology = pd.read_csv(cascade_topology_path)
         materialize_cascade_storage_units(

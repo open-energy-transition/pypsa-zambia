@@ -102,7 +102,7 @@ from utility_custom_features import (
 idx = pd.IndexSlice
 
 from hydro_cascade import (
-    resolve_cascade_plants,
+    match_cascade_plants_to_powerplants,
     validate_cascade_topology,
 )
 
@@ -1480,7 +1480,7 @@ if __name__ == "__main__":
         # cascade IDs can be propagated back to the full powerplant table.
         resolution_input = ppl.assign(_cascade_source_index=ppl.index)
 
-        cascade_plants = resolve_cascade_plants(
+        cascade_plants = match_cascade_plants_to_powerplants(
             cascade_topology,
             resolution_input,
         )

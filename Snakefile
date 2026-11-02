@@ -832,17 +832,19 @@ rule build_powerplants:
         "scripts/build_powerplants.py"
 
 
-def hydro_cascade_inputs():
+def hydro_cascade_inputs(include_profile=True):
     """Return optional inputs required when cascading hydro is enabled."""
     if not HYDRO_CASCADE.get("enable", False):
         return {}
 
-    return {
-        "hydro_cascade_topology": HYDRO_CASCADE_TOPOLOGY,
-        "profile_hydro_cascade": (
+    inputs = {"hydro_cascade_topology": HYDRO_CASCADE_TOPOLOGY}
+
+    if include_profile:
+        inputs["profile_hydro_cascade"] = (
             f"resources/{RDIR}renewable_profiles/profile_hydro_cascade.nc"
-        ),
-    }
+        )
+
+    return inputs
 
 
 if config["validation"].get("biomass"):
@@ -1156,15 +1158,7 @@ rule add_extra_components:
         electricity=config["electricity"],
         csp_model=config["renewable"]["csp"]["csp_model"],
     input:
-        **(
-            {
-                "hydro_cascade_topology": config["renewable"]["hydro"]["cascading"][
-                    "topology"
-                ]
-            }
-            if config["renewable"]["hydro"].get("cascading", {}).get("enable", False)
-            else {}
-        ),
+        **hydro_cascade_inputs(include_profile=False),
         network="networks/" + RDIR + "elec_s{simpl}_{clusters}.nc",
         tech_costs="resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv",
     output:

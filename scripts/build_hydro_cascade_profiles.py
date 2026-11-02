@@ -20,7 +20,7 @@ from _helpers import configure_logging, read_csv_nafix
 from atlite import hydro as hydrom
 from dask.distributed import Client
 from hydro_cascade import (
-    resolve_cascade_plants,
+    match_cascade_plants_to_powerplants,
     validate_cascade_topology,
 )
 
@@ -128,7 +128,7 @@ def build_era5_cascade_hydraulic_inflow(
         _cascade_profile_index=hydro_powerplants.index
     )
 
-    cascade_powerplants = resolve_cascade_plants(
+    cascade_powerplants = match_cascade_plants_to_powerplants(
         topology,
         resolution_input,
     )
@@ -365,13 +365,13 @@ def build_local_cascade_basins(
         [cascade_profile_indices[plant_id] for plant_id in ordered_ids]
     ].copy()
 
-    for downstream, edges in topology.groupby("downstream", sort=False):
+    for downstream, connections in topology.groupby("downstream", sort=False):
         downstream_index = cascade_profile_indices[downstream]
         downstream_basins = list(basins.plants.at[downstream_index, "upstream"])
         downstream_basin_set = set(downstream_basins)
         local_basin_set = set(downstream_basins)
 
-        for upstream in edges["upstream"]:
+        for upstream in connections["upstream"]:
             upstream_index = cascade_profile_indices[upstream]
             upstream_basin_set = set(basins.plants.at[upstream_index, "upstream"])
 
@@ -464,7 +464,7 @@ def build_glofas_cascade_hydraulic_inflow(
     topology["downstream"] = topology["downstream"].astype(str).str.strip()
     validate_cascade_topology(topology)
 
-    cascade_powerplants = resolve_cascade_plants(
+    cascade_powerplants = match_cascade_plants_to_powerplants(
         topology,
         hydro_powerplants,
     )
@@ -672,7 +672,7 @@ def build_hydro_cascade_profile_file(
                 "Snapshots are required for custom GloFAS cascade profiles."
             )
 
-        return build_glofas_cascade_profile_file(
+        build_glofas_cascade_profile_file(
             powerplants_path=powerplants_path,
             hydrobasins_path=hydrobasins_path,
             topology_path=topology_path,
@@ -681,6 +681,7 @@ def build_hydro_cascade_profile_file(
             snapshots=snapshots,
             output_path=output_path,
         )
+        return
 
     if source != "era5":
         raise ValueError(
@@ -688,7 +689,7 @@ def build_hydro_cascade_profile_file(
             "Expected 'era5' or 'custom'."
         )
 
-    return build_era5_cascade_profile_file(
+    build_era5_cascade_profile_file(
         powerplants_path=powerplants_path,
         hydrobasins_path=hydrobasins_path,
         topology_path=topology_path,

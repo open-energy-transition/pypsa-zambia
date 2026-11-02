@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-from __future__ import annotations
-
 import ast
 import math
 
@@ -48,45 +46,44 @@ def validate_cascade_topology(topology: pd.DataFrame) -> None:
     if topology.empty:
         raise ValueError("Cascade topology must contain at least one connection.")
 
-    edges = topology[["upstream", "downstream", "travel_time_hours"]].copy()
+    connections = topology[["upstream", "downstream", "travel_time_hours"]].copy()
 
-    if edges[["upstream", "downstream"]].isna().any().any():
+    if connections[["upstream", "downstream"]].isna().any().any():
         raise ValueError(
             "Cascade topology contains missing upstream or downstream node IDs."
         )
 
     for column in ["upstream", "downstream"]:
-        edges[column] = edges[column].astype(str).str.strip()
+        connections[column] = connections[column].astype(str).str.strip()
 
     for column in ["upstream", "downstream"]:
-        empty = edges[column].map(
+        empty = connections[column].map(
             lambda value: isinstance(value, str) and not value.strip()
         )
         if empty.any():
             raise ValueError(f"Cascade topology contains empty values in '{column}'.")
 
-    if (edges["upstream"] == edges["downstream"]).any():
+    if (connections["upstream"] == connections["downstream"]).any():
         raise ValueError("Cascade topology contains a self-loop.")
 
-    if edges.duplicated(["upstream", "downstream"]).any():
+    if connections.duplicated(["upstream", "downstream"]).any():
         raise ValueError("Cascade topology contains duplicate hydraulic connections.")
 
     delays = pd.to_numeric(
-        edges["travel_time_hours"],
+        connections["travel_time_hours"],
         errors="coerce",
     )
 
     invalid_delay = delays.map(
-        lambda value: pd.isna(value) or not math.isfinite(float(value))
+        lambda value: (
+            pd.isna(value) or not math.isfinite(float(value)) or float(value) < 0
+        )
     )
 
     if invalid_delay.any():
-        raise ValueError("Cascade topology contains invalid travel times.")
+        raise ValueError("Cascade topology contains invalid or negative travel times.")
 
-    if (delays < 0).any():
-        raise ValueError("Cascade topology contains negative travel times.")
-
-    downstream_count = edges.groupby("upstream")["downstream"].nunique()
+    downstream_count = connections.groupby("upstream")["downstream"].nunique()
 
     branching_nodes = downstream_count[downstream_count > 1]
 
@@ -97,7 +94,9 @@ def validate_cascade_topology(topology: pd.DataFrame) -> None:
             f"downstream connection per node. Branching nodes: {nodes}"
         )
 
-    downstream_by_upstream = dict(zip(edges["upstream"], edges["downstream"]))
+    downstream_by_upstream = dict(
+        zip(connections["upstream"], connections["downstream"])
+    )
 
     completed = set()
 
@@ -121,8 +120,8 @@ def validate_cascade_topology(topology: pd.DataFrame) -> None:
         completed.update(path)
 
 
-def _qualified_project_ids(value) -> set[str]:
-    """Return source-qualified IDs such as ``GHPT:G123456``."""
+def _parse_qualified_project_ids(value) -> set[str]:
+    """Parse powerplantmatching project IDs into source-qualified IDs."""
     if value is None:
         return set()
 
@@ -130,6 +129,7 @@ def _qualified_project_ids(value) -> set[str]:
         value = value.strip()
         if not value or value.lower() == "nan":
             return set()
+        # CSV input may contain the projectid dictionary as a serialized string.
         try:
             value = ast.literal_eval(value)
         except (SyntaxError, ValueError):
@@ -161,12 +161,12 @@ def _qualified_project_ids(value) -> set[str]:
     return qualified
 
 
-def resolve_cascade_plants(
+def match_cascade_plants_to_powerplants(
     topology: pd.DataFrame,
     powerplants: pd.DataFrame,
 ) -> pd.DataFrame:
     """
-    Resolve cascade topology nodes against the powerplant table.
+    Match cascade topology nodes to rows in the powerplant table.
 
     Topology nodes may either match an explicit ``plant_id`` or use a
     source-qualified powerplantmatching project ID such as
@@ -224,7 +224,7 @@ def resolve_cascade_plants(
         matches = {node: [] for node in unresolved}
 
         for component, project_ids in powerplants["projectid"].items():
-            qualified_ids = _qualified_project_ids(project_ids)
+            qualified_ids = _parse_qualified_project_ids(project_ids)
 
             for node in unresolved.intersection(qualified_ids):
                 matches[node].append(component)
@@ -265,7 +265,7 @@ def resolve_cascade_plants(
     return plants
 
 
-def add_hydro_reservoir(
+def add_cascade_hydro_reservoir(
     n: pypsa.Network,
     plant_id: str,
     electricity_bus: str,
@@ -278,9 +278,9 @@ def add_hydro_reservoir(
     build_year: int = 0,
     lifetime: float = math.inf,
 ) -> dict[str, str]:
-    """Add a reservoir as a water bus, Store and turbine Link."""
+    """Add a cascade reservoir as a water bus, Store and turbine Link."""
     if p_nom <= 0:
-        raise ValueError("Reservoir p_nom must be positive.")
+        raise ValueError("Cascade reservoir electrical p_nom must be positive.")
     if max_hours <= 0:
         raise ValueError("Reservoir max_hours must be positive.")
     if not 0 < efficiency_dispatch <= 1:
@@ -494,7 +494,7 @@ def materialize_cascade_storage_units(
         component = component_by_plant.loc[plant_id]
         row = static.loc[component]
 
-        names = add_hydro_reservoir(
+        names = add_cascade_hydro_reservoir(
             n,
             plant_id=plant_id,
             electricity_bus=row["bus"],
