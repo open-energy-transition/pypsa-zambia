@@ -12,7 +12,7 @@ access_token = your-sandbox-token
 [production]
 access_token = your-production-token
 
-Alternativelly, you can export a token in your terminal directly:
+Alternatively, you can export a token in your terminal directly:
 
 ```bash
 export ZENODO_ACCESS_TOKEN="your-production-token"
@@ -26,7 +26,7 @@ export SANDBOX_ACCESS_TOKEN="your-production-token"
 
 2. Create config
 
-3. Run upload 
+3. Run upload
 
 Example:
 ```
@@ -42,7 +42,6 @@ from pathlib import Path
 
 import requests
 import yaml
-
 
 parser = argparse.ArgumentParser()
 parser.add_argument("config", type=Path)
@@ -63,7 +62,7 @@ if not token:
     )
 
 base_url = (
-    else "https://zenodo.org/api"    
+    else "https://zenodo.org/api"
     if args.production
     "https://sandbox.zenodo.org/api"
 )
