@@ -56,6 +56,9 @@ def validate_cascade_topology(topology: pd.DataFrame) -> None:
         )
 
     for column in ["upstream", "downstream"]:
+        edges[column] = edges[column].astype(str).str.strip()
+
+    for column in ["upstream", "downstream"]:
         empty = edges[column].map(
             lambda value: isinstance(value, str) and not value.strip()
         )
@@ -405,131 +408,6 @@ def connect_hydro_reservoirs(
     }
 
 
-def build_local_cascade_basins(
-    basins,
-    topology: pd.DataFrame,
-    cascade_profile_indices: dict[str, object],
-):
-    """
-    Restrict cascade plants to their local HydroBASINS catchments.
-
-    For each downstream reservoir, basins already draining through an
-    immediately upstream cascade reservoir are removed. Travel-time delays
-    from the cascade topology are intentionally not used here: runoff routing
-    remains the responsibility of atlite.
-    """
-    topology = topology.copy()
-    topology["upstream"] = topology["upstream"].astype(str).str.strip()
-    topology["downstream"] = topology["downstream"].astype(str).str.strip()
-    validate_cascade_topology(topology)
-
-    cascade_profile_indices = {
-        str(plant_id).strip(): index
-        for plant_id, index in cascade_profile_indices.items()
-    }
-
-    cascade_ids = set(topology["upstream"]).union(topology["downstream"])
-    missing = sorted(cascade_ids - set(cascade_profile_indices))
-    if missing:
-        raise ValueError(
-            "Cascade plants are missing from the hydro basin mapping: "
-            + ", ".join(missing)
-        )
-
-    ordered_ids = dict.fromkeys(
-        topology["upstream"].tolist() + topology["downstream"].tolist()
-    )
-    local_plants = basins.plants.loc[
-        [cascade_profile_indices[plant_id] for plant_id in ordered_ids]
-    ].copy()
-
-    for downstream, edges in topology.groupby("downstream", sort=False):
-        downstream_index = cascade_profile_indices[downstream]
-        downstream_basins = list(basins.plants.at[downstream_index, "upstream"])
-        downstream_basin_set = set(downstream_basins)
-        local_basin_set = set(downstream_basins)
-
-        for upstream in edges["upstream"]:
-            upstream_index = cascade_profile_indices[upstream]
-            upstream_basin_set = set(basins.plants.at[upstream_index, "upstream"])
-
-            if not upstream_basin_set.issubset(downstream_basin_set):
-                raise ValueError(
-                    f"Cascade topology {upstream} -> {downstream} "
-                    "is inconsistent with the HydroBASINS drainage topology."
-                )
-
-            local_basin_set.difference_update(upstream_basin_set)
-
-        local_plants.at[downstream_index, "upstream"] = [
-            hid for hid in downstream_basins if hid in local_basin_set
-        ]
-
-    return type(basins)(
-        local_plants,
-        basins.meta,
-        basins.shapes,
-    )
-
-
-def runoff_to_discharge(runoff: pd.DataFrame) -> pd.DataFrame:
-    """Convert hourly runoff volumes [m3/h] to discharge [m3/s]."""
-    time_index = pd.DatetimeIndex(runoff.index)
-
-    if len(time_index) < 2:
-        raise ValueError(
-            "At least two hydro-profile timesteps are required "
-            "to convert runoff to discharge."
-        )
-
-    timesteps = time_index.to_series().diff().dropna()
-    timestep = timesteps.iloc[0]
-
-    if not (timesteps == timestep).all():
-        raise ValueError("Hydro runoff profiles must have a regular timestep.")
-
-    if timestep != pd.Timedelta(hours=1):
-        raise ValueError(
-            "Physical cascade runoff conversion currently requires "
-            "hourly hydro-profile timesteps."
-        )
-
-    return runoff / 3600.0
-
-
-def discharge_to_hydraulic_inflow(
-    discharge: pd.DataFrame,
-    dam_heights: pd.Series,
-    multiplier: float = 1.0,
-) -> pd.DataFrame:
-    """
-    Convert discharge [m3/s] to hydraulic inflow [MW].
-
-    This follows the existing PyPSA-Earth GloFAS convention:
-    discharge * dam height * rho_water * g / 1e6 * multiplier,
-    with rho_water = 1000 kg/m3 and g = 10 m/s2.
-    """
-    missing = sorted(set(discharge.columns) - set(dam_heights.index))
-
-    if missing:
-        raise ValueError(
-            "Missing dam heights for cascade plants: " + ", ".join(map(str, missing))
-        )
-
-    if multiplier <= 0:
-        raise ValueError("multiplier must be positive.")
-
-    scaling = (1e3 * 10.0) / 1e6 * multiplier
-
-    return (
-        discharge.mul(
-            dam_heights[discharge.columns],
-            axis="columns",
-        )
-        * scaling
-    )
-
-
 def materialize_cascade_storage_units(
     n: pypsa.Network,
     topology: pd.DataFrame,
@@ -579,11 +457,20 @@ def materialize_cascade_storage_units(
 
     component_by_plant = pd.Series(static.index, index=plant_ids)
     topology_nodes = set(topology["upstream"]).union(topology["downstream"])
-    missing_nodes = sorted(topology_nodes - set(component_by_plant.index))
+    component_nodes = set(component_by_plant.index)
+
+    missing_nodes = sorted(topology_nodes - component_nodes)
     if missing_nodes:
         raise ValueError(
             "Cascade topology nodes are missing from the clustered network: "
             + ", ".join(missing_nodes)
+        )
+
+    unexpected_nodes = sorted(component_nodes - topology_nodes)
+    if unexpected_nodes:
+        raise ValueError(
+            "Clustered network contains cascade plants not present in the topology: "
+            + ", ".join(unexpected_nodes)
         )
 
     dam_heights = pd.to_numeric(
@@ -690,6 +577,8 @@ def materialize_cascade_storage_units(
     for plant_id in terminal_ids:
         component = component_by_plant.loc[plant_id]
         row = static.loc[component]
+        spill_cost = row.get("spill_cost", 0.0)
+        spill_cost = 0.0 if pd.isna(spill_cost) else float(spill_cost)
         spill = f"{plant_id} terminal spill"
 
         n.add(
@@ -700,7 +589,7 @@ def materialize_cascade_storage_units(
             sign=-1.0,
             p_nom=float("inf"),
             p_nom_extendable=False,
-            marginal_cost=float(row.get("spill_cost", 0.0)),
+            marginal_cost=spill_cost,
             build_year=int(row.get("build_year", 0)),
             lifetime=float(row.get("lifetime", math.inf)),
         )

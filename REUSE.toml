@@ -78,3 +78,9 @@ path = "pixi.lock"
 precedence = "override"
 SPDX-FileCopyrightText = "The PyPSA-Earth and PyPSA-Eur Authors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+[[annotations]]
+path = "configs/zambia_configs/hydro_cascade_topology.csv"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "The PyPSA-Earth and PyPSA-Eur Authors"
+SPDX-License-Identifier = "CC-BY-4.0"

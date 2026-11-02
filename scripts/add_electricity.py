@@ -984,18 +984,26 @@ def attach_hydro(
     ].copy()
 
     inflow_t = pd.DataFrame(index=n.snapshots)
-    available_ppl = inflow_required.iloc[0:0].copy()
 
-    if not inflow_required.empty:
+    cascade_required_mask = inflow_required["plant_id"].isin(cascade_plant_ids)
+    standard_inflow_required = inflow_required.loc[~cascade_required_mask]
+
+    # Cascade plants use their dedicated local-inflow profile and therefore
+    # must not depend on availability in the standard hydro profile.
+    available_ppl = inflow_required.loc[cascade_required_mask].copy()
+
+    if not standard_inflow_required.empty:
         with xr.open_dataarray(snakemake.input.profile_hydro) as inflow:
-            found_plants = inflow_required.ppl_id[
-                inflow_required.ppl_id.isin(inflow.indexes["plant"])
+            found_plants = standard_inflow_required.ppl_id[
+                standard_inflow_required.ppl_id.isin(inflow.indexes["plant"])
             ]
-            missing_plants = inflow_required.index.difference(found_plants.index)
+            missing_plants = standard_inflow_required.index.difference(
+                found_plants.index
+            )
 
             if not missing_plants.empty:
-                total_p_nom = inflow_required.p_nom.sum()
-                loss_p_nom = inflow_required.loc[missing_plants, "p_nom"].sum()
+                total_p_nom = standard_inflow_required.p_nom.sum()
+                loss_p_nom = standard_inflow_required.loc[missing_plants, "p_nom"].sum()
                 logger.warning(
                     f"'{snakemake.input.profile_hydro}' is missing inflow "
                     f"time-series for {len(missing_plants)} hydro plants. "
@@ -1004,7 +1012,13 @@ def attach_hydro(
                     f"{total_p_nom:.2f} MW."
                 )
 
-            available_ppl = inflow_required.loc[found_plants.index].copy()
+            available_standard_ppl = standard_inflow_required.loc[
+                found_plants.index
+            ].copy()
+            available_ppl = pd.concat(
+                [available_standard_ppl, available_ppl],
+                axis=0,
+            )
 
             if not found_plants.empty:
                 inflow_t = (
@@ -1040,15 +1054,27 @@ def attach_hydro(
     ].copy()
 
     if not cascade_hydro.empty:
-        cascade_hydro["profile_name"] = cascade_hydro.index
         cascade_hydro["build_year"] = cascade_hydro["datein"].astype(int)
         cascade_hydro["lifetime"] = (
             cascade_hydro["dateout"] - cascade_hydro["datein"]
         ).fillna(np.inf)
         cascade_hydro = cascade_hydro.set_index("plant_id", drop=False)
 
-        inflow_cascade = inflow_t[cascade_hydro["profile_name"].tolist()].copy()
-        inflow_cascade.columns = cascade_hydro.index
+        with xr.open_dataarray(snakemake.input.profile_hydro_cascade) as inflow:
+            missing_cascade_profiles = cascade_hydro.index.difference(
+                inflow.indexes["plant"]
+            )
+            if not missing_cascade_profiles.empty:
+                raise ValueError(
+                    "Cascade inflow profile is missing plants: "
+                    + ", ".join(missing_cascade_profiles.astype(str))
+                )
+
+            inflow_cascade = (
+                inflow.sel(plant=cascade_hydro.index.tolist())
+                .transpose("time", "plant")
+                .to_pandas()
+            )
     else:
         inflow_cascade = pd.DataFrame(index=inflow_t.index)
 
@@ -1445,11 +1471,7 @@ if __name__ == "__main__":
         snakemake.params.length_factor,
     )
     cascade_plant_ids = set()
-    cascade_topology_path = getattr(
-        snakemake.input,
-        "hydro_cascade_topology",
-        None,
-    )
+    cascade_topology_path = snakemake.input.get("hydro_cascade_topology")
     if cascade_topology_path:
         cascade_topology = pd.read_csv(cascade_topology_path)
         validate_cascade_topology(cascade_topology)
