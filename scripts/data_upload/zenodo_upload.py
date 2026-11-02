@@ -1,7 +1,18 @@
+# -*- coding: utf-8 -*-
+# SPDX-FileCopyrightText:  PyPSA-Earth and PyPSA-Eur Authors
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
 """
 Generate a production Zenodo API token at Zenodo applications settings with permissions for record creation, file upload and publication.
 
-Export it in your terminal:
+1. Setup Zenodo API
+[sandbox]
+access_token = your-sandbox-token
+
+[production]
+access_token = your-production-token
+
+Alternativelly, you can export a token in your terminal directly:
 
 ```bash
 export ZENODO_ACCESS_TOKEN="your-production-token"
@@ -11,7 +22,11 @@ or
 
 ```bash
 export SANDBOX_ACCESS_TOKEN="your-production-token"
-``` 
+```
+
+2. Create config
+
+3. Run upload 
 
 Example:
 ```
