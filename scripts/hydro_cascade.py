@@ -90,8 +90,8 @@ def validate_cascade_topology(topology: pd.DataFrame) -> None:
     if not branching_nodes.empty:
         nodes = ", ".join(map(str, branching_nodes.index.tolist()))
         raise ValueError(
-            "Cascade topology currently supports at most one "
-            f"downstream connection per node. Branching nodes: {nodes}"
+            "Cascade topology does not support branching: each upstream node "
+            f"may have only one downstream connection. Branching nodes: {nodes}"
         )
 
     downstream_by_upstream = dict(
@@ -107,12 +107,9 @@ def validate_cascade_topology(topology: pd.DataFrame) -> None:
         path = set()
         node = start
 
-        while node in downstream_by_upstream:
+        while node in downstream_by_upstream and node not in completed:
             if node in path:
                 raise ValueError("Cascade topology contains a directed cycle.")
-
-            if node in completed:
-                break
 
             path.add(node)
             node = downstream_by_upstream[node]
