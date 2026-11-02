@@ -17,7 +17,6 @@ Alternatively, you can export a token in your terminal directly:
 ```bash
 export ZENODO_ACCESS_TOKEN="your-production-token"
 ```
-
 or
 
 ```bash
@@ -37,34 +36,43 @@ python scripts/upload_zenodo.py cutout-era5-tutorial.yaml
 
 """
 import argparse
+import configparser
 import os
 from pathlib import Path
 
 import requests
 import yaml
 
+TOKEN_FL = ".zenodo.ini"
+
+# It is convenient to pass parameters through the command line
 parser = argparse.ArgumentParser()
 parser.add_argument("config", type=Path)
 parser.add_argument("--sandbox", action="store_true")
 parser.add_argument("--publish", action="store_true")
 
-# key parameters are supplied via command line
 args = parser.parse_args()
 
+environment = "sandbox" if args.sandbox else "production"
 token_env = "SANDBOX_ACCESS_TOKEN" if args.sandbox else "ZENODO_ACCESS_TOKEN"
 
-token = os.getenv(token_env)
+# Zenodo token can be put into a configuration file
+# or defined in the terminal as an environment variable
+if Path(TOKEN_FL).exists():
+    credentials = configparser.ConfigParser()
+    credentials.read(TOKEN_FL)
+    token = credentials.get(environment, "access_token", fallback=None)
+else:
+    token = os.getenv(token_env)
 
 if not token:
     raise RuntimeError(
-        f"{token_env} is not set. "
-        "Export the corresponding Zenodo API token before running the script."
+        f"Zenodo {environment} access token is not configured. "
+        f"Provide it in {TOKEN_FL} or export {token_env}."
     )
 
 base_url = (
-    else "https://zenodo.org/api"
-    if args.production
-    "https://sandbox.zenodo.org/api"
+    "https://sandbox.zenodo.org/api" if args.sandbox else "https://zenodo.org/api"
 )
 
 headers = {"Authorization": f"Bearer {token}"}
