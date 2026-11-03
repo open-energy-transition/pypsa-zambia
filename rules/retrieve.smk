@@ -48,16 +48,6 @@ if (HYDROBASINS_DATASET := dataset_version("hydrobasins", config))["source"] in 
     topology_generation = (
         config["renewable"]["hydro"].get("cascading", {}).get("topology_generation", {})
     )
-    topology_level = int(topology_generation.get("hydrobasins_level", level))
-    topology_hydrobasins_manifest = (
-        "data/hydrobasins/" f"hybas_cascade_topology_lev{topology_level:02d}.txt"
-    )
-
-    if not 1 <= topology_level <= 12:
-        raise ValueError(
-            "renewable.hydro.cascading.topology_generation."
-            "hydrobasins_level must be between 1 and 12."
-        )
 
     def get_hydrobasins(input, output):
         """Merge the hydrobasins files into a single shapefile
@@ -136,6 +126,18 @@ if (HYDROBASINS_DATASET := dataset_version("hydrobasins", config))["source"] in 
             get_hydrobasins(input, output)
 
     if topology_generation.get("enable", False):
+        topology_level = int(topology_generation.get("hydrobasins_level", level))
+
+        if not 1 <= topology_level <= 12:
+            raise ValueError(
+                "renewable.hydro.cascading.topology_generation."
+                "hydrobasins_level must be between 1 and 12."
+            )
+
+        topology_hydrobasins_manifest = (
+            "data/hydrobasins/"
+            f"hybas_cascade_topology_lev{topology_level:02d}.txt"
+        )
 
         rule prepare_hydrobasins_cascade_topology:
             message:
