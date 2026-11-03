@@ -848,14 +848,21 @@ HYDRO_CASCADE_TOPOLOGY_CANDIDATES = (
     f"resources/{RDIR}hydro_cascade_topology_candidates.csv"
 )
 
-HYDRO_CASCADE_TOPOLOGY = (
-    HYDRO_CASCADE_EXPLICIT_TOPOLOGY
-    if HYDRO_CASCADE_EXPLICIT_TOPOLOGY
-    else (
-        HYDRO_CASCADE_GENERATED_TOPOLOGY
-        if HYDRO_CASCADE_TOPOLOGY_GENERATION.get("enable", False)
-        else None
+if (
+    HYDRO_CASCADE_TOPOLOGY_GENERATION.get("enable", False)
+    and HYDRO_CASCADE_EXPLICIT_TOPOLOGY
+):
+    raise ValueError(
+        "renewable.hydro.cascading.topology and "
+        "renewable.hydro.cascading.topology_generation.enable cannot be "
+        "configured together. Disable automatic topology generation or "
+        "remove the explicit topology."
     )
+
+HYDRO_CASCADE_TOPOLOGY = (
+    HYDRO_CASCADE_GENERATED_TOPOLOGY
+    if HYDRO_CASCADE_TOPOLOGY_GENERATION.get("enable", False)
+    else HYDRO_CASCADE_EXPLICIT_TOPOLOGY
 )
 HYDRO_CASCADE_TOPOLOGY_AMBIGUITIES = (
     f"resources/{RDIR}hydro_cascade_topology_ambiguities.csv"
