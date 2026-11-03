@@ -571,7 +571,7 @@ if config["enable"].get("build_cutout", False):
             "scripts/build_cutout.py"
 
 
-if config["enable"].get("retrieve_cutout", False):
+if config["enable"].get("retrieve_cutout", False) and (config["countries"][0] != "ZM"):
 
     cutout_to_download = get_best_bundles_in_snakemake(
         config, include_categories=["cutouts"]
