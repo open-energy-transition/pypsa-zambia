@@ -1,22 +1,74 @@
 file: cutouts/zm-2013-tutorial-era5.nc
 
+zenodo:
+  sandbox_record_id: null
+  production_record_id: "23929802"
+
 metadata:
-  title: "ERA5 Tutorial Cutout for Zambia (2013)"
-  description: ERA5-based meteorological cutout for Zambia, prepared for the PyPSA-Zambia tutorial.
+  title: "PyPSA-Zambia Tutorial Weather Cutout"
+  description:  |
+    <p>
+      This record provides the <strong>PyPSA-Zambia Tutorial Weather
+      Cutout</strong>, a minimal and curated collection of weather inputs
+      required to execute the testing and tutorial versions of the
+      PyPSA-Zambia workflow.
+    </p>
+  
+    <p>
+      The cutout has been prepared for the <strong>2013 weather year</strong>.
+    </p>
+
   publication_date: "2026-11-02"
   resource_type:
     id: dataset
+
   creators:
-    - person_or_org:
-        name: "Open Energy Transition"
-        type: organizational
+  - person_or_org:
+      name: "Fedotova, Ekaterina"
+      type: personal
+      given_name: "Ekaterina"
+      family_name: "Fedotova"
+    affiliations:
+      - name: "Open Energy Transition"  
+
+  # contributors:
+  #   - person_or_org:
+  #       name: "Simpemba, Mwiche"
+  #       type: personal
+  #       given_name: "Mwiche"
+  #       family_name: "Simpemba"
+  #     role:
+  #       id: producer
+  #     affiliations:
+  #       - name: "Open Energy Transition"
+
+  publisher: "Zenodo"     
+
   version: "1.0"
+
   keywords:
-    - ERA5
-    - Zambia
-    - PyPSA
-    - Energy modelling
+  - weather
+  - energy system modelling
+  - ERA5
+  - atlite
+  - Zambia
+
+  rights:
+    - id: cc-by-4.0 
+
+  dates:
+    - date: "2026-11-02"
+      type:
+        id: submitted  
+
+  related_identifiers:
+    - identifier: "https://github.com/open-energy-transition/pypsa-zambia"
+      scheme: url
+      relation_type:
+        id: issupplementto
+      resource_type:
+        id: software 
 
 access:
   record: public
-  files: public
+  files: public         
