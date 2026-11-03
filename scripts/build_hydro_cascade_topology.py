@@ -458,6 +458,38 @@ def build_hydro_cascade_topology(
         powerplants_path,
         technologies=technologies,
     )
+
+    ambiguity_columns = [
+        "reason",
+        "plant",
+        "plant_index",
+        "hybas_id",
+        "plants",
+        "upstream",
+    ]
+
+    if powerplants.empty:
+        topology = pd.DataFrame(columns=["upstream", "downstream", "travel_time_hours"])
+        candidates = pd.DataFrame(
+            columns=[
+                "upstream",
+                "downstream",
+                "upstream_hybas_id",
+                "downstream_hybas_id",
+                "travel_time_hours",
+            ]
+        )
+        ambiguous = id_ambiguities.reindex(columns=ambiguity_columns)
+
+        topology.to_csv(output_path, index=False)
+        candidates.to_csv(candidate_output_path, index=False)
+        ambiguous.to_csv(ambiguous_output_path, index=False)
+
+        logger.info(
+            "No eligible hydropower plants found for cascade topology generation."
+        )
+        return
+
     hydrobasins = load_relevant_hydrobasins(
         hydrobasins_path,
         powerplants,
@@ -494,14 +526,6 @@ def build_hydro_cascade_topology(
         ignore_index=True,
     ).drop_duplicates()
 
-    ambiguity_columns = [
-        "reason",
-        "plant",
-        "plant_index",
-        "hybas_id",
-        "plants",
-        "upstream",
-    ]
     ambiguous = ambiguous.reindex(columns=ambiguity_columns)
 
     topology = connections[["upstream", "downstream", "travel_time_hours"]].copy()
