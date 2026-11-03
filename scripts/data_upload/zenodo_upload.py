@@ -6,6 +6,14 @@
 Generate a production Zenodo API token at Zenodo applications settings with permissions for record creation, file upload and publication.
 
 1. Setup Zenodo API
+
+My Account -> Applications
+
+See https://developers.zenodo.org/#authentication
+NB Zenodo.Sandbox
+
+NB2 No quotes please!
+
 [sandbox]
 access_token = your-sandbox-token
 
@@ -25,11 +33,13 @@ export SANDBOX_ACCESS_TOKEN="your-production-token"
 
 2. Create config
 
+See an example
+
 3. Run upload
 
 Example:
 ```
-python scripts/upload_zenodo.py cutout-era5-tutorial.yaml
+python scripts/data_upload/zenodo_upload.py scripts/data_upload//config.upload.cutout-era5-tutorial.yaml
 
 ```
 
