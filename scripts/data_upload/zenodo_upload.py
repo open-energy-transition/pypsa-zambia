@@ -53,7 +53,7 @@ from pathlib import Path
 import requests
 import yaml
 
-TOKEN_FL = ".zenodo.ini"
+TOKEN_FL = "scripts/data_upload/.zenodo.ini"
 
 # It is convenient to pass parameters through the command line
 parser = argparse.ArgumentParser()
