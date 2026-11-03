@@ -24,19 +24,19 @@ metadata:
 
   creators:
   - person_or_org:
-      name: "Fedotova, Ekaterina"
+      name: "Surname, Given Name"
       type: personal
-      given_name: "Ekaterina"
-      family_name: "Fedotova"
+      given_name: "Given Name"
+      family_name: "Surname"
     affiliations:
     - name: "Open Energy Transition"
 
   # contributors:
   #   - person_or_org:
-  #       name: "Simpemba, Mwiche"
+  #       name: "Surname, Given Name"
   #       type: personal
-  #       given_name: "Mwiche"
-  #       family_name: "Simpemba"
+  #       given_name: "Given Name"
+  #       family_name: "Surname"
   #     role:
   #       id: producer
   #     affiliations:
