@@ -23,10 +23,6 @@ countries: ["ZM"]
 enable:
   build_natura_raster: false # If 'true', then an exclusion raster will be build. Otherwise use pregenerated raster.
 
-atlite:
-  cutouts:
-    zm-2013-tutorial-era5: {}
-
 download_osm_data_nprocesses: 4
 
 load_options:

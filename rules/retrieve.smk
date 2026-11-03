@@ -361,7 +361,7 @@ if (NATURA_EARTH_DATASET := dataset_version("natura_earth", config))["source"] i
             copy2(os.path.join(output["tiff"]), output["shp"])
 
 
-if not (config["enable"].get("retrieve_cutout", False)) and (
+if config["enable"].get("retrieve_cutout", False) and (
     (ERA5_CUTOUT := dataset_version("cutout-era5", config))["source"]
     in [
         "primary",
