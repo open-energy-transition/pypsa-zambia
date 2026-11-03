@@ -58,13 +58,13 @@ TOKEN_FL = "scripts/data_upload/.zenodo.ini"
 # It is convenient to pass parameters through the command line
 parser = argparse.ArgumentParser()
 parser.add_argument("config", type=Path)
-parser.add_argument("--sandbox", action="store_true")
-parser.add_argument("--publish", action="store_true")
+parser.add_argument("--production", action="store_true")
+parser.add_argument("--upload", action="store_true")
 
 args = parser.parse_args()
 
-environment = "sandbox" if args.sandbox else "production"
-token_env = "SANDBOX_ACCESS_TOKEN" if args.sandbox else "ZENODO_ACCESS_TOKEN"
+environment = "production" if args.production else "sandbox"
+token_env = "ZENODO_ACCESS_TOKEN" if args.production else "SANDBOX_ACCESS_TOKEN"
 
 # Zenodo token can be put into a configuration file
 # or defined in the terminal as an environment variable
@@ -82,7 +82,7 @@ if not token:
     )
 
 base_url = (
-    "https://sandbox.zenodo.org/api" if args.sandbox else "https://zenodo.org/api"
+    "https://zenodo.org/api" if args.production else "https://sandbox.zenodo.org/api"
 )
 
 headers = {"Authorization": f"Bearer {token}"}
