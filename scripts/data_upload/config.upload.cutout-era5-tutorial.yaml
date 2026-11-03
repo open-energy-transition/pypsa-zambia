@@ -1,19 +1,19 @@
 file: cutouts/zm-2013-tutorial-era5.nc
 
 zenodo:
-  sandbox_record_id: null
+  sandbox_record_id:
   production_record_id: "23929802"
 
 metadata:
   title: "PyPSA-Zambia Tutorial Weather Cutout"
-  description:  |
+  description: |
     <p>
       This record provides the <strong>PyPSA-Zambia Tutorial Weather
       Cutout</strong>, a minimal and curated collection of weather inputs
       required to execute the testing and tutorial versions of the
       PyPSA-Zambia workflow.
     </p>
-  
+
     <p>
       The cutout has been prepared for the <strong>2013 weather year</strong>.
     </p>
@@ -29,7 +29,7 @@ metadata:
       given_name: "Ekaterina"
       family_name: "Fedotova"
     affiliations:
-      - name: "Open Energy Transition"  
+    - name: "Open Energy Transition"
 
   # contributors:
   #   - person_or_org:
@@ -42,7 +42,7 @@ metadata:
   #     affiliations:
   #       - name: "Open Energy Transition"
 
-  publisher: "Zenodo"     
+  publisher: "Zenodo"
 
   version: "1.0"
 
@@ -54,21 +54,21 @@ metadata:
   - Zambia
 
   rights:
-    - id: cc-by-4.0 
+  - id: cc-by-4.0
 
   dates:
-    - date: "2026-11-02"
-      type:
-        id: submitted  
+  - date: "2026-11-02"
+    type:
+      id: submitted
 
   related_identifiers:
-    - identifier: "https://github.com/open-energy-transition/pypsa-zambia"
-      scheme: url
-      relation_type:
-        id: issupplementto
-      resource_type:
-        id: software 
+  - identifier: "https://github.com/open-energy-transition/pypsa-zambia"
+    scheme: url
+    relation_type:
+      id: issupplementto
+    resource_type:
+      id: software
 
 access:
   record: public
-  files: public         
+  files: public

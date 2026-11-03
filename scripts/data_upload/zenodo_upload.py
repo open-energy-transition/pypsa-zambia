@@ -42,7 +42,7 @@ Example:
 # testing
 python scripts/data_upload/zenodo_upload.py scripts/data_upload/config.upload.cutout-era5-tutorial.yaml
 
-or 
+or
 
 # production upload
 pypsa-zambia % python scripts/data_upload/zenodo_upload.py scripts/data_upload/config.upload.cutout-era5-tutorial.yaml --production --upload
@@ -141,7 +141,7 @@ if record_id:
     )
     response.raise_for_status()
 
-    print(f"Updated metadata: {record_id}")   
+    print(f"Updated metadata: {record_id}")
 
 else:
     file_path = Path(config["file"])
@@ -173,9 +173,9 @@ if args.upload:
         timeout=60,
     )
     response.raise_for_status()
-    
+
     file_info = response.json()["entries"][0]
-    
+
     with file_path.open("rb") as f:
         response = requests.put(
             file_info["links"]["content"],
@@ -187,14 +187,14 @@ if args.upload:
             timeout=3600,
         )
         response.raise_for_status()
-    
+
     response = requests.post(
         file_info["links"]["commit"],
         headers=headers,
         timeout=120,
     )
     response.raise_for_status()
-    
+
     print(f"Draft URL: {base_url.removesuffix('/api')}/uploads/{record_id}")
 
 
