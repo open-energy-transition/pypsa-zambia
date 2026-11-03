@@ -448,6 +448,7 @@ def build_hydro_cascade_topology(
     powerplants_path,
     hydrobasins_path,
     output_path,
+    candidate_output_path,
     ambiguous_output_path,
     technologies=("Reservoir",),
     flowspeed=1.0,
@@ -465,6 +466,11 @@ def build_hydro_cascade_topology(
     connections, basin_ambiguities = identify_cascade_connections(
         powerplants,
         hydrobasins,
+    )
+
+    connections["travel_time_hours"] = pd.Series(
+        index=connections.index,
+        dtype="int64",
     )
 
     if not connections.empty:
@@ -498,7 +504,10 @@ def build_hydro_cascade_topology(
     ]
     ambiguous = ambiguous.reindex(columns=ambiguity_columns)
 
-    connections.to_csv(output_path, index=False)
+    topology = connections[["upstream", "downstream", "travel_time_hours"]].copy()
+
+    topology.to_csv(output_path, index=False)
+    connections.to_csv(candidate_output_path, index=False)
     ambiguous.to_csv(ambiguous_output_path, index=False)
 
     logger.info(
@@ -520,6 +529,7 @@ if __name__ == "__main__":
         powerplants_path=snakemake.input.powerplants,
         hydrobasins_path=snakemake.input.hydrobasins,
         output_path=snakemake.output.topology,
+        candidate_output_path=snakemake.output.candidates,
         ambiguous_output_path=snakemake.output.ambiguous,
         technologies=snakemake.params.technologies,
         flowspeed=snakemake.params.flowspeed,

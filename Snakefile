@@ -825,8 +825,9 @@ rule build_renewable_profiles:
 
 
 HYDRO_CASCADE = config["renewable"]["hydro"].get("cascading", {})
-HYDRO_CASCADE_TOPOLOGY = HYDRO_CASCADE.get("topology")
+HYDRO_CASCADE_EXPLICIT_TOPOLOGY = HYDRO_CASCADE.get("topology")
 HYDRO_CASCADE_TOPOLOGY_GENERATION = HYDRO_CASCADE.get("topology_generation", {})
+HYDRO_CASCADE_GENERATED_TOPOLOGY = f"resources/{RDIR}hydro_cascade_topology.csv"
 HYDRO_CASCADE_TOPOLOGY_LEVEL = int(
     HYDRO_CASCADE_TOPOLOGY_GENERATION.get("hydrobasins_level", 9)
 )
@@ -847,6 +848,16 @@ if (
 
 HYDRO_CASCADE_TOPOLOGY_CANDIDATES = (
     f"resources/{RDIR}hydro_cascade_topology_candidates.csv"
+)
+
+HYDRO_CASCADE_TOPOLOGY = (
+    HYDRO_CASCADE_EXPLICIT_TOPOLOGY
+    if HYDRO_CASCADE_EXPLICIT_TOPOLOGY
+    else (
+        HYDRO_CASCADE_GENERATED_TOPOLOGY
+        if HYDRO_CASCADE_TOPOLOGY_GENERATION.get("enable", False)
+        else None
+    )
 )
 HYDRO_CASCADE_TOPOLOGY_AMBIGUITIES = (
     f"resources/{RDIR}hydro_cascade_topology_ambiguities.csv"
@@ -875,7 +886,8 @@ if HYDRO_CASCADE_TOPOLOGY_GENERATION.get("enable", False):
             powerplants="resources/" + RDIR + "powerplants.csv",
             hydrobasins=HYDRO_CASCADE_TOPOLOGY_HYDROBASINS_MANIFEST,
         output:
-            topology=HYDRO_CASCADE_TOPOLOGY_CANDIDATES,
+            topology=HYDRO_CASCADE_GENERATED_TOPOLOGY,
+            candidates=HYDRO_CASCADE_TOPOLOGY_CANDIDATES,
             ambiguous=HYDRO_CASCADE_TOPOLOGY_AMBIGUITIES,
         log:
             "logs/" + RDIR + "build_hydro_cascade_topology.log",
