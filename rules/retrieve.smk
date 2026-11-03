@@ -375,7 +375,8 @@ if not (config["enable"].get("retrieve_cutout", False)) and (
         f"{region}-{year}-tutorial-era5.nc"
         if ERA5_CUTOUT["source"] == "tutorial"
         else f"cutout-{year}-era5.nc"
-    )    
+    )
+
     rule retrieve_era5_cutout:
         message:
             f"Retrieving ERA5 cutout for region {region} ({year})"

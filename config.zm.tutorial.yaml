@@ -29,7 +29,7 @@ data:
     version: Mar2026
   cutout-era5:
     source: tutorial
-    version: latest       
+    version: latest
 
 scenario:
   clusters: [6]
