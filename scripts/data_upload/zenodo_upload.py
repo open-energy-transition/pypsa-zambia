@@ -3,53 +3,47 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 """
-Generate a production Zenodo API token at Zenodo applications settings with permissions for record creation, file upload and publication.
+Upload datasets and update metadata on Zenodo.
 
-1. Setup Zenodo API
+Supports both Zenodo Sandbox (default) and production. Dataset uploads
+must be explicitly requested, while metadata will be updated by default.
+Records are to be published manually through the Zenodo web interface.
 
-My Account -> Applications
+Setup
+-----
+1. Generate an API token under My Account > Applications with the required
+   permissions. See https://developers.zenodo.org/#authentication.
 
-See https://developers.zenodo.org/#authentication
-NB Zenodo.Sandbox
+2. Store the tokens in `scripts/data_upload/.zenodo.ini`:
 
-NB2 No quotes please!
+   [sandbox]
+   access_token = your-sandbox-token
 
-[sandbox]
-access_token = your-sandbox-token
+   [production]
+   access_token = your-production-token
 
-[production]
-access_token = your-production-token
+   Alternatively, export the corresponding environment variable:
 
-Alternatively, you can export a token in your terminal directly:
+   export SANDBOX_ACCESS_TOKEN="your-sandbox-token"
+   export ZENODO_ACCESS_TOKEN="your-production-token"
 
-```bash
-export ZENODO_ACCESS_TOKEN="your-production-token"
-```
-or
+3. Prepare a YAML configuration file following the provided example.
 
-```bash
-export SANDBOX_ACCESS_TOKEN="your-production-token"
-```
-
-2. Create config
-
-See an example
-
-3. Run upload
-
-Example:
-```
-# testing
+Usage
+-----
+# Update metadata on Zenodo Sandbox (default)
 python scripts/data_upload/zenodo_upload.py scripts/data_upload/config.upload.cutout-era5-tutorial.yaml
 
-or
+# Create a new record and upload the dataset to production Zenodo
+python scripts/data_upload/zenodo_upload.py scripts/data_upload/config.upload.cutout-era5-tutorial.yaml --production --upload
 
-# production upload
-pypsa-zambia % python scripts/data_upload/zenodo_upload.py scripts/data_upload/config.upload.cutout-era5-tutorial.yaml --production --upload
-
-```
-
-
+Notes
+-----
+- Sandbox and production require separate API tokens.
+- Do not add quotes around token values in `.zenodo.ini`.
+- Keep `.zenodo.ini` excluded from version control.
+- Use `--upload` only when creating a new record.
+- Existing records are identified by their IDs in the YAML configuration.
 """
 import argparse
 import configparser
