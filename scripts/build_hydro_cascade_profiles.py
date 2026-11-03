@@ -24,6 +24,7 @@ from _helpers import configure_logging, read_csv_nafix
 from atlite import hydro as hydrom
 from dask.distributed import Client
 from hydro_cascade import (
+    calculate_cascade_routing_hours,
     match_cascade_plants_to_powerplants,
     validate_cascade_topology,
 )
@@ -315,18 +316,11 @@ def get_cascade_routing_hours(
         upstream_hid = basins.plants.at[upstream_index, "hid"]
         downstream_hid = basins.plants.at[downstream_index, "hid"]
 
-        distance_km = (
-            basins.meta.at[upstream_hid, "DIST_MAIN"]
-            - basins.meta.at[downstream_hid, "DIST_MAIN"]
+        routing_hours[(upstream, downstream)] = calculate_cascade_routing_hours(
+            basins.meta.at[upstream_hid, "DIST_MAIN"],
+            basins.meta.at[downstream_hid, "DIST_MAIN"],
+            flowspeed=flowspeed,
         )
-
-        if not np.isfinite(distance_km) or distance_km < 0:
-            raise ValueError(
-                f"Invalid HydroBASINS routing distance for "
-                f"{upstream} -> {downstream}: {distance_km} km."
-            )
-
-        routing_hours[(upstream, downstream)] = distance_km / (flowspeed * 3.6)
 
     return pd.Series(routing_hours, name="routing_hours")
 

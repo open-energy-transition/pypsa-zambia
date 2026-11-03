@@ -9,12 +9,16 @@ Identify candidate cascading-hydropower connections from HydroBASINS.
 """
 
 import logging
+import math
 from pathlib import Path
 
 import geopandas as gpd
 import pandas as pd
 from _helpers import configure_logging, read_csv_nafix
-from hydro_cascade import _parse_qualified_project_ids
+from hydro_cascade import (
+    _parse_qualified_project_ids,
+    calculate_cascade_routing_hours,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -446,6 +450,7 @@ def build_hydro_cascade_topology(
     output_path,
     ambiguous_output_path,
     technologies=("Reservoir",),
+    flowspeed=1.0,
 ):
     """Build candidate cascade connections from plant and basin data."""
     powerplants, id_ambiguities = load_hydro_powerplants(
@@ -461,6 +466,22 @@ def build_hydro_cascade_topology(
         powerplants,
         hydrobasins,
     )
+
+    if not connections.empty:
+        basins = hydrobasins.set_index("HYBAS_ID")
+
+        routing_hours = connections.apply(
+            lambda row: calculate_cascade_routing_hours(
+                basins.at[row["upstream_hybas_id"], "DIST_MAIN"],
+                basins.at[row["downstream_hybas_id"], "DIST_MAIN"],
+                flowspeed=flowspeed,
+            ),
+            axis=1,
+        )
+
+        connections["travel_time_hours"] = routing_hours.map(
+            lambda hours: math.floor(hours + 0.5)
+        ).astype(int)
 
     ambiguous = pd.concat(
         [id_ambiguities, basin_ambiguities],
@@ -501,4 +522,5 @@ if __name__ == "__main__":
         output_path=snakemake.output.topology,
         ambiguous_output_path=snakemake.output.ambiguous,
         technologies=snakemake.params.technologies,
+        flowspeed=snakemake.params.flowspeed,
     )
