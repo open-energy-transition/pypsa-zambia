@@ -40,6 +40,8 @@ This part of documentation collects descriptive release notes to capture the mai
 
 ### Minor Changes and bug-fixing
 
+* Automate upload datasets to Zenodo storage[PR #476](https://github.com/open-energy-transition/pypsa-zambia/pull/476)
+
 * Amend missed release notes and update reference objectives [PR #447](https://github.com/open-energy-transition/pypsa-zambia/pull/447)
 
 * Restore git history after squash merge [PR #443](https://github.com/open-energy-transition/pypsa-zambia/pull/443)
