@@ -118,7 +118,14 @@ def load_hydro_powerplants(
     powerplants_path,
     technologies=("Reservoir",),
 ):
-    """Load hydropower plants eligible for cascade topology generation."""
+    """
+    Load hydropower plants eligible for cascade topology generation.
+
+    Returns
+    -------
+    tuple[pd.DataFrame, pd.DataFrame]
+        Resolved hydropower plants and unresolved plant-ID cases.
+    """
     powerplants = read_csv_nafix(powerplants_path, index_col=0)
 
     hydro = powerplants[
@@ -148,21 +155,44 @@ def load_hydro_powerplants(
     hydro["stable_id"] = resolve_stable_plant_ids(hydro)
 
     unresolved = hydro["stable_id"].isna()
+    ambiguity_rows = []
+
+    for idx, row in hydro.loc[unresolved].iterrows():
+        name = row.get("Name")
+        plant = str(name).strip() if pd.notna(name) and str(name).strip() else str(idx)
+
+        explicit_id = row.get("plant_id")
+        project_ids = _parse_qualified_project_ids(row.get("projectid"))
+
+        has_identifier = (pd.notna(explicit_id) and str(explicit_id).strip()) or bool(
+            project_ids
+        )
+
+        ambiguity_rows.append(
+            {
+                "reason": (
+                    "non_unique_stable_id" if has_identifier else "missing_stable_id"
+                ),
+                "plant": plant,
+                "plant_index": idx,
+            }
+        )
 
     if unresolved.any():
-        unresolved_names = [
-            str(name).strip() if pd.notna(name) and str(name).strip() else str(idx)
-            for idx, name in hydro.loc[unresolved, "Name"].items()
-        ]
-
         logger.warning(
             "Skipping %d hydropower plants without a unique stable ID: %s",
             int(unresolved.sum()),
-            ", ".join(unresolved_names),
+            ", ".join(row["plant"] for row in ambiguity_rows),
         )
-        hydro = hydro.loc[~unresolved].copy()
 
-    return hydro
+    id_ambiguities = pd.DataFrame(
+        ambiguity_rows,
+        columns=["reason", "plant", "plant_index"],
+    )
+
+    hydro = hydro.loc[~unresolved].copy()
+
+    return hydro, id_ambiguities
 
 
 def assign_plants_to_basins(
@@ -315,7 +345,17 @@ def identify_cascade_connections(
         ],
     ).drop_duplicates()
 
-    ambiguous = pd.DataFrame(ambiguous_rows).drop_duplicates()
+    ambiguous = pd.DataFrame(
+        ambiguous_rows,
+        columns=[
+            "reason",
+            "plant",
+            "plant_index",
+            "hybas_id",
+            "plants",
+            "upstream",
+        ],
+    ).drop_duplicates()
 
     return connections, ambiguous
 
@@ -327,13 +367,28 @@ def build_hydro_cascade_topology(
     ambiguous_output_path,
 ):
     """Build candidate cascade connections from plant and basin data."""
-    powerplants = load_hydro_powerplants(powerplants_path)
+    powerplants, id_ambiguities = load_hydro_powerplants(powerplants_path)
     hydrobasins = gpd.read_file(hydrobasins_path)
 
-    connections, ambiguous = identify_cascade_connections(
+    connections, basin_ambiguities = identify_cascade_connections(
         powerplants,
         hydrobasins,
     )
+
+    ambiguous = pd.concat(
+        [id_ambiguities, basin_ambiguities],
+        ignore_index=True,
+    ).drop_duplicates()
+
+    ambiguity_columns = [
+        "reason",
+        "plant",
+        "plant_index",
+        "hybas_id",
+        "plants",
+        "upstream",
+    ]
+    ambiguous = ambiguous.reindex(columns=ambiguity_columns)
 
     connections.to_csv(output_path, index=False)
     ambiguous.to_csv(ambiguous_output_path, index=False)
