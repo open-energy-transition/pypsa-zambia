@@ -39,8 +39,7 @@ See an example
 
 Example:
 ```
-python scripts/data_upload/zenodo_upload.py scripts/data_upload//config.upload.cutout-era5-tutorial.yaml
-
+python scripts/data_upload/zenodo_upload.py scripts/data_upload/config.upload.cutout-era5-tutorial.yaml
 ```
 
 
