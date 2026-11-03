@@ -825,6 +825,23 @@ rule build_renewable_profiles:
 HYDRO_CASCADE = config["renewable"]["hydro"].get("cascading", {})
 HYDRO_CASCADE_TOPOLOGY = HYDRO_CASCADE.get("topology")
 HYDRO_CASCADE_TOPOLOGY_GENERATION = HYDRO_CASCADE.get("topology_generation", {})
+HYDRO_CASCADE_TOPOLOGY_LEVEL = int(
+    HYDRO_CASCADE_TOPOLOGY_GENERATION.get("hydrobasins_level", 9)
+)
+HYDRO_CASCADE_TOPOLOGY_HYDROBASINS_MANIFEST = (
+    "data/hydrobasins/"
+    f"hybas_cascade_topology_lev{HYDRO_CASCADE_TOPOLOGY_LEVEL:02d}.txt"
+)
+
+if (
+    HYDRO_CASCADE_TOPOLOGY_GENERATION.get("enable", False)
+    and config["data"]["hydrobasins"]["source"] != "build"
+):
+    raise ValueError(
+        "Automatic hydro cascade topology generation currently requires "
+        "data.hydrobasins.source: build, because the topology workflow "
+        "requires access to configurable HydroBASINS levels."
+    )
 
 HYDRO_CASCADE_TOPOLOGY_CANDIDATES = (
     f"resources/{RDIR}hydro_cascade_topology_candidates.csv"
@@ -850,7 +867,7 @@ if HYDRO_CASCADE_TOPOLOGY_GENERATION.get("enable", False):
             ),
         input:
             powerplants="resources/" + RDIR + "powerplants.csv",
-            hydrobasins=HYDRO_CASCADE_TOPOLOGY_GENERATION["hydrobasins"],
+            hydrobasins=HYDRO_CASCADE_TOPOLOGY_HYDROBASINS_MANIFEST,
         output:
             topology=HYDRO_CASCADE_TOPOLOGY_CANDIDATES,
             ambiguous=HYDRO_CASCADE_TOPOLOGY_AMBIGUITIES,

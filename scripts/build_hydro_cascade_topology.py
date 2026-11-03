@@ -9,6 +9,7 @@ Identify candidate cascading-hydropower connections from HydroBASINS.
 """
 
 import logging
+from pathlib import Path
 
 import geopandas as gpd
 import pandas as pd
@@ -195,6 +196,85 @@ def load_hydro_powerplants(
     return hydro, id_ambiguities
 
 
+def load_relevant_hydrobasins(
+    hydrobasins_path,
+    powerplants: pd.DataFrame,
+) -> gpd.GeoDataFrame:
+    """
+    Load HydroBASINS regions containing the hydropower plants.
+
+    A manifest may list multiple regional HydroBASINS files. Regional files
+    are first queried spatially and only regions containing modelled plants
+    are then loaded completely, preserving downstream routing information
+    without requiring a merged global HydroBASINS dataset.
+    """
+    hydrobasins_path = Path(hydrobasins_path)
+
+    if hydrobasins_path.suffix == ".txt":
+        hydrobasins_paths = [
+            Path(line.strip())
+            for line in hydrobasins_path.read_text().splitlines()
+            if line.strip()
+        ]
+    else:
+        hydrobasins_paths = [hydrobasins_path]
+
+    missing = [path for path in hydrobasins_paths if not path.exists()]
+    if missing:
+        raise FileNotFoundError(
+            "Missing HydroBASINS files: " + ", ".join(str(path) for path in missing)
+        )
+
+    plants = gpd.GeoDataFrame(
+        powerplants.copy(),
+        geometry=gpd.points_from_xy(
+            powerplants["lon"],
+            powerplants["lat"],
+        ),
+        crs="EPSG:4326",
+    )
+
+    relevant_paths = []
+
+    for path in hydrobasins_paths:
+        candidate_basins = gpd.read_file(
+            path,
+            bbox=tuple(plants.total_bounds),
+        )
+
+        if candidate_basins.empty:
+            continue
+
+        candidate_plants = plants.to_crs(candidate_basins.crs)
+
+        matches = gpd.sjoin(
+            candidate_plants[["geometry"]],
+            candidate_basins[["geometry"]],
+            how="inner",
+            predicate="within",
+        )
+
+        if not matches.empty:
+            relevant_paths.append(path)
+
+    if not relevant_paths:
+        raise ValueError("No HydroBASINS region contains the hydropower plants.")
+
+    logger.info(
+        "Using HydroBASINS regions for cascade topology: %s",
+        ", ".join(str(path) for path in relevant_paths),
+    )
+
+    frames = [gpd.read_file(path) for path in relevant_paths]
+
+    hydrobasins = gpd.GeoDataFrame(
+        pd.concat(frames, ignore_index=True),
+        crs=frames[0].crs,
+    ).drop_duplicates(subset="HYBAS_ID", ignore_index=True)
+
+    return hydrobasins
+
+
 def assign_plants_to_basins(
     powerplants: pd.DataFrame,
     hydrobasins: gpd.GeoDataFrame,
@@ -372,7 +452,10 @@ def build_hydro_cascade_topology(
         powerplants_path,
         technologies=technologies,
     )
-    hydrobasins = gpd.read_file(hydrobasins_path)
+    hydrobasins = load_relevant_hydrobasins(
+        hydrobasins_path,
+        powerplants,
+    )
 
     connections, basin_ambiguities = identify_cascade_connections(
         powerplants,
