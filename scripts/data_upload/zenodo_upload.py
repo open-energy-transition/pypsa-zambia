@@ -39,7 +39,14 @@ See an example
 
 Example:
 ```
+# testing
 python scripts/data_upload/zenodo_upload.py scripts/data_upload/config.upload.cutout-era5-tutorial.yaml
+
+or 
+
+# production upload
+pypsa-zambia % python scripts/data_upload/zenodo_upload.py scripts/data_upload/config.upload.cutout-era5-tutorial.yaml --production --upload
+
 ```
 
 
