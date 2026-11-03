@@ -49,6 +49,9 @@ if (HYDROBASINS_DATASET := dataset_version("hydrobasins", config))["source"] in 
         config["renewable"]["hydro"].get("cascading", {}).get("topology_generation", {})
     )
     topology_level = int(topology_generation.get("hydrobasins_level", level))
+    topology_hydrobasins_manifest = (
+        "data/hydrobasins/" f"hybas_cascade_topology_lev{topology_level:02d}.txt"
+    )
 
     if not 1 <= topology_level <= 12:
         raise ValueError(
@@ -134,9 +137,9 @@ if (HYDROBASINS_DATASET := dataset_version("hydrobasins", config))["source"] in 
 
     if topology_generation.get("enable", False):
 
-        rule create_hydrobasins_cascade_topology:
+        rule prepare_hydrobasins_cascade_topology:
             message:
-                "Aggregate HydroBASINS for cascade topology generation"
+                "Prepare HydroBASINS inputs for cascade topology generation"
             input:
                 unpacked=expand(
                     f"{HYDROBASINS_DATASET['folder']}"
@@ -144,14 +147,7 @@ if (HYDROBASINS_DATASET := dataset_version("hydrobasins", config))["source"] in 
                     suffix=suffixes,
                 ),
             output:
-                shp="data/hydrobasins/hybas_cascade_topology_world.shp",
-                other=multiext(
-                    "data/hydrobasins/hybas_cascade_topology_world",
-                    ".cpg",
-                    ".dbf",
-                    ".prj",
-                    ".shx",
-                ),
+                manifest=topology_hydrobasins_manifest,
             run:
                 topology_files = [
                     f"{HYDROBASINS_DATASET['folder']}"
@@ -170,7 +166,8 @@ if (HYDROBASINS_DATASET := dataset_version("hydrobasins", config))["source"] in 
                         f"level {topology_level}: {missing}"
                     )
 
-                get_hydrobasins(topology_files, output)
+                with open(output.manifest, "w") as file:
+                    file.write("\n".join(topology_files) + "\n")
 
 
 
