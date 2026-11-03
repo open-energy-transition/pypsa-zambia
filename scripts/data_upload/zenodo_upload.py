@@ -67,12 +67,11 @@ token_env = "ZENODO_ACCESS_TOKEN" if args.production else "SANDBOX_ACCESS_TOKEN"
 
 # Zenodo token can be put into a configuration file
 # or defined in the terminal as an environment variable
-if Path(TOKEN_FL).exists():
-    credentials = configparser.ConfigParser()
-    credentials.read(TOKEN_FL)
-    token = credentials.get(environment, "access_token", fallback=None)
-else:
-    token = os.getenv(token_env)
+credentials = configparser.ConfigParser()
+credentials.read(TOKEN_FL)
+
+token = credentials.get(environment, "access_token", fallback=None)
+token = token or os.getenv(token_env)
 
 if not token:
     raise RuntimeError(
