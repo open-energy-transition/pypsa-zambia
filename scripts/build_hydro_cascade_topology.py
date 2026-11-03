@@ -365,9 +365,13 @@ def build_hydro_cascade_topology(
     hydrobasins_path,
     output_path,
     ambiguous_output_path,
+    technologies=("Reservoir",),
 ):
     """Build candidate cascade connections from plant and basin data."""
-    powerplants, id_ambiguities = load_hydro_powerplants(powerplants_path)
+    powerplants, id_ambiguities = load_hydro_powerplants(
+        powerplants_path,
+        technologies=technologies,
+    )
     hydrobasins = gpd.read_file(hydrobasins_path)
 
     connections, basin_ambiguities = identify_cascade_connections(
@@ -413,4 +417,5 @@ if __name__ == "__main__":
         hydrobasins_path=snakemake.input.hydrobasins,
         output_path=snakemake.output.topology,
         ambiguous_output_path=snakemake.output.ambiguous,
+        technologies=snakemake.params.technologies,
     )
