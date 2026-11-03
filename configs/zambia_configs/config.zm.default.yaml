@@ -113,6 +113,12 @@ renewable:
     cascading:
       enable: true
       topology: configs/zambia_configs/hydro_cascade_topology.csv
+      topology_generation:
+        enable: true
+        hydrobasins_level: 9
+        hydrobasins: data/hydrobasins/hybas_cascade_topology_world.shp
+        technologies:
+        - Reservoir
 
 # ------------------- Costs & emissions -------------------
 costs:

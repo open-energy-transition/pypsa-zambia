@@ -824,12 +824,42 @@ rule build_renewable_profiles:
 
 HYDRO_CASCADE = config["renewable"]["hydro"].get("cascading", {})
 HYDRO_CASCADE_TOPOLOGY = HYDRO_CASCADE.get("topology")
+HYDRO_CASCADE_TOPOLOGY_GENERATION = HYDRO_CASCADE.get("topology_generation", {})
+
+HYDRO_CASCADE_TOPOLOGY_CANDIDATES = (
+    f"resources/{RDIR}hydro_cascade_topology_candidates.csv"
+)
+HYDRO_CASCADE_TOPOLOGY_AMBIGUITIES = (
+    f"resources/{RDIR}hydro_cascade_topology_ambiguities.csv"
+)
 
 if HYDRO_CASCADE.get("enable", False) and not HYDRO_CASCADE_TOPOLOGY:
     raise ValueError(
         "renewable.hydro.cascading.topology must be configured "
         "when cascading hydro is enabled."
     )
+
+
+if HYDRO_CASCADE_TOPOLOGY_GENERATION.get("enable", False):
+
+    rule build_hydro_cascade_topology:
+        params:
+            technologies=HYDRO_CASCADE_TOPOLOGY_GENERATION.get(
+                "technologies",
+                ["Reservoir"],
+            ),
+        input:
+            powerplants="resources/" + RDIR + "powerplants.csv",
+            hydrobasins=HYDRO_CASCADE_TOPOLOGY_GENERATION["hydrobasins"],
+        output:
+            topology=HYDRO_CASCADE_TOPOLOGY_CANDIDATES,
+            ambiguous=HYDRO_CASCADE_TOPOLOGY_AMBIGUITIES,
+        log:
+            "logs/" + RDIR + "build_hydro_cascade_topology.log",
+        benchmark:
+            "benchmarks/" + RDIR + "build_hydro_cascade_topology"
+        script:
+            "scripts/build_hydro_cascade_topology.py"
 
 
 if HYDRO_CASCADE.get("enable", False):

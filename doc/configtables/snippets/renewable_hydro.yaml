@@ -23,3 +23,9 @@
     cascading:
       enable: false
       topology:
+      topology_generation:
+        enable: false
+        hydrobasins_level: 9
+        hydrobasins: data/hydrobasins/hybas_cascade_topology_world.shp
+        technologies:
+        - Reservoir
