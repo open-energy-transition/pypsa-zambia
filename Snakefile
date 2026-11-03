@@ -865,6 +865,10 @@ if HYDRO_CASCADE_TOPOLOGY_GENERATION.get("enable", False):
                 "technologies",
                 ["Reservoir"],
             ),
+            flowspeed=config["renewable"]["hydro"]["resource"].get(
+                "flowspeed",
+                1.0,
+            ),
         input:
             powerplants="resources/" + RDIR + "powerplants.csv",
             hydrobasins=HYDRO_CASCADE_TOPOLOGY_HYDROBASINS_MANIFEST,
