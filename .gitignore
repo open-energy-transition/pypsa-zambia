@@ -34,6 +34,9 @@ gurobi.log
 gadm_shapes.geojson
 doc/*.vscode/settings.json
 
+# credential files
+scripts/data_upload/.zenodo.ini
+
 # Untracked folders (and files within)
 bak
 benchmarks/
