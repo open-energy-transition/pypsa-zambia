@@ -289,44 +289,6 @@ def build_local_cascade_discharge(
     return local_discharge.clip(lower=0.0)
 
 
-def get_cascade_routing_hours(
-    basins,
-    topology: pd.DataFrame,
-    cascade_profile_indices: dict[str, object],
-    flowspeed: float = 1.0,
-) -> pd.Series:
-    """Estimate river-routing times between cascade plants from HydroBASINS."""
-    if flowspeed <= 0:
-        raise ValueError("flowspeed must be positive.")
-
-    routing_hours = {}
-
-    for edge in topology.itertuples(index=False):
-        upstream = str(edge.upstream).strip()
-        downstream = str(edge.downstream).strip()
-
-        upstream_index = cascade_profile_indices[upstream]
-        downstream_index = cascade_profile_indices[downstream]
-
-        upstream_hid = basins.plants.at[upstream_index, "hid"]
-        downstream_hid = basins.plants.at[downstream_index, "hid"]
-
-        distance_km = (
-            basins.meta.at[upstream_hid, "DIST_MAIN"]
-            - basins.meta.at[downstream_hid, "DIST_MAIN"]
-        )
-
-        if not np.isfinite(distance_km) or distance_km < 0:
-            raise ValueError(
-                f"Invalid HydroBASINS routing distance for "
-                f"{upstream} -> {downstream}: {distance_km} km."
-            )
-
-        routing_hours[(upstream, downstream)] = distance_km / (flowspeed * 3.6)
-
-    return pd.Series(routing_hours, name="routing_hours")
-
-
 def build_local_cascade_basins(
     basins,
     topology: pd.DataFrame,
@@ -452,10 +414,8 @@ def discharge_to_hydraulic_inflow(
 
 def build_glofas_cascade_hydraulic_inflow(
     glofas: xr.Dataset,
-    hydrobasins: gpd.GeoDataFrame,
     hydro_powerplants: pd.DataFrame,
     topology_path,
-    flowspeed: float = 1.0,
     multiplier: float = 1.0,
 ):
     """Build local hydraulic inflow from routed GloFAS discharge."""
@@ -469,26 +429,9 @@ def build_glofas_cascade_hydraulic_inflow(
         hydro_powerplants,
     )
 
-    plants = cascade_powerplants.rename(columns={"country": "countries"})[
-        ["lon", "lat", "countries"]
-    ]
-
-    basins = hydrom.determine_basins(
-        plants,
-        hydrobasins,
-        show_progress=False,
-    )
-
-    cascade_profile_indices = {
-        str(plant_id): plant_id for plant_id in cascade_powerplants.index
-    }
-
-    routing_hours = get_cascade_routing_hours(
-        basins,
-        topology,
-        cascade_profile_indices,
-        flowspeed=flowspeed,
-    )
+    routing_hours = topology.set_index(["upstream", "downstream"])[
+        "travel_time_hours"
+    ].astype(float)
 
     discharge = extract_glofas_discharge(
         glofas,
@@ -524,7 +467,6 @@ def build_glofas_cascade_hydraulic_inflow(
 
 def build_glofas_cascade_profile_file(
     powerplants_path,
-    hydrobasins_path,
     topology_path,
     glofas_path,
     hydro_config,
@@ -533,15 +475,12 @@ def build_glofas_cascade_profile_file(
 ):
     """Build and write cascade hydraulic inflow profiles from GloFAS."""
     hydro_powerplants = load_hydro_powerplants(powerplants_path)
-    hydrobasins = gpd.read_file(hydrobasins_path)
     glofas = xr.open_dataset(glofas_path)
 
     hydraulic_inflow, _ = build_glofas_cascade_hydraulic_inflow(
         glofas=glofas,
-        hydrobasins=hydrobasins,
         hydro_powerplants=hydro_powerplants,
         topology_path=topology_path,
-        flowspeed=hydro_config["resource"].get("flowspeed", 1.0),
         multiplier=hydro_config.get("multiplier", 1.0),
     )
 
@@ -674,7 +613,6 @@ def build_hydro_cascade_profile_file(
 
         build_glofas_cascade_profile_file(
             powerplants_path=powerplants_path,
-            hydrobasins_path=hydrobasins_path,
             topology_path=topology_path,
             glofas_path=cutout_path,
             hydro_config=hydro_config,

@@ -112,7 +112,12 @@ renewable:
     multiplier: 10 # has different meaning for custom and era5 sources
     cascading:
       enable: true
-      topology: configs/zambia_configs/hydro_cascade_topology.csv
+      topology:
+      topology_generation:
+        enable: true
+        hydrobasins_level: 9
+        technologies:
+        - Reservoir
 
 # ------------------- Costs & emissions -------------------
 costs:

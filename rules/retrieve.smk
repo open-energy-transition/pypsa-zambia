@@ -45,6 +45,10 @@ if (HYDROBASINS_DATASET := dataset_version("hydrobasins", config))["source"] in 
     suffixes: list = HYDROBASINS_DATASET["region"].split(" ")
     level = config["renewable"]["hydro"]["hydrobasins_level"]
 
+    topology_generation = (
+        config["renewable"]["hydro"].get("cascading", {}).get("topology_generation", {})
+    )
+
     def get_hydrobasins(input, output):
         """Merge the hydrobasins files into a single shapefile
 
@@ -120,6 +124,53 @@ if (HYDROBASINS_DATASET := dataset_version("hydrobasins", config))["source"] in 
             ),
         run:
             get_hydrobasins(input, output)
+
+    if topology_generation.get("enable", False):
+        topology_level = int(topology_generation.get("hydrobasins_level", level))
+
+        if not 1 <= topology_level <= 12:
+            raise ValueError(
+                "renewable.hydro.cascading.topology_generation."
+                "hydrobasins_level must be between 1 and 12."
+            )
+
+        topology_hydrobasins_manifest = (
+            "data/hydrobasins/"
+            f"hybas_cascade_topology_lev{topology_level:02d}.txt"
+        )
+
+        rule prepare_hydrobasins_cascade_topology:
+            message:
+                "Prepare HydroBASINS inputs for cascade topology generation"
+            input:
+                unpacked=expand(
+                    f"{HYDROBASINS_DATASET['folder']}"
+                    + "/hybas_{suffix}_lev01-12_v1c",
+                    suffix=suffixes,
+                ),
+            output:
+                manifest=topology_hydrobasins_manifest,
+            run:
+                topology_files = [
+                    f"{HYDROBASINS_DATASET['folder']}"
+                    + f"/hybas_{suffix}_lev01-12_v1c"
+                    + f"/hybas_{suffix}_lev{topology_level:02d}_v1c.shp"
+                    for suffix in suffixes
+                ]
+
+                missing = [
+                    file for file in topology_files if not os.path.exists(file)
+                ]
+
+                if missing:
+                    raise FileNotFoundError(
+                        "Missing HydroBASINS files for cascade topology "
+                        f"level {topology_level}: {missing}"
+                    )
+
+                with open(output.manifest, "w") as file:
+                    file.write("\n".join(topology_files) + "\n")
+
 
 
 if (IRENA_DATASET := dataset_version("irena", config))["source"] in ["primary"]:
