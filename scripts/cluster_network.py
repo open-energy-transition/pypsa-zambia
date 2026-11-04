@@ -584,7 +584,7 @@ def clustering_for_n_clusters(
         scale_link_capital_costs=False,
     )
     restore_cascade_storage_units(
-        clustering.network,
+        clustering.n,
         cascade_static,
         cascade_dynamic,
         busmap,
