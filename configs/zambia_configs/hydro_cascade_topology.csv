@@ -1,0 +1,3 @@
+upstream,downstream,travel_time_hours
+GHPT:G604089,GHPT:G604091,0
+GHPT:G604091,GHPT:G604090,0
