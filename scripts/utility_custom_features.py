@@ -12,7 +12,6 @@ import numpy as np
 import pandas as pd
 import rasterio
 from pyproj import Transformer
-from pypsa.io import import_components_from_dataframe, import_series_from_dataframe
 from rasterio.features import rasterize
 from rasterio.mask import mask
 from rasterio.transform import from_bounds
@@ -51,7 +50,7 @@ def add_biomass_potential(n, biomass_gdf, costs, geo_crs):
     n.generators.loc[buses_to_update + " biomass", "p_nom_max"] = p_nom_max[
         buses_to_update
     ].values
-    n.madd(
+    n.add(
         "Generator",
         buses_to_add,
         suffix=" biomass",
@@ -332,10 +331,10 @@ def restore_excluded_components(n, component, saved_components, saved_timeseries
     """
     if saved_components.empty:
         return
-    import_components_from_dataframe(n, saved_components, component)
+    n.add(component, saved_components.index, **saved_components)
     for attr, data in saved_timeseries.items():
         if not data.empty:
-            import_series_from_dataframe(n, data, component, attr)
+            n._import_series_from_df(data, component, attr)
 
 
 def busmap_keeps_topology(busmap):
