@@ -78,7 +78,7 @@ In case you don't have Java, you have to install it. We recommend:
 ### Clone the Repository
 
 !!! note
-    In order to work with the provided Jupyter notebooks in the [documentation repository](https://github.com/pypsa-meets-earth/documentation), it is recommended to follow the folder structure suggested in [Notebooks](../tutorials/examples.md).
+    In order to work with the provided Jupyter notebooks in the [documentation repository](https://github.com/pypsa-meets-earth/documentation), it is recommended to follow the folder structure suggested in [Notebooks](../tutorials/generic-examples/examples.md).
 
 First of all, clone the [PyPSA-Earth repository](https://github.com/pypsa-meets-earth/pypsa-earth/) using the version control system `git`. The path to the directory into which the `git repository` is cloned must **not** have any spaces. The following commands can be executed in command prompt of `miniconda`, terminal of `VSCode`, or in `Git Bash`.
 
@@ -287,6 +287,9 @@ pixi install
     ```
 
     After this, any Jupyter session can select the `pypsa-earth` kernel regardless of the working directory.
+
+!!! tip "Need to run this without an internet connection?"
+    See [Preparing an Offline Package](offline-setup-prepare.md) for how to package a pixi environment and a model's input data so it can be installed and run on a computer with no internet access. If you have already been given such a package, see [Running from an Offline Package](offline-setup-run.md) instead.
 
 ## Solver Installation
 

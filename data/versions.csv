@@ -10,6 +10,7 @@ cutout-era5,v1.0,primary,latest supported,zm,2013,2026-05-24,Zambia Cutout,sandb
 cutout-era5,v1.0,primary,latest supported,zm,2023,2026-05-24,Zambia Cutout,sandbox.zenodo.org/records/499379/files/cutout-2023-era5.nc
 cutout-era5,v1.0,primary,latest supported,zm,2024,2026-05-24,Zambia Cutout,sandbox.zenodo.org/records/499392/files/cutout-2024-era5.nc
 cutout-era5,v1.0,primary,latest supported,zm,2025,2026-05-24,Zambia Cutout,sandbox.zenodo.org/records/488187/files/cutout-2025-era5.nc
+cutout-era5,v1.0,tutorial,latest supported,zm,2013,2026-05-24,Zambia Cutout,zenodo.org/records/23929802/files/zm-2013-tutorial-era5.nc
 zm-biomass,v1.0,primary,latest supported,zm,,2026-05-28,Zambia Biomass Data,sandbox.zenodo.org/records/501547/files/biomass_data.csv
 inflow-glofas,v1.0,primary,latest supported,zm,2001,2026-06-11,Zambia Inflow,zenodo.org/records/19740377/files/zm-2001-glofas.nc
 inflow-glofas,v1.0,primary,latest supported,zm,2002,2026-06-11,Zambia Inflow,zenodo.org/records/19740377/files/zm-2002-glofas.nc
@@ -26,3 +27,5 @@ generation-by-mini-hydro,v1,primary,supported,zm,,2026-07-28,Electricity generat
 total-exports,v1,primary,supported,zm,,2026-07-28,Total Exports,sandbox.zenodo.org/records/582000/files/zm-total-exports.csv
 custom-powerplants,v6,primary,supported,zm,,2026-07-08,Zambia capacity expansion power plants (IRP + proposed plants),sandbox.zenodo.org/records/537704/files/custom_powerplants.csv
 sapp-countries,v1,primary,latest supported,zm,,2026-07-16,SAPP year-indexed trade data (ERB ESR 2020-2025),sandbox.zenodo.org/records/565480/files/sapp_countries.csv
+bundle_data,v1,primary,latest supported,earth,,,,sandbox.zenodo.org/records/323567/files/bundle_data_earth.zip
+demand_cast,v1,primary,latest supported,earth,,,,zenodo.org/records/18374352/files/forecasts_on_historical_period.parquet

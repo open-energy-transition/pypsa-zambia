@@ -12,7 +12,6 @@ import numpy as np
 import pandas as pd
 import rasterio
 from pyproj import Transformer
-from pypsa.io import import_components_from_dataframe, import_series_from_dataframe
 from rasterio.features import rasterize
 from rasterio.mask import mask
 from rasterio.transform import from_bounds
@@ -51,7 +50,7 @@ def add_biomass_potential(n, biomass_gdf, costs, geo_crs):
     n.generators.loc[buses_to_update + " biomass", "p_nom_max"] = p_nom_max[
         buses_to_update
     ].values
-    n.madd(
+    n.add(
         "Generator",
         buses_to_add,
         suffix=" biomass",
@@ -204,32 +203,6 @@ def add_interconnectors(
     return n
 
 
-def load_custom_line_types(line_types: str) -> pd.DataFrame:
-    """Load and format custom transmission line types for a PyPSA network."""
-    custom_line_types = pd.read_csv(line_types)
-
-    custom_line_types = custom_line_types.rename(
-        columns={
-            "PyPSA Type Name": "name",
-            "f_nom (Hz)": "f_nom",
-            "r_per_length (Ω/km)": "r_per_length",
-            "x_per_length (Ω/km)": "x_per_length",
-            "c_per_length (nF/km)": "c_per_length",
-            "i_nom (kA)": "i_nom",
-            "cross_section (mm²)": "cross_section",
-        }
-    )
-    custom_line_types = custom_line_types.set_index("name")
-    return custom_line_types
-
-
-def add_custom_line_types(n, custom_line_types):
-    """merge custom line_types into the pypsa network"""
-    n.line_types = pd.concat([n.line_types, custom_line_types], axis=0)
-    n.line_types = n.line_types[~n.line_types.index.duplicated(keep="last")]
-    return n
-
-
 def map_buses_from_coords(
     n, df, buses_df=None, distance_crs="EPSG:20935", geo_crs="EPSG:4326"
 ):
@@ -358,10 +331,10 @@ def restore_excluded_components(n, component, saved_components, saved_timeseries
     """
     if saved_components.empty:
         return
-    import_components_from_dataframe(n, saved_components, component)
+    n.add(component, saved_components.index, **saved_components)
     for attr, data in saved_timeseries.items():
         if not data.empty:
-            import_series_from_dataframe(n, data, component, attr)
+            n._import_series_from_df(data, component, attr)
 
 
 def busmap_keeps_topology(busmap):

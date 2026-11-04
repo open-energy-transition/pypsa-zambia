@@ -1,0 +1,4 @@
+  existing_thermal_dispatch:
+    enable: false
+    base_year: 2025
+    carriers: [coal, oil]

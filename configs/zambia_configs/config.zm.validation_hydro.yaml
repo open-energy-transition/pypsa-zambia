@@ -11,7 +11,7 @@ scenario:
   simpl: ['']
   ll: [v1.0]
   clusters: ['10']
-  opts: [Co2L-3h]
+  opts: [3h]
 
 snapshots:
   start: '2023-01-01'
@@ -44,4 +44,4 @@ data:
     source: primary
     version: v1.0
     # NB Must be adjusted according to the weather year
-    year: 2013
+    year: 2023

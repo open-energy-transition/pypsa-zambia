@@ -11,7 +11,7 @@ scenario:
   simpl: ['']
   ll: [v1.0]
   clusters: ['10']
-  opts: [Co2L-3h]
+  opts: [3h]
 
 snapshots:
   start: '2013-01-01'
@@ -66,12 +66,17 @@ electricity:
   renewable_carriers: [solar, onwind, hydro]
 
   # ----------------- Grid topology -------------------
-  base_voltage: 330.
+  base_voltage:
+    default: 380.
+    ZM: 330.
   voltages: [66., 88., 132., 220., 330.]
 
   # ----------------- Existing powerplants -------------------
   powerplants_filter: (DateOut >= 2024 or DateOut != DateOut) and (DateIn <= 2024 or DateIn != DateIn)
-  custom_powerplants: replace # set to "merge" or "replace" if you have a custom_powerplants.csv for Zambia
+  custom_powerplants:
+    filepaths:  # list of custom powerplant files used in "merge" and "replace" options
+    - data/custom_powerplants.csv
+    method: replace  # "false" use only powerplantmatching (ppm) data, "merge" combines ppm and custom powerplants, "replace" use only custom powerplants
   disaggregate_powerplants: false # to enable disaggregation also in simplify_network, a set of excluded carries must be specified
 
   estimate_renewable_capacities:
@@ -80,11 +85,14 @@ electricity:
     activate: false
 
 lines:
+  use_country_specific_types: true
   ac_types:
-    66.: ACSR Wolf 66.0
-    132.: ACSR Panther 132.0
-    220.: ACSR Zebra 220.0
-    330.: ACSR Bison 330.0
+    ZM:
+      66.: ZM_66kV_wolf
+      88.: ZM_88kV_wolf
+      132.: ZM_132kV_wolf
+      220.: ZM_220kV_bison
+      330.: ZM_330kV_bison_2bundle
   s_max_pu: 0.7
   s_nom_extendable: false
 
@@ -153,6 +161,8 @@ costs:
     oil: 30
 
 co2:
+  limit: 3.100e+6  # annual cap 2023 [tCO2/year]; Source: https://www.iea.org/countries/zambia/emissions
+  base: 3.100e+6  # baseline emissions used for relative reduction targets; Source: https://www.iea.org/countries/zambia/emissions
   emission_price: 0. # [currency/tCO2]; active via Ep wildcard
   automatic_emission: # derive co2.limit from historical emission data instead of the value above
     enable: true
@@ -214,6 +224,8 @@ validation:
 
 
 data:
+  bundle_data:
+    source: primary
   custom-powerplants:
     source: primary
     # parameters of powerplants correspond to the real state of the national power system

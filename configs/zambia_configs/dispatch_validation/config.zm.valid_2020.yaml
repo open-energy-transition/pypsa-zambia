@@ -1,0 +1,49 @@
+# SPDX-FileCopyrightText: Contributors to PyPSA-Earth
+# SPDX-FileCopyrightText: Open Energy Transition gGmbH
+# SPDX-License-Identifier: CC0-1.0
+# Scenario diff — 2020 validation
+# Merges with: configs/zambia_configs/config.zm.validation_dispatch.yaml
+
+run:
+  name: config.zm.valid_2020
+  base_config: configs/zambia_configs/config.zm.validation_dispatch.yaml
+
+snapshots:
+  start: '2020-01-01'
+  end: '2021-01-01'
+  inclusive: left   # end is not inclusive
+
+scenario:
+  simpl: ['']
+  ll: [v1.0]
+  clusters: ['10']
+  opts: [Co2L-3h]
+atlite:
+  nprocesses: 4
+  default: zm-2020-era5
+  hydro: hydro/zm-2020-glofas.nc
+
+electricity:
+  powerplants_filter: (DateOut >= 2020 or DateOut != DateOut) and (DateIn <= 2020 or DateIn != DateIn)
+  extendable_carriers:
+    Generator: []
+
+lines:
+  s_max_pu: 0.70
+
+renewable:
+  hydro:
+    source: custom
+    multiplier: 0.175
+
+load_options:
+  source: demcast
+  weather_year: 2020
+  scale: 1.21
+
+costs:
+  year: 2020
+
+validation:
+  interconnectors:
+    enable: true
