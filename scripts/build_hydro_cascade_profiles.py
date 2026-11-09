@@ -5,7 +5,11 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 """
-Hydrological preprocessing for cascading hydropower.
+Build hydrological profiles for cascaded hydropower plants.
+
+Profiles are derived from either ERA5 runoff or GloFAS discharge and converted
+to plant-level local hydraulic inflows, excluding water already represented by
+upstream cascade plants.
 """
 
 import logging

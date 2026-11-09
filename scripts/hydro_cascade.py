@@ -2,6 +2,10 @@
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
+"""
+Utilities for validating, matching, preserving, and materializing cascade hydro.
+"""
+
 import ast
 import math
 
@@ -127,10 +131,7 @@ def _parse_qualified_project_ids(value) -> set[str]:
         if not value or value.lower() == "nan":
             return set()
         # CSV input may contain the projectid dictionary as a serialized string.
-        try:
-            value = ast.literal_eval(value)
-        except (SyntaxError, ValueError):
-            return set()
+        value = ast.literal_eval(value)
 
     if not isinstance(value, dict):
         return set()
@@ -138,22 +139,20 @@ def _parse_qualified_project_ids(value) -> set[str]:
     qualified = set()
 
     for source, identifiers in value.items():
-        if isinstance(identifiers, (set, list, tuple)):
-            values = identifiers
-        else:
-            values = [identifiers]
+        if not isinstance(identifiers, (set, list, tuple)):
+            identifiers = [identifiers]
 
-        for identifier in values:
-            if identifier is None:
-                continue
+        valid_ids = {
+            str(identifier).strip()
+            for identifier in identifiers
+            if not (pd.api.types.is_scalar(identifier) and pd.isna(identifier))
+        }
 
-            if pd.api.types.is_scalar(identifier) and pd.isna(identifier):
-                continue
-
-            identifier = str(identifier).strip()
-
-            if identifier and identifier.lower() != "nan":
-                qualified.add(f"{source}:{identifier}")
+        qualified.update(
+            f"{source}:{identifier}"
+            for identifier in valid_ids
+            if identifier and identifier.lower() != "nan"
+        )
 
     return qualified
 
@@ -411,6 +410,12 @@ def materialize_cascade_storage_units(
 ) -> dict[str, dict[str, str]]:
     """
     Convert preserved cascade StorageUnits into explicit hydraulic components.
+
+    Cascade plants remain as StorageUnits through simplification and clustering
+    so that plant identity and inflow time series survive electrical-network
+    aggregation. At this stage they are replaced by explicit water buses,
+    stores, turbines, inflow generators and spill components, and the cascade
+    routing delays are applied.
 
     The StorageUnit inflow is already expressed as local hydraulic power.
     It is therefore attached as a fixed Generator on the corresponding

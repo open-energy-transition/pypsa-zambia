@@ -425,6 +425,8 @@ if __name__ == "__main__":
         storage_techs,
     )
 
+    # Cascade plants are preserved as StorageUnits through simplification and
+    # clustering, then materialized here into the explicit hydraulic network.
     cascade_topology_path = snakemake.input.get("hydro_cascade_topology")
     if cascade_topology_path:
         cascade_topology = pd.read_csv(cascade_topology_path)
