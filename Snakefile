@@ -736,6 +736,7 @@ def inputs_hydro(w):
             "powerplants": "resources/" + RDIR + "powerplants.csv",
             "hydrobasins": config["renewable"]["hydro"]["resource"]["hydrobasins"],
         }
+
         return HYDRO_PROFILES
     else:
         return {}
@@ -821,6 +822,43 @@ rule build_renewable_profiles:
         "scripts/build_renewable_profiles.py"
 
 
+HYDRO_CASCADE = config["renewable"]["hydro"].get("cascading", {})
+HYDRO_CASCADE_TOPOLOGY = HYDRO_CASCADE.get("topology")
+
+if HYDRO_CASCADE.get("enable", False) and not HYDRO_CASCADE_TOPOLOGY:
+    raise ValueError(
+        "renewable.hydro.cascading.topology must be configured "
+        "when cascading hydro is enabled."
+    )
+
+
+if HYDRO_CASCADE.get("enable", False):
+
+    rule build_hydro_cascade_profile:
+        params:
+            hydro=config["renewable"]["hydro"],
+        input:
+            powerplants="resources/" + RDIR + "powerplants.csv",
+            hydrobasins=config["renewable"]["hydro"]["resource"]["hydrobasins"],
+            topology=HYDRO_CASCADE_TOPOLOGY,
+            cutout=(
+                "cutouts/" + config["atlite"].get("hydro")
+                if config["renewable"]["hydro"].get("source", "era5") == "custom"
+                else "cutouts/" + CDIR + config["renewable"]["hydro"]["cutout"] + ".nc"
+            ),
+        output:
+            profile="resources/" + RDIR + "renewable_profiles/profile_hydro_cascade.nc",
+        log:
+            "logs/" + RDIR + "build_hydro_cascade_profile.log",
+        benchmark:
+            "benchmarks/" + RDIR + "build_hydro_cascade_profile"
+        threads: ATLITE_NPROCESSES
+        resources:
+            mem_mb=ATLITE_NPROCESSES * 5000,
+        script:
+            "scripts/build_hydro_cascade_profiles.py"
+
+
 rule build_powerplants:
     params:
         geo_crs=config["crs"]["geo_crs"],
@@ -857,6 +895,21 @@ rule build_powerplants:
         "scripts/build_powerplants.py"
 
 
+def hydro_cascade_inputs(include_profile=True):
+    """Return optional inputs required when cascading hydro is enabled."""
+    if not HYDRO_CASCADE.get("enable", False):
+        return {}
+
+    inputs = {"hydro_cascade_topology": HYDRO_CASCADE_TOPOLOGY}
+
+    if include_profile:
+        inputs["profile_hydro_cascade"] = (
+            f"resources/{RDIR}renewable_profiles/profile_hydro_cascade.nc"
+        )
+
+    return inputs
+
+
 if config["validation"].get("biomass"):
 
     # TODO-MERGE check conflicts resolution
@@ -889,6 +942,7 @@ if config["validation"].get("biomass"):
                 for attr, fn in d.items()
                 if str(fn).startswith("data/")
             },
+            **hydro_cascade_inputs(),
             base_network="networks/" + RDIR + "base.nc",
             tech_costs="resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv",
             powerplants="resources/" + RDIR + "powerplants.csv",
@@ -945,6 +999,7 @@ else:
                 for attr, fn in d.items()
                 if str(fn).startswith("data/")
             },
+            **hydro_cascade_inputs(),
             base_network="networks/" + RDIR + "base.nc",
             tech_costs="resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv",
             powerplants="resources/" + RDIR + "powerplants.csv",
@@ -1166,6 +1221,7 @@ rule add_extra_components:
         electricity=config["electricity"],
         csp_model=config["renewable"]["csp"]["csp_model"],
     input:
+        **hydro_cascade_inputs(include_profile=False),
         network="networks/" + RDIR + "elec_s{simpl}_{clusters}.nc",
         tech_costs="resources/" + RDIR + f"costs_{config['costs']['year']}_elec.csv",
     output:
