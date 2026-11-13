@@ -116,8 +116,6 @@ renewable:
       topology_generation:
         enable: true
         hydrobasins_level: 9
-        technologies:
-        - Reservoir
 
 # ------------------- Costs & emissions -------------------
 costs:

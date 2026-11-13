@@ -879,10 +879,7 @@ if HYDRO_CASCADE_TOPOLOGY_GENERATION.get("enable", False):
 
     rule build_hydro_cascade_topology:
         params:
-            technologies=HYDRO_CASCADE_TOPOLOGY_GENERATION.get(
-                "technologies",
-                ["Reservoir"],
-            ),
+            technologies=["Reservoir"],
             flowspeed=config["renewable"]["hydro"]["resource"].get(
                 "flowspeed",
                 1.0,

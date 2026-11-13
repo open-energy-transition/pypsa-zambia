@@ -26,5 +26,3 @@
       topology_generation:
         enable: false
         hydrobasins_level: 9
-        technologies:
-        - Reservoir
