@@ -734,6 +734,44 @@ databundle entry in `configs/zambia_configs/config.zm.validation_dispatch.yaml`:
     version: v1.0
     year: 2013   # adjust to match the weather year in use
 ```
+
+### Automatic cascade topology detection
+
+When automatic cascade topology generation is enabled, the workflow infers
+hydraulic connections between eligible hydropower plants from the HydroBASINS
+drainage topology. Each plant is assigned to a HydroBASINS sub-basin and the
+`NEXT_DOWN` chain is followed until the first downstream sub-basin containing
+another eligible plant is reached. The two plants are then considered directly
+connected in the inferred cascade topology.
+
+The detection is based on the following assumptions:
+
+- plant coordinates correctly locate each hydropower plant within its
+  corresponding HydroBASINS sub-basin;
+- the HydroBASINS downstream topology is a suitable approximation of the natural
+  hydraulic connectivity between plants;
+- intermediate sub-basins without another modelled hydropower plant can be
+  traversed until the next downstream plant is found;
+- the first eligible plant encountered downstream is the direct downstream
+  neighbour in the inferred cascade;
+- plants located within the same HydroBASINS polygon cannot be reliably ordered
+  from HydroBASINS alone and are reported as ambiguous rather than assigned
+  automatically.
+
+The inferred topology follows the natural downstream drainage path rather than
+requiring plants to lie on the same named river. For example, a plant on a
+tributary can be hydraulically upstream of a plant located below a confluence.
+
+The resulting topology should therefore be interpreted as a hydrologically
+inferred topology, not as a complete reconstruction of hydropower infrastructure.
+Engineered connections that are not represented by the natural drainage network,
+such as canals, tunnels, diversions, pumping connections, or inter-basin
+transfers, cannot be inferred automatically.
+
+The current automatic cascade topology workflow identifies reservoir
+hydropower plants, matching the reservoir-only downstream cascade
+representation. Run-of-river plants are outside the current scope.
+
 ## Power Plant Data
 
 PyPSA-Earth populates generators from the global

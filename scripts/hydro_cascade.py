@@ -21,6 +21,32 @@ REQUIRED_TOPOLOGY_COLUMNS = {
 PLANT_ID_COLUMN = "plant_id"
 
 
+def calculate_cascade_routing_hours(
+    upstream_dist_main: float,
+    downstream_dist_main: float,
+    flowspeed: float = 1.0,
+) -> float:
+    """Calculate river-routing time from HydroBASINS DIST_MAIN values."""
+    if flowspeed <= 0 or not math.isfinite(flowspeed):
+        raise ValueError("flowspeed must be positive and finite.")
+
+    upstream_dist_main = float(upstream_dist_main)
+    downstream_dist_main = float(downstream_dist_main)
+
+    if not math.isfinite(upstream_dist_main) or not math.isfinite(downstream_dist_main):
+        raise ValueError("HydroBASINS DIST_MAIN values must be finite.")
+
+    distance_km = upstream_dist_main - downstream_dist_main
+
+    if distance_km < 0:
+        raise ValueError(
+            "Upstream HydroBASINS DIST_MAIN must be greater than or equal "
+            "to downstream DIST_MAIN."
+        )
+
+    return distance_km / (flowspeed * 3.6)
+
+
 def validate_cascade_topology(topology: pd.DataFrame) -> None:
     """
     Validate a directed cascading-hydro topology.
