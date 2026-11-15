@@ -100,6 +100,55 @@ To add a completely new data source to PyPSA-Zambia:
 Maintainers of the repository will create the corresponding `archive`
 entry after reviewing your contribution.
 
+## Publishing datasets on Zenodo
+
+PyPSA-Zambia uses [Zenodo](https://zenodo.org/) to store open datasets and ensure their long-term availability and reproducibility. Dataset upload can be automated through a Python script.
+
+To run this automation for the first time, you'll need to configure Zenodo API authentication following the instructions in `scripts/data_upload/zenodo_upload.py`.
+
+### Preparing a dataset
+
+1. Prepare the dataset file and a corresponding YAML metadata configuration `config.upload.{dataset}.yaml`. See `scripts/data_upload/config.upload.cutout-era5-tutorial.yaml` for an example.
+2. Update dataset metadata in the configuration, such as description, creators, contributors, license, and related identifiers.
+
+The uploader supports both [Zenodo Sandbox](https://sandbox.zenodo.org/) for testing and [production Zenodo](https://zenodo.org/) for permanent archiving.
+
+### Uploading a dataset
+
+To create a new record and upload a dataset to Zenodo Sandbox, run:
+
+```bash
+python scripts/data_upload/zenodo_upload.py scripts/data_upload/config.upload.{dataset}.yaml --upload
+```
+
+For production, additionally specify `--production`:
+
+```bash
+python scripts/data_upload/zenodo_upload.py scripts/data_upload/config.upload.{dataset}.yaml --production --upload
+```
+
+The script creates a draft record and uploads the dataset. **Publication must be completed manually** through the Zenodo web interface after reviewing the metadata and uploaded files.
+
+### Updating dataset metadata
+
+Metadata can be updated independently without re-uploading the dataset. To update an existing record:
+
+1. Specify its `sandbox_record_id` or `production_record_id` in the YAML configuration.
+2. Modify the metadata as required.
+3. Run the script without `--upload`.
+
+For example, to update metadata on production Zenodo:
+
+```bash
+python scripts/data_upload/zenodo_upload.py scripts/data_upload/config.upload.cutout-era5-tutorial.yaml --production
+```
+
+The changes are saved as a draft and must be published manually.
+
+**Note**
+
+After publishing a new dataset, update `data/versions.csv` with the corresponding Zenodo download URL. Published dataset versions should remain accessible to ensure reproducibility of existing modelling results.
+
 
 ## Data inventory
 
