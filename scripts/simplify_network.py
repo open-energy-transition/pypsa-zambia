@@ -92,6 +92,8 @@ from _helpers import (
     add_year_suffix_to_carriers,
     configure_logging,
     create_logger,
+    get_aggregate_carriers,
+    get_base_carrier,
     get_linetype_by_voltage_and_country,
     nearest_shape,
     restore_base_carrier_names,
@@ -433,10 +435,16 @@ def _aggregate_and_move_components(
     cascade_static, cascade_dynamic = pop_cascade_storage_units(n)
 
     if disaggregate_flag:
+        excluded_generator_carriers = {
+            carrier
+            for carrier in n.generators.carrier.unique()
+            if get_base_carrier(carrier) in exclude_carriers
+        }
         excl_gens, excl_gens_pnl = save_excluded_components(
-            n, "Generator", busmap, exclude_carriers
+            n, "Generator", busmap, excluded_generator_carriers
         )
-    carriers = set(n.generators.carrier) - set(exclude_carriers)
+
+    carriers = get_aggregate_carriers(n, exclude_carriers)
     generators, generators_pnl = aggregateoneport(
         n,
         busmap,
@@ -450,25 +458,40 @@ def _aggregate_and_move_components(
         restore_excluded_components(n, "Generator", excl_gens, excl_gens_pnl)
     for one_port in aggregate_one_ports:
         one_port_strategy = one_port_strategies.get(one_port, dict())
-        df, pnl = aggregateoneport(
-            n,
-            busmap,
-            component=one_port,
-            custom_strategies=one_port_strategy,
-        )
-        replace_components(n, one_port, df, pnl)
+
         if one_port == "StorageUnit" and disaggregate_flag:
+            excluded_storage_carriers = {
+                carrier
+                for carrier in n.storage_units.carrier.unique()
+                if get_base_carrier(carrier) in exclude_carriers
+            }
+
             excl_sus, excl_sus_pnl = save_excluded_components(
-                n, "StorageUnit", busmap, exclude_carriers
+                n, "StorageUnit", busmap, excluded_storage_carriers
             )
-            su_carriers = set(n.storage_units.carrier) - set(exclude_carriers)
+
+            su_carriers = set(n.storage_units.carrier) - excluded_storage_carriers
+
             df, pnl = aggregateoneport(
-                n, busmap, component=one_port, carriers=su_carriers
+                n,
+                busmap,
+                component=one_port,
+                carriers=su_carriers,
+                custom_strategies=one_port_strategy,
             )
+
             replace_components(n, one_port, df, pnl)
+
             restore_excluded_components(n, "StorageUnit", excl_sus, excl_sus_pnl)
+
         else:
-            df, pnl = aggregateoneport(n, busmap, component=one_port)
+            df, pnl = aggregateoneport(
+                n,
+                busmap,
+                component=one_port,
+                custom_strategies=one_port_strategy,
+            )
+
             replace_components(n, one_port, df, pnl)
 
     buses_to_del = n.buses.index.difference(busmap)
@@ -486,16 +509,17 @@ def _aggregate_and_move_components(
 
 
 # Filter AC lines to avoid mixing with DC part when processing links
-def contains_ac(ls):
+def contains_ac(n, ls):
     def is_ac_branch(x):
         if x[0] == "Link":
             return n.links.loc[x[1]].dc != True
         elif x[0] == "Line":
             return n.lines.loc[x[1]].dc != True
         else:
-            logger.error("Unknown branch type for the instance {x}")
+            logger.error(f"Unknown branch type for the instance {x}")
+            return False
 
-    return any(list(map(lambda x: is_ac_branch(x), ls)))
+    return any(is_ac_branch(x) for x in ls)
 
 
 def simplify_links(
@@ -582,7 +606,7 @@ def simplify_links(
             for m, ls in G.adj[u].items():
                 # AC lines can be captured in case of complicated network topologies
                 # even despite using `nodes` defined by links
-                if m not in nodes or m in seen or contains_ac(ls):
+                if m not in nodes or m in seen or contains_ac(n, ls):
                     continue
 
                 buses = [u, m]
@@ -592,7 +616,7 @@ def simplify_links(
                     seen.add(m)
                     for m2, ls2 in G.adj[m].items():
                         # there may be AC lines which connect ends of DC chains
-                        if m2 in seen or m2 == u or contains_ac(ls2):
+                        if m2 in seen or m2 == u or contains_ac(n, ls2):
                             continue
                         buses.append(m2)
                         links.append(list(ls2))  # [name for name in ls])
@@ -921,7 +945,12 @@ def drop_isolated_networks(n, threshold):
     load_mean_origin = n.loads_t.p_set.mean().mean()
 
     # duplicated sub-networks mean that there is at least one interconnection between buses
-    p_by_node = n.loads_t.p_set.mean().reindex(n.buses.index, fill_value=0.0)
+    p_by_node = (
+        n.loads_t.p_set.mean()
+        .groupby(n.loads.bus)
+        .sum()
+        .reindex(n.buses.index, fill_value=0.0)
+    )
     p_by_sub = p_by_node.groupby(p_by_node.index.map(n.buses.sub_network)).sum()
 
     small_subs = p_by_sub[p_by_sub < threshold].index
@@ -975,7 +1004,8 @@ def transform_to_gdf(n, network_crs):
     buses_df["bus_id"] = buses_df.index
 
     # load data are crucial to deal with sub-networks
-    buses_df = buses_df.join(n.loads_t.p_set.sum().T.rename("load"))
+    load_by_bus = n.loads_t.p_set.sum().groupby(n.loads.bus).sum()
+    buses_df["load"] = load_by_bus.reindex(buses_df.index, fill_value=0.0)
     buses_df["load_in_subnetw"] = buses_df.groupby(["country", "sub_network"])[
         "load"
     ].transform("sum")
@@ -1129,7 +1159,12 @@ def merge_isolated_networks(n, threshold, aggregation_strategies=dict()):
 
     n.determine_network_topology()
 
-    p_by_node = n.loads_t.p_set.mean().reindex(n.buses.index, fill_value=0.0)
+    p_by_node = (
+        n.loads_t.p_set.mean()
+        .groupby(n.loads.bus)
+        .sum()
+        .reindex(n.buses.index, fill_value=0.0)
+    )
     p_by_sub = p_by_node.groupby(p_by_node.index.map(n.buses.sub_network)).sum()
 
     small_subs = p_by_sub[p_by_sub < threshold].index

@@ -149,7 +149,6 @@ To use them, you need to go through the following steps:
 3. Set-up Copernicus API
 4. run `build_cutout` rule
 
-## Validation
 ## Compatibility with newer PyPSA-Earth versions
 
 Recent PyPSA-Earth updates introduce support for PyPSA 1.x and Snakemake 9,
