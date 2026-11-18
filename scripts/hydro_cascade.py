@@ -11,6 +11,7 @@ import math
 
 import pandas as pd
 import pypsa
+from _helpers import read_csv_nafix
 
 REQUIRED_TOPOLOGY_COLUMNS = {
     "upstream",
@@ -19,6 +20,68 @@ REQUIRED_TOPOLOGY_COLUMNS = {
 }
 
 PLANT_ID_COLUMN = "plant_id"
+
+
+def load_hydro_powerplants(powerplants_path):
+    """Load and normalise hydro plants from the powerplantmatching-style output."""
+    powerplants = read_csv_nafix(powerplants_path, index_col=0)
+
+    hydro = powerplants[
+        powerplants["Fueltype"].astype(str).str.casefold().eq("hydro")
+    ].copy()
+
+    hydro = hydro.rename(
+        columns={
+            "Country": "country",
+            "DamHeight_m": "damheight_m",
+            "projectID": "projectid",
+        }
+    )
+
+    return hydro
+
+
+def calculate_cascade_routing_hours(
+    upstream_dist_main: float,
+    downstream_dist_main: float,
+    river_flow_speed: float = 1.0,
+) -> float:
+    """
+    Calculate river-routing time between cascade plants.
+
+    Parameters
+    ----------
+    upstream_dist_main : float
+        HydroBASINS DIST_MAIN of the upstream plant basin [km].
+    downstream_dist_main : float
+        HydroBASINS DIST_MAIN of the downstream plant basin [km].
+    river_flow_speed : float, optional
+        Effective river flow speed [m/s].
+
+    Returns
+    -------
+    float
+        Estimated travel time between cascade plants [hours].
+    """
+    if river_flow_speed <= 0 or not math.isfinite(river_flow_speed):
+        raise ValueError("river_flow_speed must be positive and finite.")
+
+    upstream_dist_main = float(upstream_dist_main)
+    downstream_dist_main = float(downstream_dist_main)
+
+    if not math.isfinite(upstream_dist_main) or not math.isfinite(downstream_dist_main):
+        raise ValueError("HydroBASINS DIST_MAIN values must be finite.")
+
+    distance_km = upstream_dist_main - downstream_dist_main
+
+    if distance_km < 0:
+        raise ValueError(
+            "Upstream HydroBASINS DIST_MAIN must be greater than or equal "
+            "to downstream DIST_MAIN."
+        )
+
+    # Convert river flow speed from m/s to km/h.
+    return distance_km / (river_flow_speed * 3.6)
 
 
 def validate_cascade_topology(topology: pd.DataFrame) -> None:
