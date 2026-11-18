@@ -282,6 +282,7 @@ def load_relevant_hydrobasins(
 def assign_plants_to_basins(
     powerplants: pd.DataFrame,
     hydrobasins: gpd.GeoDataFrame,
+    geo_crs: str,
 ) -> pd.DataFrame:
     """Assign each hydropower plant to one HydroBASINS basin."""
     required = {"HYBAS_ID", "NEXT_DOWN", "DIST_MAIN", "geometry"}
@@ -299,7 +300,7 @@ def assign_plants_to_basins(
             powerplants["lon"],
             powerplants["lat"],
         ),
-        crs="EPSG:4326",
+        crs=geo_crs,
     ).to_crs(hydrobasins.crs)
 
     matched = gpd.sjoin(
@@ -329,6 +330,7 @@ def assign_plants_to_basins(
 def identify_cascade_connections(
     powerplants: pd.DataFrame,
     hydrobasins: gpd.GeoDataFrame,
+    geo_crs: str,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Identify unambiguous downstream hydropower connections.
@@ -339,7 +341,7 @@ def identify_cascade_connections(
     Plants sharing the same HydroBASINS basin are reported as ambiguous and
     are not ordered automatically.
     """
-    assigned = assign_plants_to_basins(powerplants, hydrobasins)
+    assigned = assign_plants_to_basins(powerplants, hydrobasins, geo_crs=geo_crs)
 
     basins = hydrobasins.set_index("HYBAS_ID")
     next_down = basins["NEXT_DOWN"]
@@ -450,6 +452,7 @@ def build_hydro_cascade_topology(
     output_path,
     candidate_output_path,
     ambiguous_output_path,
+    geo_crs: str,
     technologies=("Reservoir",),
     flowspeed=1.0,
 ):
@@ -498,6 +501,7 @@ def build_hydro_cascade_topology(
     connections, basin_ambiguities = identify_cascade_connections(
         powerplants,
         hydrobasins,
+        geo_crs=geo_crs,
     )
 
     connections["travel_time_hours"] = pd.Series(
@@ -557,4 +561,5 @@ if __name__ == "__main__":
         ambiguous_output_path=snakemake.output.ambiguous,
         technologies=snakemake.params.technologies,
         flowspeed=snakemake.params.flowspeed,
+        geo_crs=snakemake.config["crs"]["geo_crs"],
     )
