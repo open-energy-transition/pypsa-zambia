@@ -9,7 +9,6 @@ Identify candidate cascading-hydropower connections from HydroBASINS.
 """
 
 import logging
-import math
 from pathlib import Path
 
 import geopandas as gpd
@@ -515,7 +514,7 @@ def build_hydro_cascade_topology(
 
     connections["travel_time_hours"] = pd.Series(
         index=connections.index,
-        dtype="int64",
+        dtype="float64",
     )
 
     if not connections.empty:
@@ -530,9 +529,7 @@ def build_hydro_cascade_topology(
             axis=1,
         )
 
-        connections["travel_time_hours"] = routing_hours.map(
-            lambda hours: math.floor(hours + 0.5)
-        ).astype(int)
+        connections["travel_time_hours"] = routing_hours.astype(float)
 
     ambiguous = pd.concat(
         [id_ambiguities, basin_ambiguities],
