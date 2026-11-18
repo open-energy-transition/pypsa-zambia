@@ -80,6 +80,7 @@ def calculate_cascade_routing_hours(
             "to downstream DIST_MAIN."
         )
 
+    # Convert river flow speed from m/s to km/h.
     return distance_km / (river_flow_speed * 3.6)
 
 
