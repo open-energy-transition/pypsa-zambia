@@ -13,11 +13,12 @@ from pathlib import Path
 
 import geopandas as gpd
 import pandas as pd
-from _helpers import configure_logging, read_csv_nafix
+from _helpers import configure_logging
 from hydro_cascade import (
     _parse_qualified_project_ids,
     calculate_cascade_routing_hours,
 )
+from hydro_cascade import load_hydro_powerplants as load_all_hydro_powerplants
 
 logger = logging.getLogger(__name__)
 
@@ -158,18 +159,7 @@ def load_hydro_powerplants(
     tuple[pd.DataFrame, pd.DataFrame]
         Resolved hydropower plants and unresolved plant-ID cases.
     """
-    powerplants = read_csv_nafix(powerplants_path, index_col=0)
-
-    hydro = powerplants[
-        powerplants["Fueltype"].astype(str).str.casefold().eq("hydro")
-    ].copy()
-
-    hydro = hydro.rename(
-        columns={
-            "projectID": "projectid",
-            "DamHeight_m": "damheight_m",
-        }
-    )
+    hydro = load_all_hydro_powerplants(powerplants_path)
 
     if technologies is not None:
         if "Technology" not in hydro.columns:

@@ -20,37 +20,16 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 import xarray as xr
-from _helpers import configure_logging, read_csv_nafix
+from _helpers import configure_logging
 from atlite import hydro as hydrom
 from dask.distributed import Client
 from hydro_cascade import (
+    load_hydro_powerplants,
     match_cascade_plants_to_powerplants,
     validate_cascade_topology,
 )
 
 logger = logging.getLogger(__name__)
-
-
-def load_hydro_powerplants(powerplants_path):
-    """Load hydro plants from the powerplantmatching-style workflow output."""
-    powerplants = read_csv_nafix(
-        powerplants_path,
-        index_col=0,
-    )
-
-    hydro = powerplants[
-        powerplants["Fueltype"].astype(str).str.casefold().eq("hydro")
-    ].copy()
-
-    hydro = hydro.rename(
-        columns={
-            "Country": "country",
-            "DamHeight_m": "damheight_m",
-            "projectID": "projectid",
-        }
-    )
-
-    return hydro
 
 
 def extract_glofas_discharge(

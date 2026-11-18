@@ -11,6 +11,7 @@ import math
 
 import pandas as pd
 import pypsa
+from _helpers import read_csv_nafix
 
 REQUIRED_TOPOLOGY_COLUMNS = {
     "upstream",
@@ -19,6 +20,25 @@ REQUIRED_TOPOLOGY_COLUMNS = {
 }
 
 PLANT_ID_COLUMN = "plant_id"
+
+
+def load_hydro_powerplants(powerplants_path):
+    """Load and normalise hydro plants from the powerplantmatching-style output."""
+    powerplants = read_csv_nafix(powerplants_path, index_col=0)
+
+    hydro = powerplants[
+        powerplants["Fueltype"].astype(str).str.casefold().eq("hydro")
+    ].copy()
+
+    hydro = hydro.rename(
+        columns={
+            "Country": "country",
+            "DamHeight_m": "damheight_m",
+            "projectID": "projectid",
+        }
+    )
+
+    return hydro
 
 
 def calculate_cascade_routing_hours(
