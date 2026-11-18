@@ -24,11 +24,14 @@ logger = logging.getLogger(__name__)
 
 def resolve_stable_plant_ids(powerplants: pd.DataFrame) -> pd.Series:
     """
-    Resolve stable source-qualified identifiers for power plants.
+    Resolve stable identifiers for hydropower plants.
 
-    Identifier sources are ranked from the input data according to how many
-    plants they can identify uniquely. This avoids assuming a specific
-    powerplant database or country.
+    Unique explicit ``plant_id`` values are preferred. Otherwise,
+    source-qualified ``projectid`` values, including those provided by
+    powerplantmatching (PPM) outputs, are used.
+
+    Identifier sources are ranked according to how many plants they can
+    identify uniquely, without assuming a specific database or country.
     """
     explicit_ids = {}
     project_ids = {}
