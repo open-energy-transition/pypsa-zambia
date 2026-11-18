@@ -203,6 +203,7 @@ def load_hydro_powerplants(
 def load_relevant_hydrobasins(
     hydrobasins_path,
     powerplants: pd.DataFrame,
+    geo_crs: str,
 ) -> gpd.GeoDataFrame:
     """
     Load HydroBASINS regions containing the hydropower plants.
@@ -235,21 +236,28 @@ def load_relevant_hydrobasins(
             powerplants["lon"],
             powerplants["lat"],
         ),
-        crs="EPSG:4326",
+        crs=geo_crs,
     )
 
     relevant_paths = []
 
     for path in hydrobasins_paths:
+        # Read the native CRS from the HydroBASINS file metadata.
+        basin_crs = gpd.read_file(path, rows=1).crs
+
+        if basin_crs is None:
+            raise ValueError(f"HydroBASINS file has no CRS: {path}")
+
+        # The bounding box must use the same CRS as the spatial dataset.
+        candidate_plants = plants.to_crs(basin_crs)
+
         candidate_basins = gpd.read_file(
             path,
-            bbox=tuple(plants.total_bounds),
+            bbox=tuple(candidate_plants.total_bounds),
         )
 
         if candidate_basins.empty:
             continue
-
-        candidate_plants = plants.to_crs(candidate_basins.crs)
 
         matches = gpd.sjoin(
             candidate_plants[["geometry"]],
@@ -496,6 +504,7 @@ def build_hydro_cascade_topology(
     hydrobasins = load_relevant_hydrobasins(
         hydrobasins_path,
         powerplants,
+        geo_crs=geo_crs,
     )
 
     connections, basin_ambiguities = identify_cascade_connections(
