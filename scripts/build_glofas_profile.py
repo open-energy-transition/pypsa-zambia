@@ -28,6 +28,7 @@ instead of using a usual atlite workflow based on ERA5
 
 """
 
+import numpy as np
 import pandas as pd
 import xarray as xr
 from _helpers import configure_logging, create_logger
@@ -82,33 +83,49 @@ def extract_inflow_df(
     ppl_hydro_inflow_df.index.name = "time"
     ppl_hydro_inflow_df.columns.name = "plant"
 
-    ppl_hydro_inflow_df.index = pd.to_datetime(ppl_hydro_inflow_df.index)
+    # GloFAS dis24 timestamps mark the end of the preceding 24-hour
+    # averaging period. Shift them to the day represented by the discharge.
+    ppl_hydro_inflow_df.index = pd.to_datetime(
+        ppl_hydro_inflow_df.index
+    ) - np.timedelta64(1, "D")
 
     # To get hydro potential inflow must be multiplied by height, g and a scaling factor
     # TODO Get rid of a scaling factor
     ppl_hydro_inflow_df = ppl_hydro_inflow_df.mul(ppl_height_m, axis="columns")
     ppl_hydro_inflow_df = ppl_hydro_inflow_df * inflow_scaling
 
-    start = snapshots["start"]
-    end = snapshots["end"]
-    snapshots_daily = pd.date_range(start, end, freq="1d")
+    start = pd.Timestamp(snapshots["start"])
+    end = pd.Timestamp(snapshots["end"])
+    inclusive = snapshots.get("inclusive", "left")
 
-    ppl_hydro_daily_cut_inflow_df = ppl_hydro_inflow_df.loc[
-        ppl_hydro_inflow_df.index.isin(snapshots_daily)
-    ]
+    snapshots_hourly = pd.date_range(
+        start,
+        end,
+        freq="1h",
+        inclusive=inclusive,
+    )
+    snapshots_daily = pd.DatetimeIndex(snapshots_hourly.normalize().unique())
 
-    ppl_hydro_daily_cut_inflow_df = ppl_hydro_daily_cut_inflow_df.resample(
-        "1h"
-    ).interpolate(method="linear")
-
-    if ppl_hydro_daily_cut_inflow_df.empty:
-        start_year = snapshots_daily.year.min()
-        end_year = snapshots_daily.year.max()
+    missing_days = snapshots_daily.difference(ppl_hydro_inflow_df.index)
+    if not missing_days.empty:
+        preview = ", ".join(str(timestamp) for timestamp in missing_days[:5])
+        if len(missing_days) > 5:
+            preview += ", ..."
         raise ValueError(
-            f"The inflow dataframe is empty. A likely error is indexes mismatch "
-            f"{ppl_hydro_inflow_df.index.year.min()}-{ppl_hydro_inflow_df.index.year.max()} years available "
-            f"{start_year}-{end_year} years are requested be snapshots"
+            "GloFAS inflow does not cover the requested snapshot period. "
+            f"Missing {len(missing_days)} daily timestamp(s): {preview}"
         )
+
+    ppl_hydro_daily_cut_inflow_df = ppl_hydro_inflow_df.loc[snapshots_daily]
+
+    # Preserve the existing linear interpolation between daily GloFAS values.
+    # The last daily value is extended over the remaining hours of that day.
+    ppl_hydro_daily_cut_inflow_df = (
+        ppl_hydro_daily_cut_inflow_df.resample("1h")
+        .interpolate(method="linear")
+        .reindex(snapshots_hourly)
+        .ffill()
+    )
 
     return ppl_hydro_daily_cut_inflow_df
 
