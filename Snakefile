@@ -882,6 +882,7 @@ if HYDRO_CASCADE_TOPOLOGY_GENERATION.get("enable", False):
     rule build_hydro_cascade_topology:
         params:
             technologies=["Reservoir"],
+            # Effective mean river velocity [m/s]; subject to hydro validation.
             river_flow_speed=HYDRO_CASCADE_TOPOLOGY_GENERATION.get(
                 "river_flow_speed",
                 1.0,
