@@ -32,6 +32,18 @@ def resolve_stable_plant_ids(powerplants: pd.DataFrame) -> pd.Series:
 
     Identifier sources are ranked according to how many plants they can
     identify uniquely, without assuming a specific database or country.
+
+    Custom powerplant records should provide unique, persistent ``plant_id``
+    values. PPM records may instead provide source-qualified ``projectid``
+    metadata. Mixed datasets must not contain duplicate representations of
+    the same physical plant.
+
+    Missing or colliding identifiers remain unresolved. Inferred source
+    priorities depend on the input dataset, so identifier persistence
+    across dataset updates is not guaranteed.
+
+    Plant names and coordinates are not used as identifiers because they
+    are not necessarily unique or stable.
     """
     explicit_ids = {}
     project_ids = {}
@@ -118,7 +130,20 @@ def resolve_stable_plant_ids(powerplants: pd.DataFrame) -> pd.Series:
 
         resolved[idx] = stable_id
 
-    return pd.Series(resolved, dtype="object")
+    resolved = pd.Series(resolved, dtype="object")
+
+    # Detect collisions across explicit and source-qualified identifiers.
+    duplicated = resolved.notna() & resolved.duplicated(keep=False)
+
+    if duplicated.any():
+        logger.warning(
+            "Skipping %d hydropower plants with colliding resolved IDs: %s",
+            int(duplicated.sum()),
+            ", ".join(sorted(resolved.loc[duplicated].unique())),
+        )
+        resolved.loc[duplicated] = None
+
+    return resolved
 
 
 def load_hydro_powerplants(
