@@ -454,7 +454,7 @@ def build_hydro_cascade_topology(
     ambiguous_output_path,
     geo_crs: str,
     technologies=("Reservoir",),
-    flowspeed=1.0,
+    river_flow_speed=1.0,
 ):
     """Build candidate cascade connections from plant and basin data."""
     powerplants, id_ambiguities = load_hydro_powerplants(
@@ -516,7 +516,7 @@ def build_hydro_cascade_topology(
             lambda row: calculate_cascade_routing_hours(
                 basins.at[row["upstream_hybas_id"], "DIST_MAIN"],
                 basins.at[row["downstream_hybas_id"], "DIST_MAIN"],
-                flowspeed=flowspeed,
+                river_flow_speed=river_flow_speed,
             ),
             axis=1,
         )
@@ -560,6 +560,6 @@ if __name__ == "__main__":
         candidate_output_path=snakemake.output.candidates,
         ambiguous_output_path=snakemake.output.ambiguous,
         technologies=snakemake.params.technologies,
-        flowspeed=snakemake.params.flowspeed,
+        river_flow_speed=snakemake.params.river_flow_speed,
         geo_crs=snakemake.config["crs"]["geo_crs"],
     )

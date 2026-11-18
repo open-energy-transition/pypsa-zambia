@@ -24,11 +24,11 @@ PLANT_ID_COLUMN = "plant_id"
 def calculate_cascade_routing_hours(
     upstream_dist_main: float,
     downstream_dist_main: float,
-    flowspeed: float = 1.0,
+    river_flow_speed: float = 1.0,
 ) -> float:
     """Calculate river-routing time from HydroBASINS DIST_MAIN values."""
-    if flowspeed <= 0 or not math.isfinite(flowspeed):
-        raise ValueError("flowspeed must be positive and finite.")
+    if river_flow_speed <= 0 or not math.isfinite(river_flow_speed):
+        raise ValueError("river_flow_speed must be positive and finite.")
 
     upstream_dist_main = float(upstream_dist_main)
     downstream_dist_main = float(downstream_dist_main)
@@ -44,7 +44,7 @@ def calculate_cascade_routing_hours(
             "to downstream DIST_MAIN."
         )
 
-    return distance_km / (flowspeed * 3.6)
+    return distance_km / (river_flow_speed * 3.6)
 
 
 def validate_cascade_topology(topology: pd.DataFrame) -> None:

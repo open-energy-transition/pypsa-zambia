@@ -882,8 +882,8 @@ if HYDRO_CASCADE_TOPOLOGY_GENERATION.get("enable", False):
     rule build_hydro_cascade_topology:
         params:
             technologies=["Reservoir"],
-            flowspeed=config["renewable"]["hydro"]["resource"].get(
-                "flowspeed",
+            river_flow_speed=HYDRO_CASCADE_TOPOLOGY_GENERATION.get(
+                "river_flow_speed",
                 1.0,
             ),
         input:
