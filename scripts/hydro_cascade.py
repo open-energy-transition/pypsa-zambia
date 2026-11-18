@@ -26,7 +26,23 @@ def calculate_cascade_routing_hours(
     downstream_dist_main: float,
     river_flow_speed: float = 1.0,
 ) -> float:
-    """Calculate river-routing time from HydroBASINS DIST_MAIN values."""
+    """
+    Calculate river-routing time between cascade plants.
+
+    Parameters
+    ----------
+    upstream_dist_main : float
+        HydroBASINS DIST_MAIN of the upstream plant basin [km].
+    downstream_dist_main : float
+        HydroBASINS DIST_MAIN of the downstream plant basin [km].
+    river_flow_speed : float, optional
+        Effective river flow speed [m/s].
+
+    Returns
+    -------
+    float
+        Estimated travel time between cascade plants [hours].
+    """
     if river_flow_speed <= 0 or not math.isfinite(river_flow_speed):
         raise ValueError("river_flow_speed must be positive and finite.")
 
