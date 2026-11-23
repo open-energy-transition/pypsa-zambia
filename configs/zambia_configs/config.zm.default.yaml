@@ -214,6 +214,9 @@ validation:
 data:
   bundle_data:
     source: primary
+  demand_cast:
+    source: primary
+    version: v2
   custom-powerplants:
     source: primary
     # parameters of powerplants correspond to the real state of the national power system
