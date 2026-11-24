@@ -79,6 +79,14 @@ renewable:
     resource:
       method: hydro
       hydrobasins: data/hydrobasins_hydroshare/africa-geoglows-atlite.shp
+    cascading:
+      enable: false
+      topology:
+      topology_generation:
+        enable: false
+        hydrobasins_level: 9
+        technologies:
+        - Reservoir
   # TODO Check conflicts resolution
   csp:
     cutout: cutout-2013-era5-tutorial
