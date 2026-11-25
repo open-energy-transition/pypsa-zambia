@@ -468,6 +468,10 @@ renewable:
     cascading:
       enable: false
       topology:
+      topology_generation:
+        enable: false
+        hydrobasins_level: 9
+        river_flow_speed: 1.0 # m/s, effective river speed for cascade routing
   csp:
     cutout: auto
     resource:
