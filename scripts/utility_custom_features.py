@@ -11,6 +11,7 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 import rasterio
+from _helpers import read_csv_nafix
 from pyproj import Transformer
 from rasterio.features import rasterize
 from rasterio.mask import mask
@@ -76,7 +77,7 @@ def load_interconnector_data(countries_path, links_path, substations_path, year=
     *year* is selected.  When *year* is None or not present in the data the
     most recent available year is used as a fallback.
     """
-    countries = pd.read_csv(countries_path)
+    countries = read_csv_nafix(countries_path)
 
     if "year" in countries.columns:
         available_years = countries["year"].unique()
@@ -91,8 +92,8 @@ def load_interconnector_data(countries_path, links_path, substations_path, year=
 
     return (
         countries,
-        pd.read_csv(links_path),
-        pd.read_csv(substations_path),
+        read_csv_nafix(links_path),
+        read_csv_nafix(substations_path),
     )
 
 
