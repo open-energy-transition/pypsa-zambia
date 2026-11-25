@@ -40,6 +40,79 @@ DEFAULT_DAMHEIGHT_M = 5.0  # default reservoir water height
 # HYDRO_MULTIPLIER = 10 * (1e3 * 10.0) / 1e6
 
 
+def allocate_shared_hydraulic_inflow(
+    discharge: pd.DataFrame,
+    plants: pd.DataFrame,
+) -> pd.DataFrame:
+    """
+    Allocate shared river discharge among parallel hydro installations.
+
+    Plants with the same explicit hydraulic_resource_id share one
+    hydraulic resource. Discharge is allocated proportionally to installed
+    capacity, assuming identical hydraulic heads and discharge profiles.
+    """
+    if "hydraulic_resource_id" not in plants.columns:
+        return discharge
+
+    resource_ids = plants["hydraulic_resource_id"].fillna("").astype(str).str.strip()
+
+    allocated = discharge.copy()
+
+    for resource_id, group in plants.loc[resource_ids.ne("")].groupby(resource_ids):
+
+        if len(group) < 2:
+            continue
+
+        capacities = group["p_nom"]
+        heights = group["damheight_m"]
+
+        if not np.isfinite(capacities).all() or (capacities <= 0).any():
+            raise ValueError(
+                f"Invalid capacities for hydraulic resource {resource_id!r}."
+            )
+
+        if (
+            not np.isfinite(heights).all()
+            or (heights <= 0).any()
+            or not np.allclose(heights, heights.iloc[0])
+        ):
+            raise ValueError(
+                f"Inconsistent hydraulic heads for resource {resource_id!r}."
+            )
+
+        if group["technology"].nunique(dropna=False) != 1 or group["technology"].iloc[
+            0
+        ] not in ("Reservoir", "Run-Of-River"):
+            raise ValueError(
+                f"Incompatible hydro technologies for resource {resource_id!r}."
+            )
+
+        profiles = discharge.loc[:, group.index]
+        reference = profiles.iloc[:, 0]
+
+        if not np.allclose(
+            profiles.to_numpy(),
+            reference.to_numpy()[:, None],
+        ):
+            raise ValueError(
+                f"Different discharge profiles for hydraulic resource "
+                f"{resource_id!r}."
+            )
+
+        shares = capacities / capacities.sum()
+
+        allocated[group.index] = profiles.astype(float).mul(shares, axis=1)
+
+        logger.info(
+            "Allocated hydraulic resource %s across %d installations: %s",
+            resource_id,
+            len(group),
+            shares.to_dict(),
+        )
+
+    return allocated
+
+
 def extract_inflow_df(
     snapshots: list,
     ppl_df: pd.DataFrame,
@@ -78,6 +151,12 @@ def extract_inflow_df(
             method="nearest",
         )
         .to_pandas()
+    )
+
+    # Allocate shared discharge before converting it to energy units.
+    ppl_hydro_inflow_df = allocate_shared_hydraulic_inflow(
+        ppl_hydro_inflow_df,
+        ppl_hydro_df,
     )
 
     ppl_hydro_inflow_df.index.name = "time"
