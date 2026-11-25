@@ -22,6 +22,8 @@ This part of documentation collects descriptive release notes to capture the mai
 
 ### Minor Changes and bug-fixing
 
+* Preserve Namibia's country code when reading interconnector data [PR #491](https://github.com/open-energy-transition/pypsa-zambia/pull/491).
+
 * Fix GloFAS hydropower inflow time alignment by accounting for end-of-24-hour-period timestamps and matching the generated hourly profile to the configured snapshots [PR #481](https://github.com/open-energy-transition/pypsa-zambia/pull/481)
 
 
