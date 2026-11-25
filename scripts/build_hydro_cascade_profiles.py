@@ -22,6 +22,10 @@ import pandas as pd
 import xarray as xr
 from _helpers import configure_logging
 from atlite import hydro as hydrom
+from build_glofas_profile import (
+    align_glofas_inflow_to_snapshots,
+    extract_glofas_discharge,
+)
 from dask.distributed import Client
 from hydro_cascade import (
     load_hydro_powerplants,
@@ -30,55 +34,6 @@ from hydro_cascade import (
 )
 
 logger = logging.getLogger(__name__)
-
-
-def extract_glofas_discharge(
-    glofas: xr.Dataset,
-    cascade_powerplants: pd.DataFrame,
-) -> pd.DataFrame:
-    """Extract routed GloFAS discharge [m3/s] at cascade plant locations."""
-    if "dis24" not in glofas:
-        raise ValueError("GloFAS dataset must contain variable 'dis24'.")
-
-    plant_ids = cascade_powerplants.index.astype(str).to_numpy()
-
-    latitudes = xr.DataArray(
-        cascade_powerplants["lat"].to_numpy(),
-        dims="plant",
-        coords={"plant": plant_ids},
-    )
-    longitudes = xr.DataArray(
-        cascade_powerplants["lon"].to_numpy(),
-        dims="plant",
-        coords={"plant": plant_ids},
-    )
-
-    discharge_xr = glofas["dis24"].sel(
-        latitude=latitudes,
-        longitude=longitudes,
-        method="nearest",
-    )
-
-    if "time" in discharge_xr.dims:
-        time_dim = "time"
-    elif "valid_time" in discharge_xr.dims:
-        time_dim = "valid_time"
-    else:
-        raise ValueError(
-            "GloFAS discharge must contain a 'time' or 'valid_time' dimension."
-        )
-
-    discharge = discharge_xr.transpose(time_dim, "plant").to_pandas()
-    discharge.index = pd.DatetimeIndex(discharge.index, name="time")
-
-    # GloFAS dis24 timestamps mark the end of the preceding 24-hour
-    # averaging period. Shift them to the day represented by the discharge.
-    discharge.index = discharge.index - pd.Timedelta(days=1)
-
-    discharge.columns = plant_ids
-    discharge.columns.name = "plant"
-
-    return discharge
 
 
 def build_era5_cascade_hydraulic_inflow(
@@ -472,36 +427,7 @@ def build_glofas_cascade_profile_file(
         multiplier=hydro_config.get("multiplier", 1.0),
     )
 
-    start = pd.Timestamp(snapshots["start"])
-    end = pd.Timestamp(snapshots["end"])
-    inclusive = snapshots.get("inclusive", "left")
-
-    snapshots_hourly = pd.date_range(
-        start,
-        end,
-        freq="1h",
-        inclusive=inclusive,
-    )
-    snapshots_daily = pd.DatetimeIndex(snapshots_hourly.normalize().unique())
-
-    missing_days = snapshots_daily.difference(hydraulic_inflow.index)
-    if not missing_days.empty:
-        preview = ", ".join(str(timestamp) for timestamp in missing_days[:5])
-        if len(missing_days) > 5:
-            preview += ", ..."
-        raise ValueError(
-            "Cascade GloFAS inflow does not cover the requested snapshot period. "
-            f"Missing {len(missing_days)} daily timestamp(s): {preview}"
-        )
-
-    hydraulic_inflow = hydraulic_inflow.loc[snapshots_daily]
-
-    hydraulic_inflow = (
-        hydraulic_inflow.resample("1h")
-        .interpolate(method="linear")
-        .reindex(snapshots_hourly)
-        .ffill()
-    )
+    hydraulic_inflow = align_glofas_inflow_to_snapshots(hydraulic_inflow, snapshots)
 
     profile = xr.DataArray(
         hydraulic_inflow.to_numpy().T,
