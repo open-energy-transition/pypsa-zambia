@@ -12,6 +12,7 @@ import math
 import pandas as pd
 import pypsa
 from _helpers import read_csv_nafix
+from hydro_utils import resolve_hydraulic_heads
 
 REQUIRED_TOPOLOGY_COLUMNS = {
     "upstream",
@@ -503,7 +504,6 @@ def materialize_cascade_storage_units(
         "p_nom",
         "max_hours",
         "efficiency_dispatch",
-        "dam_height_m",
     }
     missing_columns = required - set(static.columns)
     if missing_columns:
@@ -538,16 +538,10 @@ def materialize_cascade_storage_units(
             + ", ".join(unexpected_nodes)
         )
 
-    dam_heights = pd.to_numeric(
-        static.set_index(plant_ids)["dam_height_m"],
-        errors="coerce",
+    hydraulic_heads = resolve_hydraulic_heads(
+        static.set_index(plant_ids),
+        legacy_column="dam_height_m",
     )
-    invalid_heights = dam_heights[dam_heights.isna() | (dam_heights <= 0)]
-    if not invalid_heights.empty:
-        raise ValueError(
-            "Cascade StorageUnits require positive dam heights: "
-            + ", ".join(invalid_heights.index)
-        )
 
     ordered_plant_ids = list(
         dict.fromkeys(topology["upstream"].tolist() + topology["downstream"].tolist())
@@ -624,7 +618,8 @@ def materialize_cascade_storage_units(
             downstream_plant_id=downstream,
             travel_time_hours=float(edge.travel_time_hours),
             downstream_energy_ratio=(
-                float(dam_heights.loc[downstream]) / float(dam_heights.loc[upstream])
+                float(hydraulic_heads.loc[downstream])
+                / float(hydraulic_heads.loc[upstream])
             ),
             spill_cost=spill_cost,
             cyclic_delay=False,
