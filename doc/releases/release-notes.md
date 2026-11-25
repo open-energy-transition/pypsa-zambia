@@ -12,6 +12,8 @@ This part of documentation collects descriptive release notes to capture the mai
 
 ### New Features and Major Changes
 
+* Add reproducible 2023 hydropower validation and inflow sensitivity scenarios [PR #495](https://github.com/open-energy-transition/pypsa-zambia/pull/495).
+
 * Add automatic cascading-hydropower topology generation from HydroBASINS, including downstream connectivity, ambiguity reporting, and estimated travel times [PR #477](https://github.com/open-energy-transition/pypsa-zambia/pull/477).
 
 * Add support for cascading hydropower with explicit reservoir routing, travel-time delays, and local catchment inflows [PR #455](https://github.com/open-energy-transition/pypsa-zambia/pull/455).
