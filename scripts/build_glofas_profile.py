@@ -32,13 +32,102 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 from _helpers import configure_logging, create_logger
-from add_electricity import load_powerplants
 from hydro_utils import resolve_hydraulic_heads
 
 logger = create_logger(__name__)
 
 DEFAULT_DAMHEIGHT_M = 5.0  # default reservoir water height
 # HYDRO_MULTIPLIER = 10 * (1e3 * 10.0) / 1e6
+
+
+def extract_glofas_discharge(
+    glofas: xr.Dataset,
+    powerplants: pd.DataFrame,
+) -> pd.DataFrame:
+    """Extract routed GloFAS discharge [m3/s] at hydropower plant locations."""
+    if "dis24" not in glofas:
+        raise ValueError("GloFAS dataset must contain variable 'dis24'.")
+
+    plant_ids = powerplants.index.to_numpy()
+
+    latitudes = xr.DataArray(
+        powerplants["lat"].to_numpy(),
+        dims="plant",
+        coords={"plant": plant_ids},
+    )
+    longitudes = xr.DataArray(
+        powerplants["lon"].to_numpy(),
+        dims="plant",
+        coords={"plant": plant_ids},
+    )
+
+    discharge_xr = glofas["dis24"].sel(
+        latitude=latitudes,
+        longitude=longitudes,
+        method="nearest",
+    )
+
+    if "time" in discharge_xr.dims:
+        time_dim = "time"
+    elif "valid_time" in discharge_xr.dims:
+        time_dim = "valid_time"
+    else:
+        raise ValueError(
+            "GloFAS discharge must contain a 'time' or 'valid_time' dimension."
+        )
+
+    discharge = discharge_xr.transpose(time_dim, "plant").to_pandas()
+    discharge.index = pd.DatetimeIndex(discharge.index, name="time")
+
+    # GloFAS dis24 timestamps mark the end of the preceding 24-hour
+    # averaging period. Shift them to the day represented by the discharge.
+    discharge.index = discharge.index - pd.Timedelta(days=1)
+
+    discharge.columns = plant_ids
+    discharge.columns.name = "plant"
+
+    return discharge
+
+
+def align_glofas_inflow_to_snapshots(
+    inflow: pd.DataFrame,
+    snapshots: dict,
+) -> pd.DataFrame:
+    """Align daily GloFAS inflows with the requested hourly snapshots."""
+    start = pd.Timestamp(snapshots["start"])
+    end = pd.Timestamp(snapshots["end"])
+    inclusive = snapshots.get("inclusive", "left")
+
+    snapshots_hourly = pd.date_range(
+        start,
+        end,
+        freq="1h",
+        inclusive=inclusive,
+    )
+    snapshots_daily = pd.DatetimeIndex(snapshots_hourly.normalize().unique())
+
+    missing_days = snapshots_daily.difference(inflow.index)
+    if not missing_days.empty:
+        preview = ", ".join(str(timestamp) for timestamp in missing_days[:5])
+        if len(missing_days) > 5:
+            preview += ", ..."
+        raise ValueError(
+            "GloFAS inflow does not cover the requested snapshot period. "
+            f"Missing {len(missing_days)} daily timestamp(s): {preview}"
+        )
+
+    ppl_hydro_daily_cut_inflow_df = inflow.loc[snapshots_daily]
+
+    # Preserve the existing linear interpolation between daily GloFAS values.
+    # The last daily value is extended over the remaining hours of that day.
+    ppl_hydro_daily_cut_inflow_df = (
+        ppl_hydro_daily_cut_inflow_df.resample("1h")
+        .interpolate(method="linear")
+        .reindex(snapshots_hourly)
+        .ffill()
+    )
+
+    return ppl_hydro_daily_cut_inflow_df
 
 
 def allocate_shared_hydraulic_inflow(
@@ -128,94 +217,29 @@ def extract_inflow_df(
     """
     Extract inflow for locations of hydropowerplants
     """
-    glofas_copy_xr = glofas_xr.copy(deep=True)
-
     # TODO Account for the case when there is no hydro generation
     # NB 'technology' contains data on 'Reservoir' and 'Run-Of-River'
     ppl_hydro_df = ppl_df.query("carrier=='hydro'")
 
-    ppl_hydro_lat = xr.DataArray(
-        ppl_hydro_df["lat"].to_numpy(),
-        dims="plant",
-        coords={"plant": ppl_hydro_df.index},
-    )
-
-    ppl_hydro_lon = xr.DataArray(
-        ppl_hydro_df["lon"].to_numpy(),
-        dims="plant",
-        coords={"plant": ppl_hydro_df.index},
-    )
     # Height may be unknown especially for smaller reservoirs
     ppl_height_m = resolve_hydraulic_heads(
         ppl_hydro_df,
         default=DEFAULT_DAMHEIGHT_M,
     )
 
-    # TODO Average by a few cells instead taking only the nearest one
-    ppl_hydro_inflow_df = (
-        glofas_copy_xr["dis24"]
-        .sel(
-            latitude=ppl_hydro_lat,
-            longitude=ppl_hydro_lon,
-            method="nearest",
-        )
-        .to_pandas()
-    )
+    ppl_hydro_inflow_df = extract_glofas_discharge(glofas_xr, ppl_hydro_df)
 
     # Allocate shared discharge before converting it to energy units.
     ppl_hydro_inflow_df = allocate_shared_hydraulic_inflow(
-        ppl_hydro_inflow_df,
-        ppl_hydro_df,
+        ppl_hydro_inflow_df, ppl_hydro_df
     )
-
-    ppl_hydro_inflow_df.index.name = "time"
-    ppl_hydro_inflow_df.columns.name = "plant"
-
-    # GloFAS dis24 timestamps mark the end of the preceding 24-hour
-    # averaging period. Shift them to the day represented by the discharge.
-    ppl_hydro_inflow_df.index = pd.to_datetime(
-        ppl_hydro_inflow_df.index
-    ) - np.timedelta64(1, "D")
 
     # To get hydro potential inflow must be multiplied by height, g and a scaling factor
     # TODO Get rid of a scaling factor
     ppl_hydro_inflow_df = ppl_hydro_inflow_df.mul(ppl_height_m, axis="columns")
     ppl_hydro_inflow_df = ppl_hydro_inflow_df * inflow_scaling
 
-    start = pd.Timestamp(snapshots["start"])
-    end = pd.Timestamp(snapshots["end"])
-    inclusive = snapshots.get("inclusive", "left")
-
-    snapshots_hourly = pd.date_range(
-        start,
-        end,
-        freq="1h",
-        inclusive=inclusive,
-    )
-    snapshots_daily = pd.DatetimeIndex(snapshots_hourly.normalize().unique())
-
-    missing_days = snapshots_daily.difference(ppl_hydro_inflow_df.index)
-    if not missing_days.empty:
-        preview = ", ".join(str(timestamp) for timestamp in missing_days[:5])
-        if len(missing_days) > 5:
-            preview += ", ..."
-        raise ValueError(
-            "GloFAS inflow does not cover the requested snapshot period. "
-            f"Missing {len(missing_days)} daily timestamp(s): {preview}"
-        )
-
-    ppl_hydro_daily_cut_inflow_df = ppl_hydro_inflow_df.loc[snapshots_daily]
-
-    # Preserve the existing linear interpolation between daily GloFAS values.
-    # The last daily value is extended over the remaining hours of that day.
-    ppl_hydro_daily_cut_inflow_df = (
-        ppl_hydro_daily_cut_inflow_df.resample("1h")
-        .interpolate(method="linear")
-        .reindex(snapshots_hourly)
-        .ffill()
-    )
-
-    return ppl_hydro_daily_cut_inflow_df
+    return align_glofas_inflow_to_snapshots(ppl_hydro_inflow_df, snapshots)
 
 
 def transform_to_xr(inflow_df: pd.DataFrame) -> pd.DataFrame:
@@ -238,6 +262,8 @@ def transform_to_xr(inflow_df: pd.DataFrame) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
+    from add_electricity import load_powerplants
+
     if "snakemake" not in globals():
         # TODO Avoid excessive import
         from _helpers import mock_snakemake

@@ -22,6 +22,10 @@ import pandas as pd
 import xarray as xr
 from _helpers import configure_logging
 from atlite import hydro as hydrom
+from build_glofas_profile import (
+    align_glofas_inflow_to_snapshots,
+    extract_glofas_discharge,
+)
 from dask.distributed import Client
 from hydro_cascade import (
     load_hydro_powerplants,
@@ -31,50 +35,6 @@ from hydro_cascade import (
 from hydro_utils import resolve_hydraulic_heads
 
 logger = logging.getLogger(__name__)
-
-
-def extract_glofas_discharge(
-    glofas: xr.Dataset,
-    cascade_powerplants: pd.DataFrame,
-) -> pd.DataFrame:
-    """Extract routed GloFAS discharge [m3/s] at cascade plant locations."""
-    if "dis24" not in glofas:
-        raise ValueError("GloFAS dataset must contain variable 'dis24'.")
-
-    plant_ids = cascade_powerplants.index.astype(str).to_numpy()
-
-    latitudes = xr.DataArray(
-        cascade_powerplants["lat"].to_numpy(),
-        dims="plant",
-        coords={"plant": plant_ids},
-    )
-    longitudes = xr.DataArray(
-        cascade_powerplants["lon"].to_numpy(),
-        dims="plant",
-        coords={"plant": plant_ids},
-    )
-
-    discharge_xr = glofas["dis24"].sel(
-        latitude=latitudes,
-        longitude=longitudes,
-        method="nearest",
-    )
-
-    if "time" in discharge_xr.dims:
-        time_dim = "time"
-    elif "valid_time" in discharge_xr.dims:
-        time_dim = "valid_time"
-    else:
-        raise ValueError(
-            "GloFAS discharge must contain a 'time' or 'valid_time' dimension."
-        )
-
-    discharge = discharge_xr.transpose(time_dim, "plant").to_pandas()
-    discharge.index = pd.DatetimeIndex(discharge.index, name="time")
-    discharge.columns = plant_ids
-    discharge.columns.name = "plant"
-
-    return discharge
 
 
 def build_era5_cascade_hydraulic_inflow(
@@ -446,20 +406,7 @@ def build_glofas_cascade_profile_file(
         multiplier=hydro_config.get("multiplier", 1.0),
     )
 
-    start = snapshots["start"]
-    end = snapshots["end"]
-    snapshots_daily = pd.date_range(start, end, freq="1d")
-
-    hydraulic_inflow = hydraulic_inflow.loc[
-        hydraulic_inflow.index.isin(snapshots_daily)
-    ]
-
-    if hydraulic_inflow.empty:
-        raise ValueError(
-            "The cascade GloFAS inflow dataframe is empty for the requested snapshots."
-        )
-
-    hydraulic_inflow = hydraulic_inflow.resample("1h").interpolate(method="linear")
+    hydraulic_inflow = align_glofas_inflow_to_snapshots(hydraulic_inflow, snapshots)
 
     profile = xr.DataArray(
         hydraulic_inflow.to_numpy().T,
