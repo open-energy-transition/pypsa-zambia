@@ -627,7 +627,11 @@ def materialize_cascade_storage_units(
                 float(dam_heights.loc[downstream]) / float(dam_heights.loc[upstream])
             ),
             spill_cost=spill_cost,
-            cyclic_delay=False,
+            # Preserve hydraulic transfers across cyclic horizon boundaries.
+            cyclic_delay=bool(
+                n.stores.at[f"{upstream} reservoir", "e_cyclic"]
+                and n.stores.at[f"{downstream} reservoir", "e_cyclic"]
+            ),
         )
 
     # Terminal reservoirs still need a free spill path. A negative-sign
