@@ -32,6 +32,7 @@ import numpy as np
 import pandas as pd
 import xarray as xr
 from _helpers import configure_logging, create_logger
+from hydro_utils import resolve_hydraulic_heads
 
 logger = create_logger(__name__)
 
@@ -153,7 +154,12 @@ def allocate_shared_hydraulic_inflow(
             continue
 
         capacities = group["p_nom"]
-        heights = group["damheight_m"]
+        try:
+            heights = resolve_hydraulic_heads(group)
+        except ValueError as exc:
+            raise ValueError(
+                f"Inconsistent hydraulic heads for resource {resource_id!r}."
+            ) from exc
 
         if not np.isfinite(capacities).all() or (capacities <= 0).any():
             raise ValueError(
@@ -216,7 +222,10 @@ def extract_inflow_df(
     ppl_hydro_df = ppl_df.query("carrier=='hydro'")
 
     # Height may be unknown especially for smaller reservoirs
-    ppl_height_m = ppl_hydro_df["damheight_m"].replace(0, DEFAULT_DAMHEIGHT_M)
+    ppl_height_m = resolve_hydraulic_heads(
+        ppl_hydro_df,
+        default=DEFAULT_DAMHEIGHT_M,
+    )
 
     ppl_hydro_inflow_df = extract_glofas_discharge(glofas_xr, ppl_hydro_df)
 

@@ -32,6 +32,7 @@ from hydro_cascade import (
     match_cascade_plants_to_powerplants,
     validate_cascade_topology,
 )
+from hydro_utils import resolve_hydraulic_heads
 
 logger = logging.getLogger(__name__)
 
@@ -63,9 +64,6 @@ def build_era5_cascade_hydraulic_inflow(
     topology["upstream"] = topology["upstream"].astype(str).str.strip()
     topology["downstream"] = topology["downstream"].astype(str).str.strip()
     validate_cascade_topology(topology)
-
-    if "damheight_m" not in hydro_powerplants.columns:
-        raise ValueError("Cascade hydro requires power plant column: damheight_m")
 
     resolution_input = hydro_powerplants.assign(
         _cascade_profile_index=hydro_powerplants.index
@@ -151,16 +149,7 @@ def build_era5_cascade_hydraulic_inflow(
 
     discharge = water_volume_to_discharge(local_water_volume)
 
-    dam_heights = pd.to_numeric(
-        cascade_powerplants["damheight_m"],
-        errors="coerce",
-    )
-    invalid_heights = dam_heights[dam_heights.isna() | (dam_heights <= 0)]
-    if not invalid_heights.empty:
-        raise ValueError(
-            "Cascade plants require positive dam heights: "
-            + ", ".join(invalid_heights.index)
-        )
+    dam_heights = resolve_hydraulic_heads(cascade_powerplants)
 
     hydraulic_inflow = discharge_to_hydraulic_inflow(
         discharge,
@@ -387,17 +376,7 @@ def build_glofas_cascade_hydraulic_inflow(
         routing_hours,
     )
 
-    dam_heights = pd.to_numeric(
-        cascade_powerplants["damheight_m"],
-        errors="coerce",
-    )
-
-    invalid_heights = dam_heights[dam_heights.isna() | (dam_heights <= 0)]
-    if not invalid_heights.empty:
-        raise ValueError(
-            "Cascade plants require positive dam heights: "
-            + ", ".join(invalid_heights.index)
-        )
+    dam_heights = resolve_hydraulic_heads(cascade_powerplants)
 
     hydraulic_inflow = discharge_to_hydraulic_inflow(
         local_discharge,

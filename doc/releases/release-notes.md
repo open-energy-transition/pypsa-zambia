@@ -22,6 +22,8 @@ This part of documentation collects descriptive release notes to capture the mai
 
 ### Minor Changes and bug-fixing
 
+* Support effective hydraulic heads independently of structural dam heights [PR #493](https://github.com/open-energy-transition/pypsa-zambia/pull/493).
+
 * Prevent double counting of shared hydraulic inflows across parallel hydropower installations [PR #492](https://github.com/open-energy-transition/pypsa-zambia/pull/492).
 
 * Fix GloFAS time alignment for cascading hydropower and share preprocessing with conventional hydropower [PR #489](https://github.com/open-energy-transition/pypsa-zambia/pull/489).

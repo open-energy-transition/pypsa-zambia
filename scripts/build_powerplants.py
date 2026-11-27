@@ -139,6 +139,15 @@ Optional columns:
   series within a hydro cascade. Missing or empty values preserve the
   default inflow calculation.
 
+- ``hydraulic_head_m``: effective hydraulic head in metres, distinct
+  from the structural dam height. When provided, this value takes
+  precedence over ``DamHeight_m`` in hydro inflow calculations and
+  cascade energy conversion ratios. Missing values fall back to
+  ``DamHeight_m`` for backward compatibility. Standard GloFAS
+  preprocessing uses a default of 5 m for missing or zero legacy
+  heights, whereas cascade plants require a valid positive head.
+  Explicitly supplied invalid hydraulic heads raise an error.
+
 Considerations for column values:
 
 - ``Fueltype`` should use the corresponding powerplantmatching fuel category, such as ``Natural Gas``.

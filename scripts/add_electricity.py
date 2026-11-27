@@ -105,6 +105,7 @@ from hydro_cascade import (
     match_cascade_plants_to_powerplants,
     validate_cascade_topology,
 )
+from hydro_utils import resolve_hydraulic_heads
 
 logger = create_logger(__name__)
 
@@ -1330,6 +1331,11 @@ def attach_hydro(
 
         if "damheight_m" in hydro.columns:
             n.storage_units.loc[hydro.index, "dam_height_m"] = hydro["damheight_m"]
+
+        if not cascade_hydro.empty:
+            n.storage_units.loc[cascade_hydro.index, "hydraulic_head_m"] = (
+                resolve_hydraulic_heads(cascade_hydro)
+            )
 
         logger.info(
             f"Added {len(hydro)} hydro storage units with {hydro['p_nom'].sum() / 1e3:.2f} GW"

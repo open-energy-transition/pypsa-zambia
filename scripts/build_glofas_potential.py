@@ -32,6 +32,7 @@ import pandas as pd
 import xarray as xr
 from _helpers import configure_logging, create_logger, mock_snakemake
 from add_electricity import load_powerplants
+from hydro_utils import resolve_hydraulic_heads
 
 logger = create_logger(__name__)
 
@@ -67,7 +68,10 @@ def extract_inflow_df(
         coords={"plant": ppl_hydro_df.index},
     )
     # Height may be unknown especially for smaller reservoirs
-    ppl_height_m = ppl_hydro_df["damheight_m"].replace(0, DEFAULT_DAMHEIGHT_M)
+    ppl_height_m = resolve_hydraulic_heads(
+        ppl_hydro_df,
+        default=DEFAULT_DAMHEIGHT_M,
+    )
 
     # TODO Average by a few cells instead taking only the nearest one
     ppl_hydro_inflow_df = (
