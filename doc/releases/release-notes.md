@@ -24,6 +24,8 @@ This part of documentation collects descriptive release notes to capture the mai
 
 * Fix GloFAS hydropower inflow time alignment by accounting for end-of-24-hour-period timestamps and matching the generated hourly profile to the configured snapshots [PR #481](https://github.com/open-energy-transition/pypsa-zambia/pull/481)
 
+* Update DemandCast version[PR #488](https://github.com/open-energy-transition/pypsa-zambia/pull/488)
+
 
 ### New Features and Major Changes from upstream
 
