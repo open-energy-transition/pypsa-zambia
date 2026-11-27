@@ -127,6 +127,18 @@ Required columns:
 ``lat``, ``lon``, ``Duration``, ``Volume_Mm3``, ``DamHeight_m``,
 ``StorageCapacity_MWh``, ``EIC``, and ``projectID``.
 
+Optional columns:
+
+- ``hydraulic_resource_id``: identifies a hydraulic resource shared by
+  parallel hydro installations. When generating GloFAS inflow profiles,
+  installations sharing this identifier receive a fraction of the river
+  discharge proportional to their installed capacity, preventing double
+  counting of the same hydraulic resource. Installations must have
+  consistent hydraulic heads, hydro technologies and discharge profiles.
+  This attribute must not be used to group installations connected in
+  series within a hydro cascade. Missing or empty values preserve the
+  default inflow calculation.
+
 Considerations for column values:
 
 - ``Fueltype`` should use the corresponding powerplantmatching fuel category, such as ``Natural Gas``.
